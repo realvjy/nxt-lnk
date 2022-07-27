@@ -9,13 +9,13 @@ import { HexIcon, HomeIcon } from '../components/icons';
 import vercel from '../public/vercel.svg';
 import PFP from '../public/realvjy-nft.png'
 
-export default function Home() {
-  const x = HexIcon.x
-  console.log(x);
-  return (
-    <>
-      <WebLinks />
-    </>
-  )
+export default function Links() {
+    const x = HexIcon.x
+    console.log(x);
+    return (
+        <>
+            <WebLinks />
+        </>
+    )
 }
 

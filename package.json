@@ -1,4 +1,9 @@
 {
+  "name": "realvjy",
+  "version": "5.0.0",
+  "description": "Design Wizard",
+  "author": "realvjy",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -6,8 +11,22 @@
     "start": "next start"
   },
   "dependencies": {
+    "@react-three/fiber": "^8.2.1",
     "next": "latest",
-    "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "next-seo": "^5.5.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-fast-marquee": "^1.3.2",
+    "react-mailchimp-subscribe": "^2.1.3",
+    "react-particles-js": "^3.6.0",
+    "styled-components": "^5.3.5",
+    "three": "^0.142.0",
+    "use-dark-mode": "^2.3.1",
+    "use-window-size": "^0.0.1"
+  },
+  "devDependencies": {
+    "eslint": "8.19.0",
+    "eslint-config-next": "12.2.2",
+    "prettier": "^2.7.1"
   }
 }
