@@ -7,9 +7,10 @@ import GlobalStyle from "../styles/GlobalStyle";
 import { darkTheme, lightTheme, lfgTheme } from "../styles/theme.config";
 
 function MyApp({ Component, pageProps }) {
+    const { value } = useDarkMode(false, { storageKey: null, onChange: null })
     const [isMounted, setIsMounted] = useState(false)
     const darkmode = useDarkMode(true)
-    const theme = lightTheme
+    const theme = value ? darkTheme : lightTheme
 
     useEffect(() => {
         setIsMounted(true)
@@ -21,7 +22,7 @@ function MyApp({ Component, pageProps }) {
             <Head>
                 <meta content="width=device-width, initial-scale=1" name="viewport" />
                 <link rel="icon" href="/favicon.ico" />
-                <title>Overlayz Studio</title>
+                <title>realvjy | links</title>
             </Head>
             <GlobalStyle />
             <Layout>

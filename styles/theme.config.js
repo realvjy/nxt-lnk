@@ -4,7 +4,7 @@ GlobalStyle
 const light = {
     bg: {
         primary: `var(--white)`,
-        secondary: '#ffffff',
+        secondary: `var(--light-black)`,
         inset: '#e2e4e8',
         input: 'rgba(65,67,78,0.12)',
     },
@@ -21,7 +21,7 @@ const light = {
 const dark = {
     bg: {
         primary: `var(--black)`,
-        secondary: `var(--white)`,
+        secondary: `var(--light-black)`,
         inset: '#111111',
         input: 'rgba(191,193,201,0.12)',
     },

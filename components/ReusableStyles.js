@@ -84,7 +84,7 @@ export const IssueGrid = styled.div`
     @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
         grid-template-columns: repeat(1, 1fr);
         padding: 20px;
-}
+  }
 `
 
 export const ButtonLink = styled.a`
