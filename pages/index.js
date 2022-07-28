@@ -15,7 +15,7 @@ export default function Home() {
     title: 'realvjy ✦ A design wizard',
     excerpt: 'home',
     slug: '/',
-    coverImage: '/preview.jpg'
+    coverImage: 'https://vjy.me/preview.jpg'
   };
   return (
     <>

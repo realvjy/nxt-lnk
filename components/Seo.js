@@ -11,7 +11,7 @@ export default function Seo({ page }) {
                 openGraph={{
                     type: 'website',
                     url: 'https://vjy.me',
-                    title: `${title} | realvjy`,
+                    title: `${title}`,
                     description: 'A Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...',
                     locale: 'en_EN',
                     images: [
@@ -25,7 +25,7 @@ export default function Seo({ page }) {
                 twitter={{
                     handle: '@realvjy',
                     site: 'vjy.me',
-                    cardType: 'realvjy ✦ a design wizard ✦ voyaging in the Metaverse ',
+                    cardType: 'summary_large_image',
                 }}
             />
         </>
