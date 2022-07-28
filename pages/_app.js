@@ -25,7 +25,6 @@ function MyApp({ Component, pageProps }) {
                 <Head>
                     <meta content="width=device-width, initial-scale=1" name="viewport" />
                     <link rel="icon" href="/favicon.ico" />
-                    <title>realvjy | links</title>
                 </Head>
                 <GlobalStyle />
                 <Layout>
