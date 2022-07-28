@@ -1532,6 +1532,11 @@ next@latest:
     "@next/swc-win32-ia32-msvc" "12.2.3"
     "@next/swc-win32-x64-msvc" "12.2.3"
 
+nextjs-google-analytics@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/nextjs-google-analytics/-/nextjs-google-analytics-2.0.0.tgz#390b5f215f5234475af62d55796b9c142803932d"
+  integrity sha512-ugOcdGTa1gM4ZLT1RACniAgOG7syOUIX4Iw8nkC14JhfBEVfwDdZHVG5WiQGJOQKt7TkXeExJ0vIFGR9jf+vwQ==
+
 object-assign@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"

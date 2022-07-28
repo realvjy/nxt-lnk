@@ -8,15 +8,18 @@ import { HexIcon, HomeIcon, NewUp } from '../components/icons';
 
 import vercel from '../public/vercel.svg';
 import PFP from '../public/realvjy-nft.png'
+import Seo from '../components/Seo';
 
 export default function Home() {
-  const x = HexIcon.x
-  console.log(x);
+  const page = {
+    title: 'realvjy ✦ A design wizard',
+    excerpt: 'home',
+    slug: '/',
+    coverImage: '/preview.jpg'
+  };
   return (
     <>
-      <Head>
-        <title>@realvjy - A design Wizard </title>
-      </Head>
+      <Seo page={page} />
       <WebLinks />
     </>
   )

@@ -59,7 +59,6 @@ const Links = () => {
                     return (
                       <Link href={i.url} passHref key={i.title}>
                         <LinkBox className="socialIcon">
-                          {console.log(i.icon)}
                           <img src={i.icon} style={{ filter: 'var(--img)' }} />
                         </LinkBox>
                       </Link>
@@ -330,7 +329,6 @@ const LinkBox = styled.div`
     position: relative;
     text-align: center;
     &:hover{
-      transform: scale(1.01);
       background-color: ${({ theme }) => theme.bg.tertiary};
     }
     .new-up{

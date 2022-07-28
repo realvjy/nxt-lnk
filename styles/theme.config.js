@@ -13,7 +13,7 @@ const light = {
     text: {
         primary: `var(--black)`,
         secondary: `var(--light-black)`,
-        tertiary: '#525560',
+        tertiary: '#646464',
         quarternary: '#9194a1',
         placeholder: 'rgba(82,85,96,0.5)',
         onPrimary: '#ffffff',
