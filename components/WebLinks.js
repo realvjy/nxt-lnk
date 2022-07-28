@@ -7,7 +7,18 @@ import allLinks from "./LinksData";
 import realvjyNFT from "../public/realvjy-nft.png";
 
 const Links = () => {
-
+  const social = allLinks.filter((el) => {
+    return el.type === "social"
+  });
+  const projects = allLinks.filter((el) => {
+    return el.type === "project"
+  });
+  const nfts = allLinks.filter((el) => {
+    return el.type === "nft"
+  });
+  const others = allLinks.filter((el) => {
+    return el.type === "other"
+  });
   return (
     <LinkWrapper>
       <LinkContainer>
@@ -18,6 +29,8 @@ const Links = () => {
                 <HexIcon />
                 <div className="clipped avtar-border">
                 </div>
+                <div className="clipped avtar-border-fill">
+                </div>
                 <img
                   src={'/realvjy-nft.png'}
                   className="clipped"
@@ -26,10 +39,7 @@ const Links = () => {
               </AvatarWrap>
             </Avatar>
             <Title>
-              <img
-                src={'/vijay-verma.svg'}
-                className="name"
-              />
+
               <img
                 src={'/realvjy.svg'}
                 className="handle"
@@ -41,17 +51,76 @@ const Links = () => {
             {/* <h4>Currently building what I love <a href="#">@overlayz</a></h4> */}
           </LinkBio>
           <WebLinkWrap>
-            {
-              allLinks.map((i) => {
-                return (
-                  <Link href={"/"} passHref key={i}>
-                    <LinkBox>
-                      <TwitterIcon /> {i.title} <NewUp />
-                    </LinkBox>
-                  </Link>
-                )
-              })
-            }
+            <LinkSection className="social">
+              <h3>SOCIAL MEDIA</h3>
+              <div className="iconsonly">
+                {
+                  social.map((i) => {
+                    return (
+                      <Link href={i.url} passHref key={i.title}>
+                        <LinkBox className="socialIcon">
+                          {console.log(i.icon)}
+                          <img src={i.icon} style={{ filter: 'var(--img)' }} />
+                        </LinkBox>
+                      </Link>
+                    )
+                  })
+                }
+
+
+              </div>
+            </LinkSection>
+            <NewSection>
+              <Link href={'https://www.figma.com/community/widget/1128028298799358676/Random-Hues'} passHref >
+                <img
+                  src={'/new-randomhue.png'}
+                  className="handle"
+                />
+              </Link>
+
+            </NewSection>
+            <LinkSection>
+              <h3>NFTs</h3>
+              {
+                nfts.map((i) => {
+                  return (
+                    <Link href={i.url} passHref key={i.title}>
+                      <LinkBox>
+                        <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
+                      </LinkBox>
+                    </Link>
+                  )
+                })
+              }
+            </LinkSection>
+            <LinkSection>
+              <h3>Projects</h3>
+              {
+                projects.map((i) => {
+                  return (
+                    <Link href={i.url} passHref key={i.title}>
+                      <LinkBox>
+                        <LinkTitle><img src={i.icon} /> {i.title}</LinkTitle> <NewUp />
+                      </LinkBox>
+                    </Link>
+                  )
+                })
+              }
+            </LinkSection>
+            <LinkSection>
+              <h3>Other</h3>
+              {
+                others.map((i) => {
+                  return (
+                    <Link href={i.url} passHref key={i.title}>
+                      <LinkBox>
+                        <LinkTitle><img src={i.icon} /> {i.title}</LinkTitle> <NewUp />
+                      </LinkBox>
+                    </Link>
+                  )
+                })
+              }
+            </LinkSection>
           </WebLinkWrap>
         </TopPart>
         <BottomPart>
@@ -84,7 +153,7 @@ const LinkHeader = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 150px;
+    margin-top: 60px;
     margin-bottom: 24px;
     @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
        margin-top: 20px;
@@ -111,6 +180,12 @@ const AvatarWrap = styled.div`
         position: absolute;
         background: ${({ theme }) => theme.text.primary};
    }
+   .avtar-border-2{
+        height: calc(100% - 6px);
+        width: calc(100% - 6px);
+        position: absolute;
+        background: ${({ theme }) => theme.bg.primary};
+   }
 `
 
 const Title = styled.div`
@@ -121,10 +196,16 @@ const Title = styled.div`
     }
     .name{
       margin-top: 8px;
+      @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
+        width: 140px;
+      }
     }
     .handle{
-      width: 96px;
+      width: 120px;
       margin-top: 6px;
+      @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
+        width: 92px;
+      }
     }
 `
 
@@ -132,14 +213,14 @@ const LinkBio = styled.div`
     display: flex;
     flex-direction: column;
     h1{
-      font-size: 24px;
-      line-height: 32px;
+      font-size: 22px;
+      line-height: 30px;
       font-weight: 500;
       letter-spacing: -0.6px;
       padding: 0 20px;
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
-        font-size: 18px;
-        line-height: 24px;
+        font-size: 16px;
+        line-height: 20px;
         padding: 0 8px;
 
       }
@@ -147,12 +228,12 @@ const LinkBio = styled.div`
       span{
         font-size: 14px;
         vertical-align: bottom;
-        line-height: 32px;
+        line-height: 30px;
         color: var(--light-black);
         margin: 0 2px;
         @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
           font-size: 10px;
-          line-height: 24px;
+          line-height: 20px;
         }
       }
     }
@@ -181,6 +262,8 @@ const TopPart = styled.div`
     
 `
 
+
+
 const BottomPart = styled.div`
     margin-bottom: 40px;
     
@@ -203,23 +286,104 @@ const LinkFoot = styled.div`
 const WebLinkWrap = styled.div`
     padding: 24px 80px;
     @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
-       padding: 24px 12px;
+       padding: 12px;
+    }
+`
+
+
+const LinkSection = styled.div`
+    padding: 12px 0;
+    display: flex;
+    flex-direction: column;
+    .iconsonly{
+      display: flex;
+      justify-content: center;
+      @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
+        flex-wrap: wrap;
+      }
+    }
+    h3{
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: ${({ theme }) => theme.text.secondary};
+      @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
+        font-size: 12px;
+      }
     }
 `
 
 const LinkBox = styled.div`
-    padding: 12px 20px;
+    padding: 16px 20px;
     border-radius: 12px;
-    border: 1.5px solid ${({ theme }) => theme.bg.secondary};
+    margin: 8px 18px;
+    background: ${({ theme }) => theme.bg.primary};
+    border: 1px solid ${({ theme }) => theme.bg.secondary};
+    flex-direction: row;
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    margin: 18px;
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: -.5px;
+    position: relative;
+    text-align: center;
     &:hover{
       transform: scale(1.01);
+      background-color: ${({ theme }) => theme.bg.tertiary};
+    }
+    .new-up{
+      transform: scale(.8);
+      opacity: .7;
+    }
+    
+    &.socialIcon{
+      background: ${({ theme }) => theme.bg.primary};
+      padding: 16px;
+      border-radius: 50%;
+      border: none;
+      margin: 4px;
+      opacity: .8;
+      img{
+        height: 24px;
+      }
+      &:hover{
+        opacity: 1;
+      }
+      @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
+        padding: 10px;
+        margin: 2px;
+        img{
+          height: 20px;
+        }
+      }
+    }
+    @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
+      padding: 12px 16px;
+      font-size: 16px;
+    }
+`
+const LinkTitle = styled.div`
+  display: flex;
+  align-items: center;
+    img{
+      height: 20px;
+      margin-right: 10px;
+    }
+`
+
+const NewSection = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+    img{
+      width: 100%;
+      border: 1px solid ${({ theme }) => theme.bg.secondary};
+      border-radius: 12px;
+      cursor: pointer;
+      &:hover{
+       transform: scale(1.01);
+      }
     }
 `

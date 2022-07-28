@@ -5,7 +5,7 @@ export const Container = styled.div`
   position: relative;
   align-items: center;
   justify-content: center;
-  width: 600px;
+  width: 650px;
   margin: 0 auto;
   @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
     width: 100%;

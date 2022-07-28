@@ -1,6 +1,13 @@
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
+body.dark-mode {
+  --img: invert(1);
+}
+
+body.light-mode {
+  --img: invert(0);
+} 
 
 
 * {
@@ -20,7 +27,7 @@ const GlobalStyle = createGlobalStyle`
   --light-blue: #B7F2FF;
   
   --white: #FFFFFF;
-  --black: #1A1A1A;
+  --black: #101010;
   --light-black: #808080;
 
   margin: 0;
