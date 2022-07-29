@@ -45,10 +45,11 @@ export default function Seo({ page }) {
                     content: 'IE=edge; chrome=1'
                 }]}
                 robotsProps={{
-                    nosnippet: true,
+                    nosnippet: false,
                     notranslate: true,
                     noimageindex: false,
-                    noarchive: true,
+                    noarchive: false,
+                    notranslate: false,
                     maxSnippet: -1,
                     maxImagePreview: 'large',
                     maxVideoPreview: -1,
