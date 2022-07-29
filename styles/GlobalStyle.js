@@ -28,8 +28,8 @@ body.light-mode {
   
   --white: #FFFFFF;
   --black: #101010;
-  --light-black: #808080;
-
+  --light-black: rgba(0,0,0,.5);
+  --light-white: rgba(255,255,255,.1);
   margin: 0;
   padding: 0;
   border: 0;

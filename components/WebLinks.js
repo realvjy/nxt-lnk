@@ -228,7 +228,7 @@ const LinkBio = styled.div`
         font-size: 14px;
         vertical-align: bottom;
         line-height: 30px;
-        color: var(--light-black);
+        color: ${({ theme }) => theme.text.secondary};
         margin: 0 2px;
         @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
           font-size: 10px;
@@ -269,15 +269,15 @@ const BottomPart = styled.div`
 `
 const LinkFoot = styled.div`
     h4{
-      color: var(--light-black);
+      color: ${({ theme }) => theme.text.secondary};
       line-height: 32px;
       letter-spacing: -.2px;
       span{
         font-size: 12px;
         vertical-align: bottom;
         line-height: 32px;
-        color: var(--light-black);
         margin: 0 2px;
+        opacity: .6;
       }
     }
 `
@@ -316,7 +316,6 @@ const LinkBox = styled.div`
     padding: 16px 20px;
     border-radius: 12px;
     margin: 8px 18px;
-    background: ${({ theme }) => theme.bg.primary};
     border: 1px solid ${({ theme }) => theme.bg.secondary};
     flex-direction: row;
     display: flex;
@@ -337,7 +336,6 @@ const LinkBox = styled.div`
     }
     
     &.socialIcon{
-      background: ${({ theme }) => theme.bg.primary};
       padding: 16px;
       border-radius: 50%;
       border: none;

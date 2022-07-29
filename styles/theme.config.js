@@ -5,14 +5,14 @@ const light = {
     bg: {
         primary: `var(--white)`,
         secondary: `var(--light-black)`,
-        tertiary: "#FAFAFA",
+        tertiary: 'rgba(0,0,0,0.03)',
         border: "#EAEAEA",
         inset: '#e2e4e8',
         input: 'rgba(65,67,78,0.12)',
     },
     text: {
         primary: `var(--black)`,
-        secondary: `var(--light-black)`,
+        secondary: 'rgba(0,0,0,0.5)',
         tertiary: '#646464',
         quarternary: '#9194a1',
         placeholder: 'rgba(82,85,96,0.5)',
@@ -23,15 +23,15 @@ const light = {
 const dark = {
     bg: {
         primary: `var(--black)`,
-        secondary: `var(--light-black)`,
-        tertiary: `var(--light-black)`,
+        secondary: `var(--light-white)`,
+        tertiary: 'rgba(255,255,255,0.03)',
         border: "#EAEAEA",
         inset: '#111111',
         input: 'rgba(191,193,201,0.12)',
     },
     text: {
         primary: `var(--white)`,
-        secondary: '#363636',
+        secondary: 'rgba(255,255,255,0.3)',
         tertiary: '#a9abb6',
         quarternary: '#6c6f7e',
         placeholder: 'rgba(145,148,161,0.5)',
