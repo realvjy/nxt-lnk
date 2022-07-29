@@ -5,7 +5,7 @@ const webLinks = [
     { title: 'Foundation', url: 'https://foundation.app/@realvjy', type: 'nft', icon: '/foundation.svg' },
     { title: 'OpenSea', url: 'https://opensea.io/realvjy', type: 'nft', icon: '/opensea.svg' },
     { title: 'Rarible', url: 'https://rarible.io/realvjy', type: 'nft', icon: '/rarible.svg' },
-    { title: 'Figma', url: 'https://vijayverma.co', type: 'social', icon: '/figma.svg' },
+    { title: 'Figma', url: 'https://figma.co/@realvjy', type: 'social', icon: '/figma.svg' },
     { title: 'Instagram', url: 'https://instagram.com/realvjy', type: 'social', icon: '/insta.svg' },
     { title: 'Medium', url: 'https://medium.com/@realvjy', type: 'social', icon: '/medium.svg' },
     { title: 'Dribbble', url: 'https://dribbble.com/realvjy', type: 'social', icon: '/dribbble.svg' },
