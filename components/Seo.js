@@ -6,7 +6,10 @@ export default function Seo({ page }) {
         <>
             <NextSeo
                 title={title}
-                description={excerpt}
+
+                titleTemplate="realvjy ✦ A design wizard"
+                defaultTitle="realvjy ✦ A design wizard"
+                description='A Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...'
                 canonical={`https://vjy.me`}
                 openGraph={{
                     type: 'website',
@@ -16,7 +19,9 @@ export default function Seo({ page }) {
                     locale: 'en_EN',
                     images: [
                         {
-                            url: coverImage,
+                            width: 1200,
+                            height: 630,
+                            url: `https://vjy.me/preview.jpg`,
                             alt: `${title}`,
                         },
                     ],
@@ -27,6 +32,13 @@ export default function Seo({ page }) {
                     site: 'vjy.me',
                     cardType: 'summary_large_image',
                 }}
+                additionalMetaTags={[{
+                    name: 'keywords',
+                    content: 'designer, product designer, illustrator, indian designer, vijay verma, realvjy, illlustrations, indian illustrator, ui designer india, design head india, sushi design system, zomato designer, 3dicons, uiprint, vijay realvjy, indian ui designer, design india, overlayz, eversend'
+                }, {
+                    httpEquiv: 'x-ua-compatible',
+                    content: 'IE=edge; chrome=1'
+                }]}
             />
         </>
     );
