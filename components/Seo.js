@@ -34,11 +34,25 @@ export default function Seo({ page }) {
                 }}
                 additionalMetaTags={[{
                     name: 'keywords',
-                    content: 'designer, product designer, illustrator, indian designer, vijay verma, realvjy, illlustrations, indian illustrator, ui designer india, design head india, sushi design system, zomato designer, 3dicons, uiprint, vijay realvjy, indian ui designer, design india, overlayz, eversend'
-                }, {
+                    content: 'designer, product designer, illustrator, indian designer, vijay verma, realvjy, illlustrations, indian illustrator, ui designer india, sushi design system, zomato designer, 3dicons, uiprint, vijay realvjy, indian ui designer, design india, overlayz, nft art'
+                },
+                {
+                    name: 'twitter:image',
+                    content: `https://vjy.me/preview.jpg`
+                },
+                {
                     httpEquiv: 'x-ua-compatible',
                     content: 'IE=edge; chrome=1'
                 }]}
+                robotsProps={{
+                    nosnippet: true,
+                    notranslate: true,
+                    noimageindex: false,
+                    noarchive: true,
+                    maxSnippet: -1,
+                    maxImagePreview: 'large',
+                    maxVideoPreview: -1,
+                }}
             />
         </>
     );
