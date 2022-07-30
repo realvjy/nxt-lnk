@@ -6,7 +6,6 @@ export default function Seo({ page }) {
         <>
             <NextSeo
                 title={title}
-
                 titleTemplate="realvjy ✦ A design wizard"
                 defaultTitle="realvjy ✦ A design wizard"
                 description='A Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...'

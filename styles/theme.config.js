@@ -9,6 +9,7 @@ const light = {
         border: "#EAEAEA",
         inset: '#e2e4e8',
         input: 'rgba(65,67,78,0.12)',
+        hover: 'linear-gradient(270deg, #FFF7FB 0%, #F8FAFF 100%);',
     },
     text: {
         primary: `var(--black)`,
@@ -21,6 +22,7 @@ const light = {
     img: {
         filter: 'invert(0)'
     },
+
 }
 
 const dark = {
@@ -31,6 +33,7 @@ const dark = {
         border: "#EAEAEA",
         inset: '#111111',
         input: 'rgba(191,193,201,0.12)',
+        hover: 'linear-gradient(270deg, #131628 0%, #27141C 100%);',
     },
     text: {
         primary: `var(--white)`,
