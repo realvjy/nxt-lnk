@@ -5,8 +5,6 @@ import { NextSeo } from 'next-seo';
 import WebLinks from '../components/WebLinks';
 import Header from '../components/Header';
 import { HexIcon, HomeIcon, NewUp } from '../components/icons';
-import vercel from '../public/vercel.svg';
-import PFP from '../public/realvjy-nft.png'
 import Seo from '../components/Seo';
 
 export default function Links() {

@@ -100,43 +100,6 @@ export const ButtonLink = styled.a`
     background: linear-gradient(262.31deg, #06F1F8 1.86%, #2F8FFF 27.73%, #FF3382 68.97%, #FFBD6F 99.88%);
     transition: all .3s;
     position: relative;
-    overflow: hidden;
-    box-shadow: 
-        inset 12px 2px 10px #FFBD6F;
-    &:active{
-        background:  rgb(218, 221, 224);
-        background: linear-gradient(262.31deg, #06F1F8 1.86%, #2F8FFF 37.6%, #FF3382 77.73%, #FFBD6F 99.88%), #D9D9D9;
-        box-shadow: 
-        -2px -7px 20px rgba(255, 189, 111, 0.8), 
-        4px 6px 20px #2F8FFF,
-        inset -6px -2px 8px #06F1F8, 
-        inset 4px 6px 8px #FFBD6F;
-      transition: all .3s;
-      transform: scale(.95);
-    }
-    &:hover::after {
-      content: '';
-      display: block;
-      width: 35px;
-      height: 175%;
-      background: rgb(255,255,255);
-      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 25%, rgba(255,255,255,1) 50%, rgba(255,255,255,1) 75%, rgba(255,255,255,0) 100%);
-      opacity: 0.5;
-      position: absolute;
-      top: -20px;
-      left: 0;
-      animation: shine 200ms linear;
-      filter: blur(12px);
-      transform: translateX(250px) rotate(-25deg);
-    }
-    @keyframes shine {
-      0% {
-        transform: translateX(-30px) rotate(-25deg);
-      }
-      
-      100% {
-        transform: translateX(250px) rotate(-25deg);
-      }
-    }
+ 
 
 `

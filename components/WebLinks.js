@@ -4,7 +4,7 @@ import { Button, ButtonLink, Container, StyledLink } from "./ReusableStyles";
 import Link from "next/link";
 import { ChevronRightIcon, HexIcon, HomeIcon, TwitterIcon, NewUp } from './icons';
 import allLinks from "./LinksData";
-import realvjyNFT from "../public/realvjy-nft.png";
+import realvjyNFT from "../public/avatar.png";
 
 const Links = () => {
   const social = allLinks.filter((el) => {
@@ -32,7 +32,7 @@ const Links = () => {
                 <div className="clipped avtar-border-fill">
                 </div>
                 <img
-                  src={'/realvjy-nft.png'}
+                  src={'/avatar.png'}
                   className="clipped"
                 />
 
@@ -327,8 +327,25 @@ const LinkBox = styled.div`
     letter-spacing: -.5px;
     position: relative;
     text-align: center;
+    position: relative;
+    
+    &::before{
+      content: "";
+      border-radius: 12px;
+      display: block;
+      position: absolute;
+      z-index: -1;
+      inset: -2px;
+      opacity: 0;
+      transform: scale(0.8);
+    }
     &:hover{
-      background-color: ${({ theme }) => theme.bg.tertiary};
+      &::before{
+        opacity: 1;
+        background: ${({ theme }) => theme.bg.hover};
+        transition: all 333ms ease 0s;
+        transform: scale(1);
+      }
     }
     .new-up{
       transform: scale(.8);

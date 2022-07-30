@@ -7,7 +7,6 @@ import Header from '../components/Header';
 import { HexIcon, HomeIcon, NewUp } from '../components/icons';
 
 import vercel from '../public/vercel.svg';
-import PFP from '../public/realvjy-nft.png'
 import Seo from '../components/Seo';
 
 export default function Home() {
@@ -19,7 +18,7 @@ export default function Home() {
   };
   return (
     <>
-      {/* <Seo page={page} /> */}
+      <Seo page={page} />
       <WebLinks />
     </>
   )
