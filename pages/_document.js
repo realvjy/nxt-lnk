@@ -39,14 +39,13 @@ export default class MyDocument extends Document {
                         crossOrigin="true"
                     />
                     <link
-                        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700"
+                        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=optional"
                         rel="stylesheet"
                     />
 
                 </Head>
                 <body>
 
-                    <script src="noflash.js" />
                     <Main />
                     <NextScript />
                 </body>
