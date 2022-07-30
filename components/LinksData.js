@@ -4,7 +4,7 @@ const webLinks = [
     { title: 'Twitter', url: 'https://twitter.com/realvjy', type: 'social', icon: '/twitter.svg' },
     { title: 'Foundation', url: 'https://foundation.app/@realvjy', type: 'nft', icon: '/foundation.svg' },
     { title: 'OpenSea', url: 'https://opensea.io/realvjy', type: 'nft', icon: '/opensea.svg' },
-    { title: 'Rarible', url: 'https://rarible.io/realvjy', type: 'nft', icon: '/rarible.svg' },
+    { title: 'Rarible', url: 'https://rarible.com/realvjy', type: 'nft', icon: '/rarible.svg' },
     { title: 'Figma', url: 'https://figma.com/@realvjy', type: 'social', icon: '/figma.svg' },
     { title: 'Instagram', url: 'https://instagram.com/realvjy', type: 'social', icon: '/insta.svg' },
     { title: 'Medium', url: 'https://medium.com/@realvjy', type: 'social', icon: '/medium.svg' },

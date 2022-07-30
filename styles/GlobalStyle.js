@@ -27,7 +27,10 @@ body.light-mode {
   --light-blue: #B7F2FF;
   
   --white: #FFFFFF;
-  --black: #101010;
+  --white20: #ecedee;
+  --black: #11181C;
+  --light-gray: #858585;
+  --gray: #687076;
   --light-black: rgba(0,0,0,.5);
   --light-white: rgba(255,255,255,.1);
   margin: 0;
@@ -38,6 +41,8 @@ body.light-mode {
   box-sizing: border-box;
   line-height: normal;
   transition: all .1s ease;
+  
+  
 }
 
 html{
@@ -70,9 +75,7 @@ a{
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  /* @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
-    width: 100%;
-  } */
+  
 }
 
 .clipped{
@@ -82,6 +85,8 @@ a{
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+   
 `;
 
 export default GlobalStyle;

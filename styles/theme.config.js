@@ -18,6 +18,9 @@ const light = {
         placeholder: 'rgba(82,85,96,0.5)',
         onPrimary: '#ffffff',
     },
+    img: {
+        filter: 'invert(0)'
+    },
 }
 
 const dark = {
@@ -36,6 +39,9 @@ const dark = {
         quarternary: '#6c6f7e',
         placeholder: 'rgba(145,148,161,0.5)',
         onPrimary: '#050505',
+    },
+    img: {
+        filter: 'invert(1)'
     },
     // ...
 }

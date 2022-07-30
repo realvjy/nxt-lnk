@@ -19,7 +19,7 @@ export default function Home() {
   };
   return (
     <>
-      <Seo page={page} />
+      {/* <Seo page={page} /> */}
       <WebLinks />
     </>
   )
