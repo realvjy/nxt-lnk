@@ -57,11 +57,11 @@ const Links = () => {
                 {
                   social.map((i) => {
                     return (
-                      <Link href={i.url} passHref key={i.title}>
+                      <a href={i.url} key={i.title}>
                         <LinkBox className="socialIcon">
                           <img src={i.icon} style={{ filter: 'var(--img)' }} />
                         </LinkBox>
-                      </Link>
+                      </a>
                     )
                   })
                 }
@@ -77,6 +77,7 @@ const Links = () => {
                   return (
                     <Link href={i.url} passHref key={i.title}>
                       <LinkBox>
+
                         <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
                       </LinkBox>
                     </Link>
