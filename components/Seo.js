@@ -6,15 +6,15 @@ export default function Seo({ page }) {
         <>
             <NextSeo
                 title={title}
-                titleTemplate="realvjy ✦ A design wizard"
-                defaultTitle="realvjy ✦ A design wizard"
-                description='A Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...'
+                titleTemplate="realvjy ✦ design wizard"
+                defaultTitle="realvjy ✦ design wizard"
+                description='Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...'
                 canonical={`https://vjy.me`}
                 openGraph={{
                     type: 'website',
                     url: 'https://vjy.me',
                     title: `${title}`,
-                    description: 'A Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...',
+                    description: 'Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...',
                     locale: 'en_EN',
                     images: [
                         {

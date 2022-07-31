@@ -32,7 +32,7 @@ function MyApp({ Component, pageProps }) {
                 <GlobalStyle />
                 <Layout>
                     <DefaultSeo
-                        description='A Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...'
+                        description='Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...'
                         canonical={`https://vjy.me`}
                         {...SEO}
                         additionalMetaTags={[{
@@ -49,7 +49,7 @@ function MyApp({ Component, pageProps }) {
                         },
                         {
                             name: 'twitter:description',
-                            content: 'A Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...'
+                            content: 'Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...'
                         },
                         {
                             httpEquiv: 'x-ua-compatible',

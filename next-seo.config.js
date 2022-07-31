@@ -2,9 +2,9 @@ export default {
     openGraph: {
         type: 'website',
         locale: 'en_IE',
-        title: 'realvjy ✦ A design wizard',
+        title: 'realvjy ✦ design wizard',
         url: 'https://vjy.me',
-        description: 'A Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...',
+        description: 'Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...',
         locale: 'en_EN',
         images: [
             {

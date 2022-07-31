@@ -49,7 +49,7 @@ html{
     scroll-behavior: smooth;
 }
 body {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Inter', sans-serif;
   background: ${({ theme }) => theme.bg.primary};
   color: ${({ theme }) => theme.text.primary};
   text-rendering: optimizeLegibility;

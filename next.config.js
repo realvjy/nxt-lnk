@@ -2,7 +2,14 @@
 const nextConfig = {
     reactStrictMode: true,
     swcMinify: true,
-    optimizeFonts: false,
+    optimizeFonts: false, async rewrites() {
+        return [
+            {
+                source: '/(tw|lnk|ins|fb|db)',
+                destination: '/links',
+            },
+        ]
+    },
 }
 
 module.exports = nextConfig

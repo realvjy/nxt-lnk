@@ -47,7 +47,7 @@ const Links = () => {
             </Title>
           </LinkHeader>
           <LinkBio>
-            <h1>A Design Wizard <span>✦</span> Making Open source designs 2D/3D <span>✦</span> Creating NFT arts <span>✦</span> Voyaging in the Metaverse</h1>
+            <h1>Design Wizard <span>✦</span> Making Open source designs 2D/3D <span>✦</span> Creating NFT arts <span>✦</span> Voyaging in the Metaverse</h1>
             {/* <h4>Currently building what I love <a href="#">@overlayz</a></h4> */}
           </LinkBio>
           <WebLinkWrap>
@@ -212,7 +212,7 @@ const LinkBio = styled.div`
     display: flex;
     flex-direction: column;
     h1{
-      font-size: 22px;
+      font-size: 20px;
       line-height: 30px;
       font-weight: 500;
       letter-spacing: -0.6px;
@@ -225,7 +225,7 @@ const LinkBio = styled.div`
       }
       vertical-align: middle;
       span{
-        font-size: 14px;
+        font-size: 12px;
         vertical-align: bottom;
         line-height: 30px;
         color: ${({ theme }) => theme.text.secondary};
@@ -272,12 +272,20 @@ const LinkFoot = styled.div`
       color: ${({ theme }) => theme.text.secondary};
       line-height: 32px;
       letter-spacing: -.2px;
-      span{
+      font-size: 16px;
+      font-weight: 500;
+      @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
         font-size: 12px;
+      }
+      span{
+        font-size: 10px;
         vertical-align: bottom;
         line-height: 32px;
         margin: 0 2px;
         opacity: .6;
+        @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
+          font-size: 8px;
+        }
       }
     }
 `
@@ -302,18 +310,19 @@ const LinkSection = styled.div`
       }
     }
     h3{
-      font-size: 13px;
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 3px;
+      letter-spacing: 4px;
+      margin-bottom: 4px;
       color: ${({ theme }) => theme.text.secondary};
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
-        font-size: 12px;
+        font-size: 11px;
       }
     }
 `
 
 const LinkBox = styled.div`
-    padding: 16px 20px;
+    padding: 18px 20px;
     border-radius: 12px;
     margin: 8px 18px;
     border: 1px solid ${({ theme }) => theme.bg.secondary};
@@ -322,7 +331,7 @@ const LinkBox = styled.div`
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     letter-spacing: -.5px;
     position: relative;
@@ -340,6 +349,8 @@ const LinkBox = styled.div`
       transform: scale(0.8);
     }
     &:hover{
+    transition: all 333ms ease 0s;
+    border-color: transparent;
       &::before{
         opacity: 1;
         background: ${({ theme }) => theme.bg.hover};
@@ -379,7 +390,11 @@ const LinkBox = styled.div`
 `
 const LinkTitle = styled.div`
   display: flex;
+  font-size: 18px;
   align-items: center;
+    @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
+      font-size: 14px;
+    }
     img{
       height: 20px;
       margin-right: 10px;
