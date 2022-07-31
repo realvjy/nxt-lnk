@@ -15,6 +15,7 @@ const webLinks = [
     { title: 'Illlustrations', url: 'https://illlustrations.co', type: 'project', icon: '/illlustrations.png' },
     { title: 'Gumraod', url: 'https://realvjy.gumroad.com/', type: 'other', icon: '/gumroad.png' },
     { title: 'Linkedin', url: 'https://www.linkedin.com/in/realvjy/', type: 'social', icon: '/linkedin.svg' },
+    { title: 'Buy Me a Coffee', url: 'https://www.buymeacoffee.com/realvjy', type: 'other', icon: '/bmc.png' },
     { title: 'Website', url: 'https://vijayverma.co', type: 'other', icon: '/vjy.png' }
 ];
 

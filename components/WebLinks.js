@@ -69,15 +69,7 @@ const Links = () => {
 
               </div>
             </LinkSection>
-            <NewSection>
-              <Link href={'https://www.figma.com/community/widget/1128028298799358676/Random-Hues'} passHref >
-                <img
-                  src={'/new-randomhue.png'}
-                  className="handle"
-                />
-              </Link>
 
-            </NewSection>
             <LinkSection>
               <h3>NFTs</h3>
               {
@@ -93,7 +85,16 @@ const Links = () => {
               }
             </LinkSection>
             <LinkSection>
-              <h3>Projects</h3>
+              <h3>Featured Projects</h3>
+              <NewSection>
+                <Link href={'https://www.figma.com/community/widget/1128028298799358676/Random-Hues'} passHref >
+                  <img
+                    src={'/new-randomhue.png'}
+                    className="handle"
+                  />
+                </Link>
+
+              </NewSection>
               {
                 projects.map((i) => {
                   return (
@@ -305,6 +306,7 @@ const LinkSection = styled.div`
     .iconsonly{
       display: flex;
       justify-content: center;
+      margin-bottom: 8px;
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
         flex-wrap: wrap;
       }
@@ -368,13 +370,10 @@ const LinkBox = styled.div`
       border-radius: 50%;
       border: none;
       margin: 4px;
-      opacity: .8;
       img{
         height: 24px;
       }
-      &:hover{
-        opacity: 1;
-      }
+     
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
         padding: 10px;
         margin: 2px;

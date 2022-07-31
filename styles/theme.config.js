@@ -9,7 +9,7 @@ const light = {
         border: "#EAEAEA",
         inset: '#e2e4e8',
         input: 'rgba(65,67,78,0.12)',
-        hover: 'linear-gradient(270deg, #FFF7FB 0%, #F8FAFF 100%);',
+        hover: 'linear-gradient(270deg, #FFF7FB 0%, #F4F8FF 100%);',
     },
     text: {
         primary: `var(--black)`,

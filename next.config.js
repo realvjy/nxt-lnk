@@ -5,7 +5,7 @@ const nextConfig = {
     optimizeFonts: false, async rewrites() {
         return [
             {
-                source: '/(tw|lnk|ins|fb|db)',
+                source: '/(tw|lnk|ins|fb|db|insta|be)',
                 destination: '/links',
             },
         ]
