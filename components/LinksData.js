@@ -13,7 +13,7 @@ const webLinks = [
     { title: '3dicons', url: 'https://3dicons.co', type: 'project', icon: '/3dicons.png' },
     { title: 'Designletter', url: 'https://vijayverma.co', type: 'project', icon: '/designletter.png' },
     { title: 'Illlustrations', url: 'https://illlustrations.co', type: 'project', icon: '/illlustrations.png' },
-    { title: 'Gumraod', url: 'https://realvjy.gumroad.com/', type: 'other', icon: '/gumroad.png' },
+    { title: 'Gumroad', url: 'https://realvjy.gumroad.com/', type: 'other', icon: '/gumroad.png' },
     { title: 'Linkedin', url: 'https://www.linkedin.com/in/realvjy/', type: 'social', icon: '/linkedin.svg' },
     { title: 'Buy Me a Coffee', url: 'https://www.buymeacoffee.com/realvjy', type: 'other', icon: '/bmc.png' },
     { title: 'Website', url: 'https://vijayverma.co', type: 'other', icon: '/vjy.png' }
