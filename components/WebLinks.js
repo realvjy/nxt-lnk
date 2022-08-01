@@ -1,24 +1,48 @@
+// Weblinks Page Sections
+// created by @realvjy
+// date: 29 Jul, 2022
+
 import Image from "next/image";
 import styled from "styled-components";
 import { Button, ButtonLink, Container, StyledLink } from "./ReusableStyles";
 import Link from "next/link";
-import { ChevronRightIcon, HexIcon, HomeIcon, TwitterIcon, NewUp } from './icons';
+import { ChevronRightIcon, HexIcon, HomeIcon, TwitterIcon, NewUp, OvalIcon } from './icons';
 import allLinks from "./LinksData";
+import bioData from "./BioData";
 import realvjyNFT from "../public/avatar.png";
 
 const Links = () => {
+
+  // Collect user info from bioData
+  const name = bioData[0].name;
+  const username = bioData[0].username;
+  const titleImg = bioData[0].titleImg;
+  const avatarImg = bioData[0].avatar;
+  const description = bioData[0].description;
+  const current = bioData[0].current;
+
+  // Check what class to use oval or hex for avatar
+  const avatarShape = bioData[0].nftAvatar ? `nft-clipped` : `oval-clipped`
+
+  // Collect all links filter by type - social, project, nft and other
   const social = allLinks.filter((el) => {
     return el.type === "social"
   });
   const projects = allLinks.filter((el) => {
     return el.type === "project"
   });
+
+  const newProduct = bioData[0].newProduct; // checking for newProduct flag true false
+  const newProductUrl = bioData[0].newProductUrl; // get product url if available
+
+
   const nfts = allLinks.filter((el) => {
     return el.type === "nft"
   });
   const others = allLinks.filter((el) => {
     return el.type === "other"
   });
+
   return (
     <LinkWrapper>
       <LinkContainer>
@@ -27,32 +51,45 @@ const Links = () => {
             <Avatar>
               <AvatarWrap>
                 <HexIcon />
-                <div className="clipped avtar-border">
+                <OvalIcon />
+                <div className={`${avatarShape} avatar-border`}>
                 </div>
-                <div className="clipped avtar-border-fill">
+                <div className={`${avatarShape} avatar-fill`}>
                 </div>
                 <img
-                  src={'/avatar.png'}
-                  className="clipped"
+                  src={avatarImg}
+                  className={avatarShape}
                 />
 
               </AvatarWrap>
             </Avatar>
             <Title>
-
+              {/* Uncomment h1, h3 or both if you don't want to use image as title */}
               <img
-                src={'/realvjy.svg'}
+                src={titleImg}
                 className="handle"
               />
+              {/* <h1>{username}</h1>
+              <h3>{name}</h3> */}
+
             </Title>
           </LinkHeader>
           <LinkBio>
-            <h1>Design Wizard <span>✦</span> Making Open source designs 2D/3D <span>✦</span> Creating NFT arts <span>✦</span> Voyaging in the Metaverse</h1>
-            {/* <h4>Currently building what I love <a href="#">@overlayz</a></h4> */}
+            <h1>
+              {/* {description}  // Not used because I want to customize dots between text */}
+              Design Wizard <span>✦</span> Making Open source designs 2D/3D <span>✦</span> Creating NFT arts <span>✦</span> Voyaging in the Metaverse
+            </h1>
+
+            {/* Uncomment these if want to add more details about */}
+            {/* <h4> */}
+            {/* {current} // Not used because I want href. */}
+            {/* Currently building what I love <a href="https://overlayz.studio">@overlayz</a> */}
+            {/* </h4> */}
+
           </LinkBio>
           <WebLinkWrap>
             <LinkSection className="social">
-              <h3>SOCIAL MEDIA</h3>
+              <h3>Social Media</h3>
               <div className="iconsonly">
                 {
                   social.map((i) => {
@@ -87,15 +124,17 @@ const Links = () => {
             </LinkSection>
             <LinkSection>
               <h3>Featured Projects</h3>
-              <NewSection>
-                <Link href={'https://www.figma.com/community/widget/1128028298799358676/Random-Hues'} passHref >
+              {/* New Section will render once newProduct == true */}
+              {(newProduct) ? <NewSection>
+                <Link href={newProductUrl} passHref >
                   <img
-                    src={'/new-randomhue.png'}
-                    className="handle"
+                    src={'/newproduct.png'}
+                    className="newproduct"
                   />
                 </Link>
+              </NewSection> : ''
+              }
 
-              </NewSection>
               {
                 projects.map((i) => {
                   return (
@@ -126,7 +165,7 @@ const Links = () => {
         </TopPart>
         <BottomPart>
           <LinkFoot>
-            <h4>©realvjy <span>✦</span> vijay verma</h4>
+            <h4>©{username}<span>✦</span> {name}</h4>
           </LinkFoot>
         </BottomPart>
 
@@ -175,13 +214,13 @@ const AvatarWrap = styled.div`
     height: calc(100% - 6px);
     width: calc(100% - 6px);
    }
-   .avtar-border{
+   .avatar-border{
         height: 100%;
         width: 100%;
         position: absolute;
         background: ${({ theme }) => theme.text.primary};
    }
-   .avtar-border-2{
+   .avatar-fill{
         height: calc(100% - 6px);
         width: calc(100% - 6px);
         position: absolute;
@@ -193,6 +232,20 @@ const Title = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    h1{
+      font-size: 38px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #4AB1F1 5.71%, #566CEC 33.77%, #D749AF 61.82%, #FF7C51 91.21%), #000000;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    h3{
+      font-size: 22px;
+      letter-spacing: -.7px;
+      color: ${({ theme }) => theme.text.secondary};
+    }
+    
     img{
     }
     .name{
@@ -241,7 +294,8 @@ const LinkBio = styled.div`
     h4{
       font-size: 20px;
       letter-spacing: -.5px;
-      color: var(--light-black);
+      margin: 16px 0;
+      color: ${({ theme }) => theme.text.secondary};
       font-weight: 500;
         @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
           font-size: 18px;

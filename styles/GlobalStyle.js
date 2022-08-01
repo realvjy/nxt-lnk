@@ -33,6 +33,7 @@ body.light-mode {
   --gray: #687076;
   --light-black: rgba(0,0,0,.05);
   --light-white: rgba(255,255,255,.03);
+  
   margin: 0;
   padding: 0;
   border: 0;
@@ -78,8 +79,16 @@ a{
   
 }
 
-.clipped{
-  clip-path: url(#blob);
+.nft-clipped{
+  clip-path: url(#hex);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.oval-clipped{
+  clip-path: url(#oval);
   position: absolute;
   top: 50%;
   left: 50%;
