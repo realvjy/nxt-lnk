@@ -51,7 +51,7 @@ const webLinks = [
     {
         title: 'Behance',
         url: 'https://behance.net/realvjy',
-        type: 'social',
+        type: '',
         icon: '/behance.svg'
     },
     {
@@ -83,6 +83,12 @@ const webLinks = [
         url: 'https://www.linkedin.com/in/realvjy/',
         type: 'social',
         icon: '/linkedin.svg'
+    },
+    {
+        title: 'Github',
+        url: 'https://www.github.com/realvjy/',
+        type: 'social',
+        icon: '/github.svg'
     },
     {
         title: 'Buy Me a Coffee',
