@@ -7,8 +7,8 @@ import styled from "styled-components";
 import { Button, ButtonLink, Container, StyledLink } from "./ReusableStyles";
 import Link from "next/link";
 import { ChevronRightIcon, HexIcon, HomeIcon, TwitterIcon, NewUp, OvalIcon } from './icons';
-import allLinks from "./LinksData";
-import bioData from "./BioData";
+import allLinks from "../data/LinksData";
+import bioData from "../data/BioData";
 import realvjyNFT from "../public/avatar.png";
 
 const Links = () => {
@@ -81,10 +81,11 @@ const Links = () => {
             </h1>
 
             {/* Uncomment these if want to add more details about */}
-            {/* <h4> */}
-            {/* {current} // Not used because I want href. */}
-            {/* Currently building what I love <a href="https://overlayz.studio">@overlayz</a> */}
-            {/* </h4> */}
+            <h4>
+              {/* // Not used because I want href. */}
+              {current}
+              {/* Currently building what I love <a href="https://overlayz.studio">@overlayz</a> */}
+            </h4>
 
           </LinkBio>
           <WebLinkWrap>
@@ -267,7 +268,7 @@ const LinkBio = styled.div`
     display: flex;
     flex-direction: column;
     h1{
-      font-size: 20px;
+      font-size: 22px;
       line-height: 30px;
       font-weight: 500;
       letter-spacing: -0.6px;
