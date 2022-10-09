@@ -6,24 +6,7 @@ const webLinks = [
         type: 'social',
         icon: '/twitter.svg'
     },
-    {
-        title: 'Foundation',
-        url: 'https://foundation.app/@realvjy',
-        type: 'nft',
-        icon: '/foundation.svg'
-    },
-    {
-        title: 'OpenSea',
-        url: 'https://opensea.io/realvjy',
-        type: 'nft',
-        icon: '/opensea.svg'
-    },
-    {
-        title: 'Rarible',
-        url: 'https://rarible.com/realvjy',
-        type: 'nft',
-        icon: '/rarible.svg'
-    },
+
     {
         title: 'Figma',
         url: 'https://figma.com/@realvjy',
@@ -73,10 +56,10 @@ const webLinks = [
         icon: '/illlustrations.png'
     },
     {
-        title: 'Gumroad',
+        title: 'Use this template',
         url: 'https://realvjy.gumroad.com/',
-        type: 'other',
-        icon: '/gumroad.png'
+        type: 'install',
+        icon: '/use.png'
     },
     {
         title: 'Linkedin',
@@ -87,9 +70,10 @@ const webLinks = [
     {
         title: 'Github',
         url: 'https://www.github.com/realvjy/',
-        type: 'social',
+        type: 'install',
         icon: '/github.svg'
     },
+
     {
         title: 'Buy Me a Coffee',
         url: 'https://www.buymeacoffee.com/realvjy',
@@ -97,8 +81,14 @@ const webLinks = [
         icon: '/bmc.png'
     },
     {
-        title: 'Website',
-        url: 'https://vijayverma.co',
+        title: 'Documentation',
+        url: 'https://rarible.com/realvjy',
+        type: 'install',
+        icon: '/doc.png'
+    },
+    {
+        title: 'vjy.me/lnk',
+        url: 'https://opensea.io/realvjy',
         type: 'other',
         icon: '/vjy.png'
     }

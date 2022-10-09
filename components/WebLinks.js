@@ -28,16 +28,16 @@ const Links = () => {
   const social = allLinks.filter((el) => {
     return el.type === "social"
   });
-  const projects = allLinks.filter((el) => {
-    return el.type === "project"
+  const installs = allLinks.filter((el) => {
+    return el.type === "install"
   });
 
   const newProduct = bioData[0].newProduct; // checking for newProduct flag true false
   const newProductUrl = bioData[0].newProductUrl; // get product url if available
 
 
-  const nfts = allLinks.filter((el) => {
-    return el.type === "nft"
+  const demos = allLinks.filter((el) => {
+    return el.type === "demo"
   });
   const others = allLinks.filter((el) => {
     return el.type === "other"
@@ -77,7 +77,7 @@ const Links = () => {
           <LinkBio>
             <h1>
               {/* {description}  // Not used because I want to customize dots between text */}
-              Design Wizard <span>✦</span> Making Open source designs 2D/3D <span>✦</span> Creating NFT arts <span>✦</span> Voyaging in the Metaverse
+              {description ? description : <>Fall back text if description not in BioData.js</>}
             </h1>
 
             {/* Uncomment these if want to add more details about */}
@@ -108,14 +108,16 @@ const Links = () => {
               </div>
             </LinkSection>
 
+
             <LinkSection>
-              <h3>NFTs</h3>
+              <h3>Install</h3>
+
+
               {
-                nfts.map((i) => {
+                installs.map((i) => {
                   return (
                     <Link href={i.url} passHref key={i.title}>
                       <LinkBox>
-
                         <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
                       </LinkBox>
                     </Link>
@@ -123,8 +125,9 @@ const Links = () => {
                 })
               }
             </LinkSection>
+
             <LinkSection>
-              <h3>Featured Projects</h3>
+              <h3>Other</h3>
               {/* New Section will render once newProduct == true */}
               {(newProduct) ? <NewSection>
                 <Link href={newProductUrl} passHref >
@@ -135,21 +138,6 @@ const Links = () => {
                 </Link>
               </NewSection> : ''
               }
-
-              {
-                projects.map((i) => {
-                  return (
-                    <Link href={i.url} passHref key={i.title}>
-                      <LinkBox>
-                        <LinkTitle><img src={i.icon} /> {i.title}</LinkTitle> <NewUp />
-                      </LinkBox>
-                    </Link>
-                  )
-                })
-              }
-            </LinkSection>
-            <LinkSection>
-              <h3>Other</h3>
               {
                 others.map((i) => {
                   return (
@@ -166,7 +154,7 @@ const Links = () => {
         </TopPart>
         <BottomPart>
           <LinkFoot>
-            <h4>©{username}<span>✦</span> {name}</h4>
+            <h4>made by <a href="https://twitter.com/realvjy">{username}</a> </h4>
           </LinkFoot>
         </BottomPart>
 
@@ -211,6 +199,7 @@ const Avatar = styled.div`
 const AvatarWrap = styled.div`
    height: 100%;
    width: 100%;
+   filter: drop-shadow(0px 1px 2px var(--avatar-shadow));
    img{
     height: calc(100% - 6px);
     width: calc(100% - 6px);
@@ -219,7 +208,7 @@ const AvatarWrap = styled.div`
         height: 100%;
         width: 100%;
         position: absolute;
-        background: ${({ theme }) => theme.text.primary};
+        background: ${({ theme }) => theme.bg.primary};
    }
    .avatar-fill{
         height: calc(100% - 6px);
@@ -256,10 +245,10 @@ const Title = styled.div`
       }
     }
     .handle{
-      width: 120px;
+      height: 32px;
       margin-top: 6px;
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
-        width: 92px;
+        height: 28px;
       }
     }
 `
@@ -268,13 +257,13 @@ const LinkBio = styled.div`
     display: flex;
     flex-direction: column;
     h1{
-      font-size: 22px;
+      font-size: 24px;
       line-height: 30px;
       font-weight: 500;
       letter-spacing: -0.6px;
       padding: 0 20px;
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
-        font-size: 16px;
+        font-size: 20px;
         line-height: 20px;
         padding: 0 8px;
 
@@ -295,11 +284,11 @@ const LinkBio = styled.div`
     h4{
       font-size: 20px;
       letter-spacing: -.5px;
-      margin: 16px 0;
+      margin: 12px 0;
       color: ${({ theme }) => theme.text.secondary};
       font-weight: 500;
         @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
-          font-size: 18px;
+          font-size: 15px;
           padding: 0 20px;
           line-height: 24px;
         }
