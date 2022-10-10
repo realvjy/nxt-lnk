@@ -11,36 +11,40 @@ import allLinks from "../data/LinksData";
 import bioData from "../data/BioData";
 import realvjyNFT from "../public/avatar.png";
 
+
 const Links = () => {
 
   // Collect user info from bioData
   const name = bioData[0].name;
+  const url = bioData[0].url;
   const username = bioData[0].username;
   const titleImg = bioData[0].titleImg;
   const avatarImg = bioData[0].avatar;
   const description = bioData[0].description;
-  const current = bioData[0].current;
+  const subdesc = bioData[0].subdesc;
+  const titleImage = "/title.svg";
 
   // Check what class to use oval or hex for avatar
   const avatarShape = bioData[0].nftAvatar ? `nft-clipped` : `oval-clipped`
 
   // Collect all links filter by type - social, project, nft and other
   const social = allLinks.filter((el) => {
-    return el.type === "social"
+    return el.type === "social" && el.on
   });
-  const installs = allLinks.filter((el) => {
-    return el.type === "install"
+  const featured = allLinks.filter((el) => {
+    return el.type === "install" && el.on
   });
 
   const newProduct = bioData[0].newProduct; // checking for newProduct flag true false
   const newProductUrl = bioData[0].newProductUrl; // get product url if available
 
 
-  const demos = allLinks.filter((el) => {
-    return el.type === "demo"
+  const nfts = allLinks.filter((el) => {
+    return el.type === "nft" && el.on
   });
+
   const others = allLinks.filter((el) => {
-    return el.type === "other"
+    return el.type === "other" && el.on
   });
 
   return (
@@ -50,6 +54,7 @@ const Links = () => {
           <LinkHeader>
             <Avatar>
               <AvatarWrap>
+                {/* Avatar type hex or oval if nftAvatar=true will convert to hex */}
                 <HexIcon />
                 <OvalIcon />
                 <div className={`${avatarShape} avatar-border`}>
@@ -60,35 +65,33 @@ const Links = () => {
                   src={avatarImg}
                   className={avatarShape}
                 />
-
               </AvatarWrap>
             </Avatar>
             <Title>
-              {/* Uncomment h1, h3 or both if you don't want to use image as title */}
-              <img
-                src={titleImg}
-                className="handle"
-              />
-              {/* <h1>{username}</h1>
-              <h3>{name}</h3> */}
-
+              {/* Using titleimg flag to use image as title or text */}
+              {titleImg ?
+                <img src={titleImage} className="handle" /> :
+                <h1>{name}</h1>
+              }
+              <h3><a href={`${url}`}>{username}</a></h3>
             </Title>
           </LinkHeader>
+
+          {/* Bio Section */}
           <LinkBio>
-            <h1>
-              {/* {description}  // Not used because I want to customize dots between text */}
-              {description ? description : <>Fall back text if description not in BioData.js</>}
-            </h1>
+            {
+              description ? <h1>{description} </h1> : <h1>Fall back text if description not in BioData.js</h1>
+            }
 
-            {/* Uncomment these if want to add more details about */}
-            <h4>
-              {/* // Not used because I want href. */}
-              {current}
-              {/* Currently building what I love <a href="https://overlayz.studio">@overlayz</a> */}
-            </h4>
-
+            {
+              subdesc ? <h4>{subdesc}</h4> : <h4>Write your own if you want</h4>
+            }
           </LinkBio>
+          {/* End Bio Section */}
+
+          {/* Weblinks started */}
           <WebLinkWrap>
+            {/* Social Icon */}
             <LinkSection className="social">
               <h3>Social Media</h3>
               <div className="iconsonly">
@@ -103,18 +106,15 @@ const Links = () => {
                     )
                   })
                 }
-
-
               </div>
             </LinkSection>
+            {/* Social Icon */}
 
-
+            {/* Featured Section */}
             <LinkSection>
-              <h3>Install</h3>
-
-
+              <h3>featured</h3>
               {
-                installs.map((i) => {
+                featured.map((i) => {
                   return (
                     <Link href={i.url} passHref key={i.title}>
                       <LinkBox>
@@ -125,9 +125,33 @@ const Links = () => {
                 })
               }
             </LinkSection>
+            {/* End Featured Section */}
 
+            {/* NFT Section */}
+            {
+              nfts.length > 0 ?
+                <LinkSection>
+                  <h3>nfts</h3>
+                  {
+                    nfts.map((i) => {
+                      return (
+                        <Link href={i.url} passHref key={i.title}>
+                          <LinkBox>
+                            <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
+                          </LinkBox>
+                        </Link>
+                      )
+                    })
+                  }
+                </LinkSection>
+                : ''
+            }
+            {/* End NFT Section */}
+
+            {/* Other Section */}
             <LinkSection>
               <h3>Other</h3>
+              {/* BioData.js > newProduct == true */}
               {/* New Section will render once newProduct == true */}
               {(newProduct) ? <NewSection>
                 <Link href={newProductUrl} passHref >
@@ -138,6 +162,7 @@ const Links = () => {
                 </Link>
               </NewSection> : ''
               }
+              {/* End Biodata.js, You can move this section anywhere */}
               {
                 others.map((i) => {
                   return (
@@ -150,11 +175,14 @@ const Links = () => {
                 })
               }
             </LinkSection>
+            {/* End Other Section */}
+
           </WebLinkWrap>
+          {/* End Weblinks */}
         </TopPart>
         <BottomPart>
           <LinkFoot>
-            <h4>made by <a href="https://twitter.com/realvjy">{username}</a> </h4>
+            <h4>made by <a href="https://twitter.com/realvjy">realvjy</a> </h4>
           </LinkFoot>
         </BottomPart>
 
@@ -224,20 +252,31 @@ const Title = styled.div`
     align-items: center;
     h1{
       font-size: 38px;
-      font-weight: 800;
-      background: linear-gradient(90deg, #4AB1F1 5.71%, #566CEC 33.77%, #D749AF 61.82%, #FF7C51 91.21%), #000000;
+      font-weight: 700;
+      
+      letter-spacing: -2px;
+      background: linear-gradient(90deg, #4AB1F1 5.71%, #566CEC 33.77%, #D749AF 61.82%, #FF7C51 91.21%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
+        font-size: 32px;
+      }
     }
     h3{
-      font-size: 22px;
+      margin-top:6px;
+      font-size: 18px;
+      font-weight: 500;
       letter-spacing: -.7px;
       color: ${({ theme }) => theme.text.secondary};
+      opacity: .5;
+      @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
+        font-size: 14px;
+        margin-top:2px;
+      }
     }
     
-    img{
-    }
+ 
     .name{
       margin-top: 8px;
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
@@ -247,8 +286,9 @@ const Title = styled.div`
     .handle{
       height: 32px;
       margin-top: 6px;
+      margin-bottom: 6px;
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
-        height: 28px;
+        height: 26px;
       }
     }
 `
@@ -257,14 +297,14 @@ const LinkBio = styled.div`
     display: flex;
     flex-direction: column;
     h1{
-      font-size: 24px;
+      font-size: 22px;
       line-height: 30px;
       font-weight: 500;
       letter-spacing: -0.6px;
       padding: 0 20px;
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
         font-size: 20px;
-        line-height: 20px;
+        line-height: 26px;
         padding: 0 8px;
 
       }
@@ -282,9 +322,9 @@ const LinkBio = styled.div`
       }
     }
     h4{
-      font-size: 20px;
+      font-size: 18px;
       letter-spacing: -.5px;
-      margin: 12px 0;
+      margin: 10px 0;
       color: ${({ theme }) => theme.text.secondary};
       font-weight: 500;
         @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
