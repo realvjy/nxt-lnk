@@ -9,34 +9,41 @@ Coffee fuels coding ☕️
 <a href="https://www.buymeacoffee.com/realvjy" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 **Table of Contents**
-
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-- [Usage](#usage)
+  - [Usage](#usage)
   - [Setup](#setup)
   - [Images](#images)
   - [Bio Info](#bio-info)
-    - [Add/Update](#add-update)
+    - [Add/Update](#add-update-bio)
     - [Enable/Disable](#enable-disable)
   - [Update Links](#update-links)
     - [Enable/Disable](#enable-disable)
     - [Add/Update](#add-update)
-- [Open Graph](#open-graph)
-  - [Open Graph Examples](#open-graph-examples)
+  - [Contributors](#contributors)
   
   
 ## Usage
-
 `next-lnks` works by including it on pages where you would 
 
+## Quick Start
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/project?template=https://github.com/realvjy/next-lnks) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/realvjy/next-lnks)
 
-## setup
 
-## images
+## Setup
+Run the following command to create a new project with this template:
+```
+yarn create next-app your-name -e https://github.com/realvjy/next-lnks
+```
+**or**
+```
+npx create-next-app your-name -e https://github.com/realvjy/next-lnks
+```
+
+## Images
 All images stored inside `public` folder of the project.
 
-## update-bio
+## Update Bio
 **Example from** `BioData.js` :
 ```jsx
 const bioData = [
@@ -72,7 +79,7 @@ By default `titleImg: true` and it look for `title.svg`. Replace svg with logo *
 `newProduct: true` show banner. Default is `true` make it false to hide.
 
 
-## update-links
+## Update Links
 **Example from** `LinksData.js` :
 ```jsx
 const webLinks = [

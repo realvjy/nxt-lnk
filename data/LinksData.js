@@ -88,21 +88,21 @@ const webLinks = [
     // Install section
     {
         title: 'Use this template',
-        url: 'https://realvjy.gumroad.com/',
+        url: 'https://github.com/realvjy/next-lnks/generate',
         type: 'install',
         icon: '/use.png',
         on: true
     },
     {
         title: 'Documentation',
-        url: 'https://rarible.com/realvjy',
+        url: 'https://github.com/realvjy/next-lnks#next-lnks',
         type: 'install',
         icon: '/doc.png',
         on: true
     },
     {
         title: 'Github',
-        url: 'https://www.github.com/realvjy/',
+        url: 'https://github.com/realvjy/next-lnks/',
         type: 'install',
         icon: '/github-fill.svg',
         on: true
@@ -118,7 +118,7 @@ const webLinks = [
 
     {
         title: 'vjy.me/lnk',
-        url: 'https://opensea.io/realvjy',
+        url: 'https://vjy.me/lnk',
         type: 'other',
         icon: '/vjy.png',
         on: true
