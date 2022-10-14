@@ -1,4 +1,4 @@
-#Next Lnks
+# Next Lnks
 
 next lnks is created as custom alternative for linktree, bio and other shortner platform. Check live version here [vjy.me/lnk](https://vjy.me/lnk)
 
