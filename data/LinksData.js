@@ -94,6 +94,13 @@ const webLinks = [
         on: true
     },
     {
+        title: 'Deploy on Vercel',
+        url: 'https://vercel.com/import/git?s=https://github.com/realvjy/next-lnks',
+        type: 'install',
+        icon: '/vercel.svg',
+        on: true
+    },
+    {
         title: 'Documentation',
         url: 'https://github.com/realvjy/next-lnks#next-lnks',
         type: 'install',
@@ -123,6 +130,7 @@ const webLinks = [
         icon: '/vjy.png',
         on: true
     },
+
     {
         title: 'website',
         url: 'https://vjy.me',

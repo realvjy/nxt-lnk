@@ -22,11 +22,18 @@ Coffee fuels coding ☕️
   - [Update Links](#update-links)
     - [Enable/Disable](#enable-disable)
     - [Add/Update](#add-update)
+  - [Custom Domain](#custom-domain)
   - [Contributors](#contributors)
   
   
 ## Usage
-`next-lnks` works by including it on pages where you would 
+`next-lnks` template used to create your custom bio link and self-host on Vercel or Netlify using your own domain. Need little understanding of code :) ☕
+
+Usually, you don't need to worry a lot about coding if you're just updating information in `BioData.js` and `LinkData.js`. To deep dive know more  [Next.js](https://nextjs.org/docs) and [React](https://reactjs.org/docs/getting-started.html) official documentaion.
+
+For customization used stylesheet component.  If you want to customize css you can [learn more here](https://styled-components.com/).
+
+Template auto support dark-mode depending on system cofig.
 
 ## Quick Start
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https://github.com/realvjy/next-lnks) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/realvjy/next-lnks)
@@ -55,7 +62,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 `data/BioData.js` All basic info update here
 `data/LinksData.js` Contain all the links
 `Components/WebLinks.js` UI and stylesheet
-`Components/icons/index.js` Contain all SVG icon components
+`Components/icons/index.js` Contain all SVG icon compo
 
 You can start editing the page by modifying `data/BioData.js` and `data/LinksData.js`. The page auto-updates as you edit the file.
 
@@ -155,6 +162,11 @@ create a new block by copying this
     }
 ```
 Update all info and make sure to add a icon.svg file in [public](#images) folder.
+
+## Custom Domain
+It's very simple. Vercel give you option to just add any domain to the deployed project like [vjy.me/lnk](https://vjy.me/lnk) or this project itself [nxtlnk.xyz](https://nxtlnk.xyz). All you have to do is follow official [Vercel documentaion](https://vercel.com/docs/concepts/projects/domains/add-a-domain) or [Netlify Documentaion](https://www.netlify.com/blog/2021/12/20/how-to-add-custom-domains-to-netlify-sites/)
+
+
 
 ## Contributors
 

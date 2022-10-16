@@ -54,13 +54,11 @@ const Links = () => {
           <LinkHeader>
             <Avatar>
               <AvatarWrap>
-                {/* Avatar type hex or oval if nftAvatar=true will convert to hex */}
+                {/* Avatar svg  hex or oval if nftAvatar=true will convert to hex */}
                 <HexIcon />
                 <OvalIcon />
-                <div className={`${avatarShape} avatar-border`}>
-                </div>
-                <div className={`${avatarShape} avatar-fill`}>
-                </div>
+                <div className={`${avatarShape} avatar-border`}></div>
+                <div className={`${avatarShape} avatar-fill`}></div>
                 <img
                   src={avatarImg}
                   className={avatarShape}
@@ -73,7 +71,10 @@ const Links = () => {
                 <img src={titleImage} className="handle" /> :
                 <h1>{name}</h1>
               }
-              <h3><a href={`${url}`}>{username}</a></h3>
+              {/* if your remove username from data it will not appear */}
+              {
+                username ? <h3><a href={`${url}`}>{username}</a></h3> : ''
+              }
             </Title>
           </LinkHeader>
 
@@ -93,7 +94,6 @@ const Links = () => {
           <WebLinkWrap>
             {/* Social Icon */}
             <LinkSection className="social">
-              <h3>Social Media</h3>
               <div className="iconsonly">
                 {
                   social.map((i) => {
@@ -112,7 +112,7 @@ const Links = () => {
 
             {/* Featured Section */}
             <LinkSection>
-              <h3>featured</h3>
+              <h3>{featured[0].type}</h3>
               {
                 featured.map((i) => {
                   return (
@@ -131,7 +131,7 @@ const Links = () => {
             {
               nfts.length > 0 ?
                 <LinkSection>
-                  <h3>nfts</h3>
+                  <h3>{nfts[0].type}s</h3>
                   {
                     nfts.map((i) => {
                       return (
@@ -150,7 +150,7 @@ const Links = () => {
 
             {/* Other Section */}
             <LinkSection>
-              <h3>Other</h3>
+              <h3>{others[0].type}</h3>
               {/* BioData.js > newProduct == true */}
               {/* New Section will render once newProduct == true */}
               {(newProduct) ? <NewSection>
@@ -211,7 +211,7 @@ const LinkHeader = styled.div`
     flex-direction: column;
     align-items: center;
     margin-top: 60px;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
     @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
        margin-top: 20px;
     }
@@ -271,7 +271,7 @@ const Title = styled.div`
       color: ${({ theme }) => theme.text.secondary};
       opacity: .5;
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
-        font-size: 14px;
+        font-size: 15px;
         margin-top:2px;
       }
     }
@@ -303,7 +303,7 @@ const LinkBio = styled.div`
       letter-spacing: -0.6px;
       padding: 0 20px;
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
-        font-size: 20px;
+        font-size: 18px;
         line-height: 26px;
         padding: 0 8px;
 
@@ -377,9 +377,8 @@ const LinkFoot = styled.div`
 `
 
 const WebLinkWrap = styled.div`
-    padding: 24px 80px;
     @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
-       padding: 12px;
+       padding: 0 12px;
     }
 `
 
@@ -387,11 +386,17 @@ const WebLinkWrap = styled.div`
 const LinkSection = styled.div`
     padding: 12px 0;
     display: flex;
+    margin: 0 auto;
+    max-width: 400px;
     flex-direction: column;
+    &.social{
+      max-width: max-content;
+      padding: 0;
+      margin-bottom: 18px;
+    }
     .iconsonly{
       display: flex;
       justify-content: center;
-      margin-bottom: 8px;
       @media screen and (max-width: ${({ theme }) => theme.deviceSize.tablet}) {
         flex-wrap: wrap;
       }
