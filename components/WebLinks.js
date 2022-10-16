@@ -22,7 +22,9 @@ const Links = () => {
   const avatarImg = bioData[0].avatar;
   const description = bioData[0].description;
   const subdesc = bioData[0].subdesc;
-  const footer = bioData[0].footer;
+  const footerText = bioData[0].footerText;
+  const author = bioData[0].author;
+  const authorURL = bioData[0].authorURL;
   const titleImage = "/title.svg";
 
   // Check what class to use oval or hex for avatar
@@ -188,7 +190,7 @@ const Links = () => {
         </TopPart>
         <BottomPart>
           <LinkFoot>
-            <h4>{footer}</h4>
+            <h4>{footerText} <a href={authorURL}>{author}</a></h4>
           </LinkFoot>
         </BottomPart>
 

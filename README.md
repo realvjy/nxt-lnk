@@ -19,6 +19,7 @@ Coffee fuels coding ☕️
   - [Update Bio](#update-bio)
     - [Add/Update](#update-bio)
     - [Enable/Disable](#update-bio)
+    - [Featured Banner](#update-bio)
   - [Update Links](#update-links)
     - [Enable/Disable](#update-links)
     - [Add/Update](#update-links)
@@ -51,8 +52,10 @@ npx create-next-app your-app-name -e https://github.com/realvjy/nxt-lnk
 ```
 
 ## Getting Started
-First, run the development server:
 
+Use any editor to work on editing. I use [vscode](https://code.visualstudio.com/)
+
+First, run the development server:
 ```bash
 npm run dev
 # or

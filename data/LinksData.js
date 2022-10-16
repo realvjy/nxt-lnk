@@ -88,7 +88,7 @@ const webLinks = [
     // Install section
     {
         title: 'Use this template',
-        url: 'https://github.com/realvjy/nxt-lnkgenerate',
+        url: 'https://github.com/realvjy/nxt-lnk/generate',
         type: 'install',
         icon: '/use.png',
         on: true
