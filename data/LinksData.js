@@ -88,28 +88,28 @@ const webLinks = [
     // Install section
     {
         title: 'Use this template',
-        url: 'https://github.com/realvjy/next-lnks/generate',
+        url: 'https://github.com/realvjy/nxt-lnkgenerate',
         type: 'install',
         icon: '/use.png',
         on: true
     },
     {
         title: 'Deploy on Vercel',
-        url: 'https://vercel.com/import/git?s=https://github.com/realvjy/next-lnks',
+        url: 'https://vercel.com/import/git?s=https://github.com/realvjy/nxt-lnk',
         type: 'install',
         icon: '/vercel.svg',
         on: true
     },
     {
         title: 'Documentation',
-        url: 'https://github.com/realvjy/next-lnks#next-lnks',
+        url: 'https://github.com/realvjy/nxt-lnk#next-lnks',
         type: 'install',
         icon: '/doc.png',
         on: true
     },
     {
         title: 'Github',
-        url: 'https://github.com/realvjy/next-lnks/',
+        url: 'https://github.com/realvjy/nxt-lnk',
         type: 'install',
         icon: '/github-fill.svg',
         on: true

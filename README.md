@@ -1,4 +1,4 @@
-# Next Lnks
+# Nxt Lnk
 
 next lnks is created as custom alternative for linktree, bio and other shortner platform. Check live version here [vjy.me/lnk](https://vjy.me/lnk)
 
@@ -29,7 +29,7 @@ Coffee fuels coding ☕️
   
   
 ## Usage
-`next-lnks` template used to create your custom bio link and self-host on Vercel or Netlify using your own domain. Need little understanding of code :) ☕
+`nxt-lnk` template used to create your custom bio link and self-host on Vercel or Netlify using your own domain. Need little understanding of code :) ☕
 
 Usually, you don't need to worry a lot about coding if you're just updating information in `BioData.js` and `LinkData.js`. To deep dive know more  [Next.js](https://nextjs.org/docs) and [React](https://reactjs.org/docs/getting-started.html) official documentaion.
 
@@ -38,15 +38,15 @@ For customization used stylesheet component.  If you want to customize css you c
 Template auto support dark-mode depending on system cofig.
 
 ## Quick Start
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https://github.com/realvjy/next-lnks) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/realvjy/next-lnks)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https://github.com/realvjy/nxt-lnk) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/realvjy/nxt-lnk)
 
 
 ## Manual Setup
 Run the following command to create a new project with this template:
 ```bash
-yarn create next-app your-app-name -e https://github.com/realvjy/next-lnks
+yarn create next-app your-app-name -e https://github.com/realvjy/nxt-lnk
 # or
-npx create-next-app your-app-name -e https://github.com/realvjy/next-lnks
+npx create-next-app your-app-name -e https://github.com/realvjy/nxt-lnk
 ```
 
 ## Getting Started
