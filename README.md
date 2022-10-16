@@ -16,12 +16,12 @@ Coffee fuels coding ☕️
   - [Manual Setup](#manual-setup)
   - [Getting Started](#getting-started)
   - [Images](#images)
-  - [Bio Info](#bio-info)
-    - [Add/Update](#add-update-bio)
-    - [Enable/Disable](#enable-disable)
+  - [Update Bio](#update-bio)
+    - [Add/Update](#update-bio)
+    - [Enable/Disable](#update-bio)
   - [Update Links](#update-links)
-    - [Enable/Disable](#enable-disable)
-    - [Add/Update](#add-update)
+    - [Enable/Disable](#update-links)
+    - [Add/Update](#update-links)
   - [Frontend](#frontend)
   - [SEO](#seo)
   - [Custom Domain](#custom-domain)
@@ -209,9 +209,9 @@ Add new section with specific `type` in `Linkdata.js`. Then copy `LinkSection` C
 Already added `next-seo`. All you have to do is `update next-seo.config.js` file. Make sure to add direct link of `preview.jpg`file
 
 ## Custom Domain
-It's very simple. Vercel give you option to just add any domain to the deployed project like [vjy.me/lnk](https://vjy.me/lnk). All you have to do is follow official [Vercel documentaion](https://vercel.com/docs/concepts/projects/domains/add-a-domain) or [Netlify Documentaion](https://www.netlify.com/blog/2021/12/20/how-to-add-custom-domains-to-netlify-sites/)
+By default vercel give you a subdomain with your project name like - [nxtlnk.vercel.app](https:nxtlnk.vercel.app). But you can add own domain. It's very simple. Vercel give you option to just add any domain to the deployed project like [vjy.me/lnk](https://vjy.me/lnk). All you have to do is follow official [Vercel documentaion](https://vercel.com/docs/concepts/projects/domains/add-a-domain) or [Netlify Documentaion](https://www.netlify.com/blog/2021/12/20/how-to-add-custom-domains-to-netlify-sites/)
 
-## favicon
+## Favicon
 create a `favicon.ico` file and place inside `public` folder. I use [favicon.io](https://favicon.io/favicon-converter/)
 
 ## Contributors
