@@ -11,7 +11,6 @@ body.light-mode {
   --avatar-shadow: rgba(48,52,77,.1);
 } 
 
-
 * {
   --bg-light-yellow: #F2F2EE;
   --bg-light-blue: #EDF2FF;
