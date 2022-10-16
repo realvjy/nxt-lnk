@@ -23,6 +23,7 @@ Coffee fuels coding ☕️
     - [Enable/Disable](#enable-disable)
     - [Add/Update](#add-update)
   - [Frontend](#frontend)
+  - [SEO](#seo)
   - [Custom Domain](#custom-domain)
   - [Favicon](#favicon)
   - [Contributors](#contributors)
@@ -203,6 +204,8 @@ const install = allLinks.filter((el) => {
 
 Add new section with specific `type` in `Linkdata.js`. Then copy `LinkSection` Code to create new section in `WebLinks.js` file. Make sure to create get data of that section as well.
       
+## SEO
+Already added `next-seo`. All you have to do is `update next-seo.config.js` file. Make sure to add direct link of `preview.jpg`file
 
 ## Custom Domain
 It's very simple. Vercel give you option to just add any domain to the deployed project like [vjy.me/lnk](https://vjy.me/lnk). All you have to do is follow official [Vercel documentaion](https://vercel.com/docs/concepts/projects/domains/add-a-domain) or [Netlify Documentaion](https://www.netlify.com/blog/2021/12/20/how-to-add-custom-domains-to-netlify-sites/)
