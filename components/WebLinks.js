@@ -14,7 +14,7 @@ import bioData from "../data/BioData";
 
 const Links = () => {
 
-  // Collect user info from bioData
+  // all user info from bioData
   const name = bioData[0].name;
   const url = bioData[0].url;
   const username = bioData[0].username;
@@ -22,27 +22,33 @@ const Links = () => {
   const avatarImg = bioData[0].avatar;
   const description = bioData[0].description;
   const subdesc = bioData[0].subdesc;
+  const footer = bioData[0].footer;
   const titleImage = "/title.svg";
 
   // Check what class to use oval or hex for avatar
   const avatarShape = bioData[0].nftAvatar ? `nft-clipped` : `oval-clipped`
 
-  // Collect all links filter by type - social, project, nft and other
-  const social = allLinks.filter((el) => {
-    return el.type === "social" && el.on
-  });
-  const featured = allLinks.filter((el) => {
-    return el.type === "install" && el.on
-  });
-
   const newProduct = bioData[0].newProduct; // checking for newProduct flag true false
   const newProductUrl = bioData[0].newProductUrl; // get product url if available
 
 
+  // Collect all links filter by type - social, project, nft and other etc=
+  // get data for social section
+  const social = allLinks.filter((el) => {
+    return el.type === "social" && el.on
+  });
+
+  // Get data for install section
+  const install = allLinks.filter((el) => {
+    return el.type === "install" && el.on
+  });
+
+  // Get data for nfts
   const nfts = allLinks.filter((el) => {
     return el.type === "nft" && el.on
   });
 
+  // Get data for other section
   const others = allLinks.filter((el) => {
     return el.type === "other" && el.on
   });
@@ -110,11 +116,11 @@ const Links = () => {
             </LinkSection>
             {/* Social Icon */}
 
-            {/* Featured Section */}
+            {/* Install Section */}
             <LinkSection>
-              <h3>{featured[0].type}</h3>
+              <h3>{install[0].type}</h3>
               {
-                featured.map((i) => {
+                install.map((i) => {
                   return (
                     <Link href={i.url} passHref key={i.title}>
                       <LinkBox>
@@ -125,7 +131,7 @@ const Links = () => {
                 })
               }
             </LinkSection>
-            {/* End Featured Section */}
+            {/* End Install Section */}
 
             {/* NFT Section */}
             {
@@ -182,7 +188,7 @@ const Links = () => {
         </TopPart>
         <BottomPart>
           <LinkFoot>
-            <h4>made by <a href="https://twitter.com/realvjy">realvjy</a> </h4>
+            <h4>{footer}</h4>
           </LinkFoot>
         </BottomPart>
 

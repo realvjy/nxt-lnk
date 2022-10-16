@@ -11,9 +11,11 @@ const bioData = [
         subdesc: 'Use this template and deploy on vercel for free',
         newProductUrl: 'https://3dicons.co',
         newProduct: true,
+        footer: 'made by realvjy'
     },
 ];
 
 export default bioData;
+
 
 

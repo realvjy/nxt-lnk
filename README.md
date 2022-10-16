@@ -22,7 +22,9 @@ Coffee fuels coding ☕️
   - [Update Links](#update-links)
     - [Enable/Disable](#enable-disable)
     - [Add/Update](#add-update)
+  - [Frontend](#frontend)
   - [Custom Domain](#custom-domain)
+  - [Favicon](#favicon)
   - [Contributors](#contributors)
   
   
@@ -157,19 +159,59 @@ create a new block by copying this
         title: 'Social Name',
         url: 'https://link.com/whateverurl',
         type: 'social',
-        icon: '/newicon.svg',
+        icon: '/newiconname.svg',
         on: true
     }
 ```
-Update all info and make sure to add a icon.svg file in [public](#images) folder.
+Update all info and make sure to add a `newiconname.svg` file in [public](#images) folder.
+Then you have to add new section to frontend `components/WebLinks.js`
+
+## Frontend
+All frontend customization done inside `components/WebLinks.js`. If you wante to update and add new section just look this file and update according to your need.
+
+**Update section**
+
+Look for Section codes. Like if you want to change install type other featured Update `type: 'featured'` in `LinkData.js` then update all `install` related code in `WebLinks.js` to `featured`
+```js
+// Collect all links filter by type - social, project, nft and other etc=
+// get data for install section
+const install = allLinks.filter((el) => {
+  return el.type === "install" && el.on
+});
+
+...
+...
+
+{/* Featured Section */ }
+<LinkSection>
+  <h3>{install[0].type}</h3>
+  {
+    install.map((i) => {
+      return (
+        <Link href={i.url} passHref key={i.title}>
+          <LinkBox>
+            <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
+          </LinkBox>
+        </Link>
+      )
+    })
+  }
+</LinkSection>
+{/* End Featured Section */ }
+```
+**Add New section**
+
+Add new section with specific `type` in `Linkdata.js`. Then copy `LinkSection` Code to create new section in `WebLinks.js` file. Make sure to create get data of that section as well.
+      
 
 ## Custom Domain
-It's very simple. Vercel give you option to just add any domain to the deployed project like [vjy.me/lnk](https://vjy.me/lnk) or this project itself [nxtlnk.xyz](https://nxtlnk.xyz). All you have to do is follow official [Vercel documentaion](https://vercel.com/docs/concepts/projects/domains/add-a-domain) or [Netlify Documentaion](https://www.netlify.com/blog/2021/12/20/how-to-add-custom-domains-to-netlify-sites/)
+It's very simple. Vercel give you option to just add any domain to the deployed project like [vjy.me/lnk](https://vjy.me/lnk). All you have to do is follow official [Vercel documentaion](https://vercel.com/docs/concepts/projects/domains/add-a-domain) or [Netlify Documentaion](https://www.netlify.com/blog/2021/12/20/how-to-add-custom-domains-to-netlify-sites/)
 
-
+## favicon
+create a `favicon.ico` file and place inside `public` folder. I use [favicon.io](https://favicon.io/favicon-converter/)
 
 ## Contributors
 
 [Contributing Guide](./CONTRIBUTING.md)
-
-A massive thank you to [everyone who contributes]() to this project 👏
+Jus create a pull requeste. More soon
+    
