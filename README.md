@@ -172,7 +172,8 @@ All frontend customization done inside `components/WebLinks.js`. If you wante to
 
 **Update section**
 
-Look for Section codes. Like if you want to change install type other featured Update `type: 'featured'` in `LinkData.js` then update all `install` related code in `WebLinks.js` to `featured`
+Look for Section codes. Like if you want to change `install` type to `featured` Update  the `type: 'featured'` in `LinkData.js` then update all `install` related code in `WebLinks.js` to `featured`
+
 ```js
 // Collect all links filter by type - social, project, nft and other etc=
 // get data for install section

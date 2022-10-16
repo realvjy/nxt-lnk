@@ -31,7 +31,7 @@ const webLinks = [
     },
     {
         title: 'Github',
-        url: 'https://medium.com/@realvjy',
+        url: 'https://github.com/realvjy',
         type: 'social',
         icon: '/github.svg',
         on: true
@@ -102,7 +102,7 @@ const webLinks = [
     },
     {
         title: 'Documentation',
-        url: 'https://github.com/realvjy/nxt-lnk#next-lnks',
+        url: 'https://github.com/realvjy/nxt-lnk#nxt-lnk',
         type: 'install',
         icon: '/doc.png',
         on: true
