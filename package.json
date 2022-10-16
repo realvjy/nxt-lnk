@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@react-three/fiber": "^8.2.1",
-    "next": "latest",
+    "next": "^12.2.4",
     "next-seo": "^5.5.0",
     "nextjs-google-analytics": "^2.0.0",
     "react": "18.2.0",

@@ -9,7 +9,7 @@ import Link from "next/link";
 import { ChevronRightIcon, HexIcon, HomeIcon, TwitterIcon, NewUp, OvalIcon } from './icons';
 import allLinks from "../data/LinksData";
 import bioData from "../data/BioData";
-import realvjyNFT from "../public/avatar.png";
+
 
 
 const Links = () => {

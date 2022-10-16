@@ -12,7 +12,9 @@ Coffee fuels coding ☕️
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
   - [Usage](#usage)
-  - [Setup](#setup)
+  - [Quick Start](#quick-start)
+  - [Manual Setup](#manual-setup)
+  - [Getting Started](#getting-started)
   - [Images](#images)
   - [Bio Info](#bio-info)
     - [Add/Update](#add-update-bio)
@@ -27,18 +29,37 @@ Coffee fuels coding ☕️
 `next-lnks` works by including it on pages where you would 
 
 ## Quick Start
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/project?template=https://github.com/realvjy/next-lnks) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/realvjy/next-lnks)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https://github.com/realvjy/next-lnks) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/realvjy/next-lnks)
 
 
-## Setup
+## Manual Setup
 Run the following command to create a new project with this template:
+```bash
+yarn create next-app your-app-name -e https://github.com/realvjy/next-lnks
+# or
+npx create-next-app your-app-name -e https://github.com/realvjy/next-lnks
 ```
-yarn create next-app your-name -e https://github.com/realvjy/next-lnks
+
+## Getting Started
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
 ```
-**or**
-```
-npx create-next-app your-name -e https://github.com/realvjy/next-lnks
-```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+**Important files to edit or update info**
+`data/BioData.js` All basic info update here
+`data/LinksData.js` Contain all the links
+`Components/WebLinks.js` UI and stylesheet
+`Components/icons/index.js` Contain all SVG icon components
+
+You can start editing the page by modifying `data/BioData.js` and `data/LinksData.js`. The page auto-updates as you edit the file.
+
+
 
 ## Images
 All images stored inside `public` folder of the project.

@@ -2,10 +2,11 @@ export default {
     openGraph: {
         type: 'website',
         locale: 'en_IE',
-        title: 'realvjy ✦ design wizard',
+        title: 'next lnks by realvjy',
         url: 'https://vjy.me',
-        description: 'Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...',
+        description: 'Custom bio links for creatives who love coding. Made this first to use for my own weblinks vjy.me/lnk.',
         locale: 'en_EN',
+        keywords: 'designer, product designer, illustrator, indian designer, vijay verma, realvjy, illlustrations, indian illustrator, ui designer india, sushi design system, zomato designer, 3dicons, uiprint, vijay realvjy, indian ui designer, design india, overlayz, nft art',
         images: [
             {
                 width: 1200,

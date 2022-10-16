@@ -1,4 +1,5 @@
 import { NextSeo } from 'next-seo';
+import seoData from '../next-seo.config';
 
 export default function Seo({ page }) {
     const { title, excerpt, slug, coverImage } = page;
@@ -6,21 +7,21 @@ export default function Seo({ page }) {
         <>
             <NextSeo
                 title={title}
-                titleTemplate="realvjy ✦ design wizard"
-                defaultTitle="realvjy ✦ design wizard"
-                description='Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...'
-                canonical={`https://vjy.me`}
+                titleTemplate={seoData.openGraph.title}
+                defaultTitle={seoData.openGraph.title}
+                description={seoData.openGraph.description}
+                canonical={seoData.openGraph.url}
                 openGraph={{
                     type: 'website',
-                    url: 'https://vjy.me',
+                    url: `${seoData.openGraph.url}`,
                     title: `${title}`,
-                    description: 'Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...',
+                    description: `${seoData.openGraph.description}`,
                     locale: 'en_EN',
                     images: [
                         {
                             width: 1200,
                             height: 630,
-                            url: `https://vjy.me/preview.jpg`,
+                            url: `${seoData.openGraph.images[0].url}`,
                             alt: `${title}`,
                         },
                     ],
@@ -33,11 +34,11 @@ export default function Seo({ page }) {
                 }}
                 additionalMetaTags={[{
                     name: 'keywords',
-                    content: 'designer, product designer, illustrator, indian designer, vijay verma, realvjy, illlustrations, indian illustrator, ui designer india, sushi design system, zomato designer, 3dicons, uiprint, vijay realvjy, indian ui designer, design india, overlayz, nft art'
+                    content: `${seoData.openGraph.keywords}`
                 },
                 {
                     name: 'twitter:image',
-                    content: `https://vjy.me/preview.jpg`
+                    content: `${seoData.openGraph.images[0].url}`
                 },
                 {
                     httpEquiv: 'x-ua-compatible',

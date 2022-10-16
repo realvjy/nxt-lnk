@@ -32,24 +32,23 @@ function MyApp({ Component, pageProps }) {
                 <GlobalStyle />
                 <Layout>
                     <DefaultSeo
-                        description='Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...'
-                        canonical={`https://vjy.me`}
+                        canonical={SEO.openGraph.url}
                         {...SEO}
                         additionalMetaTags={[{
                             name: 'keywords',
-                            content: 'designer, product designer, illustrator, indian designer, vijay verma, realvjy, illlustrations, indian illustrator, ui designer india, sushi design system, zomato designer, 3dicons, uiprint, vijay realvjy, indian ui designer, design india, overlayz, nft art'
+                            content: SEO.openGraph.keywords,
                         },
                         {
                             name: 'twitter:image',
-                            content: `https://vjy.me/preview.jpg`
+                            content: SEO.openGraph.images[0].url
                         },
                         {
                             name: 'twitter:title',
-                            content: 'realvjy ✦ A design wizard',
+                            content: SEO.openGraph.title,
                         },
                         {
                             name: 'twitter:description',
-                            content: 'Design Wizard | Creating NFT arts | Making opensource design resources 2D/3D | Voyaging in the Metaverse | Sushi Design System, designletter, 3dicons...'
+                            content: SEO.openGraph.description,
                         },
                         {
                             httpEquiv: 'x-ua-compatible',
