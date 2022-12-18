@@ -65,6 +65,27 @@ const webLinks = [
         on: false
     },
     {
+        title: 'Mastodon',
+        url: 'https://mastodon.online/@realvjy',
+        type: 'social',
+        icon: '/mastodon.svg',
+        on: true
+    },
+    {
+        title: 'Hive Social',
+        url: 'https://www.hivesocial.app/?@realvjy',
+        type: 'social',
+        icon: '/hive.svg',
+        on: false
+    },
+    {
+        title: 'Post',
+        url: 'https://www.post.news/realvjy',
+        type: 'social',
+        icon: '/post.svg',
+        on: false
+    },
+    {
         title: 'foundation',
         url: 'https://vjy.me',
         type: 'nft',
@@ -124,7 +145,7 @@ const webLinks = [
     },
 
     {
-        title: 'vjy.me/lnk',
+        title: 'link demo',
         url: 'https://vjy.me/lnk',
         type: 'other',
         icon: '/vjy.png',
@@ -132,11 +153,11 @@ const webLinks = [
     },
 
     {
-        title: 'website',
+        title: 'maker website',
         url: 'https://vjy.me',
         type: 'other',
         icon: '/vjy.png',
-        on: false
+        on: true
     },
 ];
 

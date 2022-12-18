@@ -1,8 +1,10 @@
 # Nxt Lnk
 
-next lnks is created as custom alternative for linktree, bio and other shortner platform. Check live version here [vjy.me/lnk](https://vjy.me/lnk)
+**Custom bio links for creatives who love coding. Made this first to use for my own weblinks vjy.me/lnk**
 
-Pull requests are very welcome. Also make sure to check out the issues for feature requests if you are looking for inspiration on what to add.
+A perfect custom alternative for linktree, bio and other shortner platform. Check live version here [nxtlnk.xyz](https://nxtlnk.xyz)
+
+Pull requests are always welcome. In case you want inspiration or new features on what to add, check out the issues for feature requests.
 
 Coffee fuels coding ☕️
 
@@ -25,6 +27,7 @@ Coffee fuels coding ☕️
     - [Add/Update](#update-links)
   - [Frontend](#frontend)
   - [SEO](#seo)
+  - [Google Analytics](#google-analytics)
   - [Custom Domain](#custom-domain)
   - [Favicon](#favicon)
   - [Contributors](#contributors)
@@ -35,9 +38,9 @@ Coffee fuels coding ☕️
 
 Usually, you don't need to worry a lot about coding if you're just updating information in `BioData.js` and `LinkData.js`. To deep dive know more  [Next.js](https://nextjs.org/docs) and [React](https://reactjs.org/docs/getting-started.html) official documentaion.
 
-For customization used stylesheet component.  If you want to customize css you can [learn more here](https://styled-components.com/).
+For customization used [styled components](https://styled-components.com/). If you want to customize styling you can [learn more here](https://styled-components.com/docs).
 
-Template auto support dark-mode depending on system cofig.
+**Template auto support dark-mode depending on system cofig.**
 
 ## Quick Start
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/git?s=https://github.com/realvjy/nxt-lnk) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/realvjy/nxt-lnk)
@@ -209,16 +212,24 @@ const install = allLinks.filter((el) => {
 Add new section with specific `type` in `Linkdata.js`. Then copy `LinkSection` Code to create new section in `WebLinks.js` file. Make sure to create get data of that section as well.
       
 ## SEO
-Already added `next-seo`. All you have to do is `update next-seo.config.js` file. Make sure to add direct link of `preview.jpg`file
+Already added `next-seo`. All you have to do is `update next-seo.config.js` file. Make sure to add direct link of `preview.jpg`file, like - `https://vjy.me/preview.jpg`.
+
+## Google Analytics
+In Vercel, you can set this by going to your project, then Settings and finally [Environments Variables](https://vercel.com/docs/concepts/projects/environment-variables). To get GA 4 code `G-ZXX0000XXX` follow [these steps ](https://support.google.com/analytics/answer/9304153?hl=en)
+
+<img src="https://vjy.me/ga-analytics.png" style="width: 500px !important;"/>
+
 
 ## Custom Domain
-By default vercel give you a subdomain with your project name like - [nxtlnk.vercel.app](https:nxtlnk.vercel.app). But you can add own domain. It's very simple. Vercel give you option to just add any domain to the deployed project like [vjy.me/lnk](https://vjy.me/lnk). All you have to do is follow official [Vercel documentaion](https://vercel.com/docs/concepts/projects/domains/add-a-domain) or [Netlify Documentaion](https://www.netlify.com/blog/2021/12/20/how-to-add-custom-domains-to-netlify-sites/)
+By default vercel give you a subdomain with your project name like - [nxtlnk.vercel.app](https:nxtlnk.vercel.app). But you can add own domain. 
+
+Vercel/Netlify give you option to add any domain to the deployed project like [vjy.me/lnk](https://vjy.me/lnk) or [nxtlnk.xyz](https://nxtlnk.xyz). All you have to do is follow official [Vercel documentaion](https://vercel.com/docs/concepts/projects/domains/add-a-domain) or [Netlify Documentaion](https://www.netlify.com/blog/2021/12/20/how-to-add-custom-domains-to-netlify-sites/)
 
 ## Favicon
 create a `favicon.ico` file and place inside `public` folder. I use [favicon.io](https://favicon.io/favicon-converter/)
 
 ## Contributors
+Created by [realvjy](https://twitter.com/realvjy)
 
-[Contributing Guide](./CONTRIBUTING.md)
-Jus create a pull requeste. More soon
+If you want to contribute. Just create a pull requeste. More soon
     
