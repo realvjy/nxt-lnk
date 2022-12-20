@@ -21,7 +21,9 @@ const Links = () => {
   const titleImg = bioData[0].titleImg;
   const avatarImg = bioData[0].avatar;
   const description = bioData[0].description;
+  const descShow = bioData[0].descShow;
   const subdesc = bioData[0].subdesc;
+  const subdescShow = bioData[0].subdescShow;
   const footerText = bioData[0].footerText;
   const author = bioData[0].author;
   const authorURL = bioData[0].authorURL;
@@ -30,8 +32,15 @@ const Links = () => {
   // Check what class to use oval or hex for avatar
   const avatarShape = bioData[0].nftAvatar ? `nft-clipped` : `oval-clipped`
 
+
+  // Description and subdescription goes here
+  const descriptionText = descShow ? description : `Write your own fall back text if description not in BioData.js or remove me/leave blank`
+  const subdescText = subdescShow ? subdesc : `Write your own if you want or just remove me/leave blank`
+
+
   const newProduct = bioData[0].newProduct; // checking for newProduct flag true false
   const newProductUrl = bioData[0].newProductUrl; // get product url if available
+
 
 
   // Collect all links filter by type - social, project, nft and other etc=
@@ -88,13 +97,8 @@ const Links = () => {
 
           {/* Bio Section */}
           <LinkBio>
-            {
-              description ? <h1>{description} </h1> : <h1>Fall back text if description not in BioData.js</h1>
-            }
-
-            {
-              subdesc ? <h4>{subdesc}</h4> : <h4>Write your own if you want</h4>
-            }
+            {description && <h1>{descriptionText} </h1>}
+            {subdesc && <h4>{subdescText}</h4>}
           </LinkBio>
           {/* End Bio Section */}
 
@@ -106,7 +110,7 @@ const Links = () => {
                 {
                   social.map((i) => {
                     return (
-                      <a href={i.url} key={i.title}>
+                      <a href={i.url} key={i.title} target="_blank">
                         <LinkBox className="socialIcon">
                           <img src={i.icon} style={{ filter: 'var(--img)' }} />
                         </LinkBox>
@@ -124,11 +128,11 @@ const Links = () => {
               {
                 install.map((i) => {
                   return (
-                    <Link href={i.url} passHref key={i.title}>
+                    <a href={i.url} key={i.title} target="_blank">
                       <LinkBox>
                         <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
                       </LinkBox>
-                    </Link>
+                    </a>
                   )
                 })
               }
@@ -143,11 +147,11 @@ const Links = () => {
                   {
                     nfts.map((i) => {
                       return (
-                        <Link href={i.url} passHref key={i.title}>
+                        <a href={i.url} key={i.title} target="_blank">
                           <LinkBox>
                             <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
                           </LinkBox>
-                        </Link>
+                        </a>
                       )
                     })
                   }
@@ -162,23 +166,23 @@ const Links = () => {
               {/* BioData.js > newProduct == true */}
               {/* New Section will render once newProduct == true */}
               {(newProduct) ? <NewSection>
-                <Link href={newProductUrl} passHref >
+                <a href={newProductUrl} target="_blank">
                   <img
                     src={'/newproduct.png'}
                     className="newproduct"
                   />
-                </Link>
+                </a>
               </NewSection> : ''
               }
               {/* End Biodata.js, You can move this section anywhere */}
               {
                 others.map((i) => {
                   return (
-                    <Link href={i.url} passHref key={i.title}>
+                    <a href={i.url} key={i.title} target="_blank">
                       <LinkBox>
                         <LinkTitle><img src={i.icon} /> {i.title}</LinkTitle> <NewUp />
                       </LinkBox>
-                    </Link>
+                    </a>
                   )
                 })
               }
