@@ -144,7 +144,7 @@ export default webLinks;
 **Enable/Disable Social Media**
 Find `type: social` and change `on:true|false`
 
-| title           | on (default)    | 
+| Title           | on (default)    | 
 | ---------       | --------        | 
 | `Twitter`       | `true`          | 
 | `Instagram`     | `true`          | 
@@ -155,6 +155,9 @@ Find `type: social` and change `on:true|false`
 | `Behance`       | `true`          | 
 | `Figma`         | `true`          | 
 | `Linkedin`      | `false`          | 
+| `Mastodon`      | `false`          | 
+| `Hive Social`    | `false`          | 
+| `Post.news`      | `false`          | 
 
 Setting `on: true` show the social icon. 
 The social media icons are arranged in a single row at the top of the page below description. If you want to use as list, chagne type to `type: 'other'`
@@ -226,10 +229,10 @@ By default vercel give you a subdomain with your project name like - [nxtlnk.ver
 Vercel/Netlify give you option to add any domain to the deployed project like [vjy.me/lnk](https://vjy.me/lnk) or [nxtlnk.xyz](https://nxtlnk.xyz). All you have to do is follow official [Vercel documentaion](https://vercel.com/docs/concepts/projects/domains/add-a-domain) or [Netlify Documentaion](https://www.netlify.com/blog/2021/12/20/how-to-add-custom-domains-to-netlify-sites/)
 
 ## Favicon
-create a `favicon.ico` file and place inside `public` folder. I use [favicon.io](https://favicon.io/favicon-converter/)
+Create a `favicon.ico` file and place inside `public` folder. I use [favicon.io](https://favicon.io/favicon-converter/)
 
 ## Contributors
-Created by [realvjy](https://twitter.com/realvjy)
+Created by [realvjy](https://twitter.com/realvjy). You are always welcome to share your feedback on twitter or any social media platform.
 
-If you want to contribute. Just create a pull requeste. More soon
+If you want to contribute. Just create a pull request. 
     
