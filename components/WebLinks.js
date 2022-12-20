@@ -110,7 +110,7 @@ const Links = () => {
                 {
                   social.map((i) => {
                     return (
-                      <a href={i.url} key={i.title} target="_blank">
+                      <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
                         <LinkBox className="socialIcon">
                           <img src={i.icon} style={{ filter: 'var(--img)' }} />
                         </LinkBox>
@@ -128,7 +128,7 @@ const Links = () => {
               {
                 install.map((i) => {
                   return (
-                    <a href={i.url} key={i.title} target="_blank">
+                    <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
                       <LinkBox>
                         <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
                       </LinkBox>
@@ -147,7 +147,7 @@ const Links = () => {
                   {
                     nfts.map((i) => {
                       return (
-                        <a href={i.url} key={i.title} target="_blank">
+                        <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
                           <LinkBox>
                             <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
                           </LinkBox>
@@ -166,7 +166,7 @@ const Links = () => {
               {/* BioData.js > newProduct == true */}
               {/* New Section will render once newProduct == true */}
               {(newProduct) ? <NewSection>
-                <a href={newProductUrl} target="_blank">
+                <a href={newProductUrl} target="_blank" rel="noreferrer">
                   <img
                     src={'/newproduct.png'}
                     className="newproduct"
@@ -178,7 +178,7 @@ const Links = () => {
               {
                 others.map((i) => {
                   return (
-                    <a href={i.url} key={i.title} target="_blank">
+                    <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
                       <LinkBox>
                         <LinkTitle><img src={i.icon} /> {i.title}</LinkTitle> <NewUp />
                       </LinkBox>
