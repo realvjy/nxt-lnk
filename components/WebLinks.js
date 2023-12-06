@@ -65,141 +65,147 @@ const Links = () => {
   });
 
   return (
-    <LinkWrapper>
-      <LinkContainer>
-        <TopPart>
-          <LinkHeader>
-            <Avatar>
-              <AvatarWrap>
-                {/* Avatar svg  hex or oval if nftAvatar=true will convert to hex */}
-                <HexIcon />
-                <OvalIcon />
-                <div className={`${avatarShape} avatar-border`}></div>
-                <div className={`${avatarShape} avatar-fill`}></div>
-                <img
-                  src={avatarImg}
-                  className={avatarShape}
-                />
-              </AvatarWrap>
-            </Avatar>
-            <Title>
-              {/* Using titleimg flag to use image as title or text */}
-              {titleImg ?
-                <img src={titleImage} className="handle" /> :
-                <h1>{name}</h1>
-              }
-              {/* if your remove username from data it will not appear */}
-              {
-                username ? <h3><a href={`${url}`}>{username}</a></h3> : ''
-              }
-            </Title>
-          </LinkHeader>
-
-          {/* Bio Section */}
-          <LinkBio>
-            {description && <h1>{descriptionText} </h1>}
-            {subdesc && <h4>{subdescText}</h4>}
-          </LinkBio>
-          {/* End Bio Section */}
-
-          {/* Weblinks started */}
-          <WebLinkWrap>
-            {/* Social Icon */}
-            <LinkSection className="social">
-              <div className="iconsonly">
-                {
-                  social.map((i) => {
-                    return (
-                      <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
-                        <LinkBox className="socialIcon">
-                          <img src={i.icon} style={{ filter: 'var(--img)' }} />
-                        </LinkBox>
-                      </a>
-                    )
-                  })
+      <LinkWrapper>
+        <LinkContainer>
+          <TopPart>
+            <LinkHeader>
+              <Avatar>
+                <AvatarWrap>
+                  {/* Avatar svg  hex or oval if nftAvatar=true will convert to hex */}
+                  <HexIcon />
+                  <OvalIcon />
+                  <div className={`${avatarShape} avatar-border`}></div>
+                  <div className={`${avatarShape} avatar-fill`}></div>
+                  <img
+                      src={avatarImg}
+                      className={avatarShape}
+                  />
+                </AvatarWrap>
+              </Avatar>
+              <Title>
+                {/* Using titleimg flag to use image as title or text */}
+                {titleImg ?
+                    <img src={titleImage} className="handle" /> :
+                    <h1>{name}</h1>
                 }
-              </div>
-            </LinkSection>
-            {/* Social Icon */}
+                {/* if your remove username from data it will not appear */}
+                {
+                  username ? <h3><a href={`${url}`}>{username}</a></h3> : ''
+                }
+              </Title>
+            </LinkHeader>
 
-            {/* Install Section */}
-            <LinkSection>
-              <h3>{install[0].type}</h3>
-              {
-                install.map((i) => {
-                  return (
-                    <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
-                      <LinkBox>
-                        <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
-                      </LinkBox>
-                    </a>
-                  )
-                })
-              }
-            </LinkSection>
-            {/* End Install Section */}
+            {/* Bio Section */}
+            <LinkBio>
+              {description && <h1>{descriptionText} </h1>}
+              {subdesc && <h4>{subdescText}</h4>}
+            </LinkBio>
+            {/* End Bio Section */}
 
-            {/* NFT Section */}
-            {
-              nfts.length > 0 ?
-                <LinkSection>
-                  <h3>{nfts[0].type}s</h3>
+            {/* Weblinks started */}
+            <WebLinkWrap>
+              {/* Social Icon */}
+              <LinkSection className="social">
+                <div className="iconsonly">
                   {
-                    nfts.map((i) => {
+                    social.map((i) => {
                       return (
-                        <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
-                          <LinkBox>
-                            <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
-                          </LinkBox>
-                        </a>
+                          <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
+                            <LinkBox className="socialIcon">
+                              <img src={i.icon} style={{ filter: 'var(--img)' }} />
+                            </LinkBox>
+                          </a>
                       )
                     })
                   }
-                </LinkSection>
-                : ''
-            }
-            {/* End NFT Section */}
+                </div>
+              </LinkSection>
+              {/* Social Icon */}
 
-            {/* Other Section */}
-            <LinkSection>
-              <h3>{others[0].type}</h3>
-              {/* BioData.js > newProduct == true */}
-              {/* New Section will render once newProduct == true */}
-              {(newProduct) ? <NewSection>
-                <a href={newProductUrl} target="_blank" rel="noreferrer">
-                  <img
-                    src={'/newproduct.png'}
-                    className="newproduct"
-                  />
-                </a>
-              </NewSection> : ''
-              }
-              {/* End Biodata.js, You can move this section anywhere */}
+              {/* Install Section */}
               {
-                others.map((i) => {
-                  return (
-                    <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
-                      <LinkBox>
-                        <LinkTitle><img src={i.icon} /> {i.title}</LinkTitle> <NewUp />
-                      </LinkBox>
-                    </a>
-                  )
-                })
+                install.length > 0 ?
+                    <LinkSection>
+                      <h3>{install[0].type}</h3>
+                      {
+                        install.map((i) => {
+                          return (
+                              <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
+                                <LinkBox>
+                                  <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
+                                </LinkBox>
+                              </a>
+                          )
+                        })
+                      }
+                    </LinkSection> : ''
               }
-            </LinkSection>
-            {/* End Other Section */}
+              {/* End Install Section */}
 
-          </WebLinkWrap>
-          {/* End Weblinks */}
-        </TopPart>
-        <BottomPart>
-          <LinkFoot>
-            <h4>{footerText} <a href={authorURL}>{author}</a></h4>
-          </LinkFoot>
-        </BottomPart>
+              {/* NFT Section */}
+              {
+                nfts.length > 0 ?
+                    <LinkSection>
+                      <h3>{nfts[0].type}s</h3>
+                      {
+                        nfts.map((i) => {
+                          return (
+                              <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
+                                <LinkBox>
+                                  <LinkTitle><img src={i.icon} style={{ filter: 'var(--img)' }} /> {i.title}</LinkTitle> <NewUp />
+                                </LinkBox>
+                              </a>
+                          )
+                        })
+                      }
+                    </LinkSection>
+                    : ''
+              }
+              {/* End NFT Section */}
 
-      </LinkContainer>
-    </LinkWrapper>
+              {/* Other Section */}
+              {
+                others.length > 0 ?
+                    <LinkSection>
+                      <h3>{others[0].type}</h3>
+                      {/* BioData.js > newProduct == true */}
+                      {/* New Section will render once newProduct == true */}
+                      {(newProduct) ? <NewSection>
+                        <a href={newProductUrl} target="_blank" rel="noreferrer">
+                          <img
+                              src={'/newproduct.png'}
+                              className="newproduct"
+                          />
+                        </a>
+                      </NewSection> : ''
+                      }
+                      {/* End Biodata.js, You can move this section anywhere */}
+                      {
+                        others.map((i) => {
+                          return (
+                              <a href={i.url} key={i.title} target="_blank" rel="noreferrer">
+                                <LinkBox>
+                                  <LinkTitle><img src={i.icon} /> {i.title}</LinkTitle> <NewUp />
+                                </LinkBox>
+                              </a>
+                          )
+                        })
+                      }
+                    </LinkSection> : ''
+              }
+              {/* End Other Section */}
+
+            </WebLinkWrap>
+            {/* End Weblinks */}
+          </TopPart>
+          <BottomPart>
+            <LinkFoot>
+              <h4>{footerText} <a href={authorURL}>{author}</a></h4>
+            </LinkFoot>
+          </BottomPart>
+
+        </LinkContainer>
+      </LinkWrapper>
 
   )
 };
@@ -440,7 +446,6 @@ const LinkBox = styled.div`
     letter-spacing: -.5px;
     position: relative;
     text-align: center;
-    position: relative;
     
     &::before{
       content: "";
