@@ -15,12 +15,16 @@ export default function SlashMenu() {
 
     const handleInsert = () => {
         if (!selectedType) return
+        const textCopy = formData.text
+        const labelCopy = formData.label
+        const urlCopy = formData.url
 
         const blockMap: Record<BlockType, Block> = {
-            name: { id: nanoid(), type: 'name', props: { text: formData.text } },
-            bio: { id: nanoid(), type: 'bio', props: { text: formData.text } },
-            link: { id: nanoid(), type: 'link', props: { label: formData.label, url: formData.url } },
+            name: { id: nanoid(), type: 'name', props: { text: textCopy } },
+            bio: { id: nanoid(), type: 'bio', props: { text: textCopy } },
+            link: { id: nanoid(), type: 'link', props: { label: labelCopy, url: urlCopy } },
         }
+
 
         addBlock(blockMap[selectedType])
         setFormData({ text: '', label: '', url: '' })

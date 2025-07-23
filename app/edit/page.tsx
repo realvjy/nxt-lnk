@@ -18,28 +18,51 @@ import {
     arrayMove,
 } from '@dnd-kit/sortable'
 import SortableBlock from '@/components/editor/SortableBlock'
+
 function SaveButton() {
     const layout = useBuilderStore((s) => s.layout)
     const username = useBuilderStore((s) => s.username)
+    const saveToStorage = useBuilderStore((s) => s.saveToStorage)
 
     const handleSave = () => {
         if (!username) return alert("Username is required")
-        localStorage.setItem(`user:${username}`, JSON.stringify(layout))
-        localStorage.setItem('active:username', username)
+        saveToStorage()
         alert(`Saved! Go to /${username}`)
     }
 
-    return <Button onClick={handleSave}>💾 Save</Button>
+    return <Button onClick={handleSave}> Save</Button>
+}
+
+function PreviewButton() {
+    const username = useBuilderStore((s) => s.username)
+
+    const handlePreview = () => {
+        if (!username) {
+            alert("Username is required to preview")
+            return
+        }
+
+        // Save current state before opening preview
+        useBuilderStore.getState().saveToStorage()
+
+        // Open the preview URL in a new tab
+        window.open(`/${username}`, '_blank')
+    }
+
+    return (
+        <Button
+            onClick={handlePreview}
+            variant="outline"
+            className="ml-2 bg-blue-500 text-white hover:bg-blue-600"
+        >
+            Preview
+        </Button>
+    )
 }
 
 function UsernameInput() {
     const username = useBuilderStore((s) => s.username)
     const setUsername = useBuilderStore((s) => s.setUsername)
-
-    useEffect(() => {
-        const savedUsername = localStorage.getItem('active:username')
-        if (savedUsername) setUsername(savedUsername)
-    }, [setUsername])
 
     return (
         <input
@@ -55,9 +78,11 @@ export default function EditPage() {
     const username = useBuilderStore((s) => s.username)
     const layout = useBuilderStore((s) => s.layout)
     const setLayout = useBuilderStore((s) => s.setLayout)
+    const loadFromStorage = useBuilderStore((s) => s.loadFromStorage)
+    const saveToStorage = useBuilderStore((s) => s.saveToStorage)
     const sensors = useSensors(useSensor(PointerSensor))
 
-    const [hasHydrated, setHasHydrated] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const handleDragEnd = (event: any) => {
         const { active, over } = event
         if (!over || active.id === over.id) return
@@ -70,28 +95,10 @@ export default function EditPage() {
         }
     }
 
-    // Hydrate username from localStorage once
     useEffect(() => {
-        const savedUsername = localStorage.getItem('active:username')
-        if (savedUsername) {
-            useBuilderStore.getState().setUsername(savedUsername)
-        }
-        setHasHydrated(true)
-    }, [])
-
-    // Then load layout only when hydrated and username is ready
-    useEffect(() => {
-        if (!hasHydrated || !username) return
-
-        const saved = localStorage.getItem(`user:${username}`)
-        if (saved) {
-            try {
-                setLayout(JSON.parse(saved))
-            } catch (e) {
-                console.warn('Failed to parse saved layout:', e)
-            }
-        }
-    }, [hasHydrated, username, setLayout])
+        loadFromStorage()
+        setIsLoading(false)
+    }, [loadFromStorage])
 
     return (
         <main className="max-w-xl mx-auto p-6 space-y-6">
@@ -109,12 +116,13 @@ export default function EditPage() {
                         </SortableBlock>
                     ))}
                 </SortableContext>
-
-
             </DndContext>
 
             <SlashMenu />
-            <SaveButton />
+            <div className="flex">
+                <SaveButton />
+                <PreviewButton />
+            </div>
         </main>
     )
 }

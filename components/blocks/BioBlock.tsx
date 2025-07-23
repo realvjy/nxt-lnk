@@ -1,23 +1,27 @@
 import { useBuilderStore } from '@/store/useBuilderStore'
+import { BioBlockType } from '@/shared/blocks'
 
-export default function BioBlock({ data, id, isEdit }: any) {
+export default function BioBlock({ block, isEdit }: { block: BioBlockType; isEdit?: boolean }) {
     const updateBlock = useBuilderStore((s) => s.updateBlock)
 
     if (isEdit) {
         return (
             <textarea
-                value={data.text}
+                value={block.props.text}
                 onChange={(e) =>
-                    updateBlock(id, {
-                        id,
-                        type: 'bio',
-                        props: { ...data, text: e.target.value },
+                    updateBlock(block.id, {
+                        ...block,
+                        props: {
+                            ...block.props,
+                            text: e.target.value
+                        }
                     })
                 }
                 className="text-lg text-gray-600 w-full"
+                placeholder="Write something about yourself"
             />
         )
     }
 
-    return <p className="text-lg text-gray-600">{data.text}</p>
+    return <p className="text-lg text-gray-600">{block.props.text}</p>
 }
