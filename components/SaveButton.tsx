@@ -1,11 +1,11 @@
 // components/SaveButton.tsx
 'use client'
 
-import { useBuilderStore } from '@/store/useBuilderStore'
+import { useLayoutStore } from '@/store/layoutStore'
 import { Button } from '@/ui/button'
 
 export default function SaveButton() {
-    const layout = useBuilderStore((s) => s.layout)
+    const layout = useLayoutStore((s) => s.layout)
 
     const handleSave = () => {
         localStorage.setItem('user:realvjy', JSON.stringify(layout))

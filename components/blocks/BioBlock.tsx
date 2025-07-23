@@ -1,8 +1,8 @@
-import { useBuilderStore } from '@/store/useBuilderStore'
+import { useLayoutStore } from '@/store/layoutStore'
 import { BioBlockType } from '@/shared/blocks'
 
 export default function BioBlock({ block, isEdit }: { block: BioBlockType; isEdit?: boolean }) {
-    const updateBlock = useBuilderStore((s) => s.updateBlock)
+    const updateBlock = useLayoutStore((s) => s.updateBlock)
 
     if (isEdit) {
         return (

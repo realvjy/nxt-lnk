@@ -1,13 +1,13 @@
 'use client'
 import { nanoid } from 'nanoid'
 import { useState } from 'react'
-import { useBuilderStore } from '@/store/useBuilderStore'
 import { Block } from '@/shared/blocks'
+import { useLayoutStore } from '@/store/layoutStore'
 
 type BlockType = 'name' | 'bio' | 'link'
 
 export default function SlashMenu() {
-    const addBlock = useBuilderStore((s) => s.addBlock)
+    const addBlock = useLayoutStore((s) => s.addBlock)
     const [visible, setVisible] = useState(false)
     const [step, setStep] = useState<'select' | 'input'>('select')
     const [selectedType, setSelectedType] = useState<BlockType | null>(null)

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useBuilderStore } from '@/store/useBuilderStore'
+import { useUserStore, useLayoutStore, initializeStores, usePersistenceStore } from '@/store/index';
 import BlockRenderer from '@/components/editor/BlockRenderer'
 import SlashMenu from '@/components/editor/SlashMenu'
 import { Button } from '@/ui/button'
@@ -20,9 +20,9 @@ import {
 import SortableBlock from '@/components/editor/SortableBlock'
 
 function SaveButton() {
-    const layout = useBuilderStore((s) => s.layout)
-    const username = useBuilderStore((s) => s.username)
-    const saveToStorage = useBuilderStore((s) => s.saveToStorage)
+    const layout = useLayoutStore((s) => s.layout)
+    const username = useUserStore((s) => s.username)
+    const saveToStorage = usePersistenceStore((s) => s.saveToStorage)
 
     const handleSave = () => {
         if (!username) return alert("Username is required")
@@ -34,7 +34,7 @@ function SaveButton() {
 }
 
 function PreviewButton() {
-    const username = useBuilderStore((s) => s.username)
+    const username = useUserStore((s) => s.username)
 
     const handlePreview = () => {
         if (!username) {
@@ -43,7 +43,7 @@ function PreviewButton() {
         }
 
         // Save current state before opening preview
-        useBuilderStore.getState().saveToStorage()
+        usePersistenceStore.getState().saveToStorage()
 
         // Open the preview URL in a new tab
         window.open(`/${username}`, '_blank')
@@ -61,8 +61,8 @@ function PreviewButton() {
 }
 
 function UsernameInput() {
-    const username = useBuilderStore((s) => s.username)
-    const setUsername = useBuilderStore((s) => s.setUsername)
+    const username = useUserStore((s) => s.username)
+    const setUsername = useUserStore((s) => s.setUsername)
 
     return (
         <input
@@ -75,11 +75,11 @@ function UsernameInput() {
 }
 
 export default function EditPage() {
-    const username = useBuilderStore((s) => s.username)
-    const layout = useBuilderStore((s) => s.layout)
-    const setLayout = useBuilderStore((s) => s.setLayout)
-    const loadFromStorage = useBuilderStore((s) => s.loadFromStorage)
-    const saveToStorage = useBuilderStore((s) => s.saveToStorage)
+    const username = useUserStore((s) => s.username)
+    const layout = useLayoutStore((s) => s.layout)
+    const setLayout = useLayoutStore((s) => s.setLayout)
+    const loadFromStorage = usePersistenceStore((s) => s.loadFromStorage)
+    const saveToStorage = usePersistenceStore((s) => s.saveToStorage)
     const sensors = useSensors(useSensor(PointerSensor))
 
     const [isLoading, setIsLoading] = useState(true)

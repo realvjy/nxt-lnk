@@ -1,7 +1,7 @@
-import { useBuilderStore } from '@/store/useBuilderStore'
+import { useLayoutStore } from '@/store/layoutStore'
 import { LinkBlockType } from '@/shared/blocks'
 export default function LinkBlock({ block, isEdit }: { block: LinkBlockType; isEdit?: boolean }) {
-    const updateBlock = useBuilderStore((s) => s.updateBlock)
+    const updateBlock = useLayoutStore((s) => s.updateBlock)
 
     const { label, url } = block.props
 

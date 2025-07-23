@@ -4,6 +4,7 @@ import "tw-animate-css";
 import type { ReactNode } from 'react'
 import { cn } from "@/lib/utils"
 import { Inter } from "next/font/google"
+import StoreInitializer from '@/components/StoreInitializer'
 
 const inter = Inter({
     subsets: ["latin"],
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en" className={inter.className}>
             <body className={cn("bg-background text-foreground")}>
+                <StoreInitializer />
                 {children}
             </body>
         </html>

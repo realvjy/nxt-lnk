@@ -1,12 +1,12 @@
 // UsernameSetting.tsx
-import { useBuilderStore } from '@/store/useBuilderStore'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useEffect } from 'react'
+import { useUserStore } from '@/store/userStore'
 
 export function UsernameSetting() {
-    const username = useBuilderStore((s) => s.username)
-    const setUsername = useBuilderStore((s) => s.setUsername)
+    const username = useUserStore((s) => s.username)
+    const setUsername = useUserStore((s) => s.setUsername)
 
     // Save username to localStorage on change
     useEffect(() => {
