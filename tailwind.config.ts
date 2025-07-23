@@ -8,7 +8,11 @@ const config: Config = {
         './styles/**/*.{css,scss}', // includes your global file
     ],
     theme: {
-        extend: {},
+        extend: {
+            fontFamily: {
+                sans: ["var(--font-inter)"],
+            },
+        },
     },
 }
 

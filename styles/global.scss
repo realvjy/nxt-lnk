@@ -2,8 +2,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@tailwind base;
-@tailwind components;
 @tailwind utilities;
 
 html{

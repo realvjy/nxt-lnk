@@ -1,25 +1,29 @@
-// store/useBuilderStore.ts
+// useBuilderStore.ts
 import { create } from 'zustand'
-import type { Block } from '@shared/blocks'
+import { Block } from '@/shared/blocks'
 
-interface BuilderState {
+type State = {
     layout: Block[]
     username: string
-    setLayout: (blocks: Block[]) => void
-    setUsername: (name: string) => void
+    setUsername: (u: string) => void
+    setLayout: (layout: Block[]) => void
+    updateBlock: (id: string, newBlock: Block) => void
     addBlock: (block: Block) => void
-    updateBlock: (index: number, newBlock: Block) => void
 }
 
-export const useBuilderStore = create<BuilderState>((set, get) => ({
+export const useBuilderStore = create<State>((set) => ({
     layout: [],
-    username: 'realvjy',
-    setLayout: (blocks) => set({ layout: blocks }),
-    setUsername: (name) => set({ username: name }),
-    addBlock: (block) => set({ layout: [...get().layout, block] }),
-    updateBlock: (index, newBlock) => {
-        const layout = [...get().layout]
-        layout[index] = newBlock
-        set({ layout })
-    },
+    username: '',
+    setUsername: (username) => set({ username }),
+    setLayout: (layout) => set({ layout }),
+    updateBlock: (id, newBlock) =>
+        set((state) => {
+            const layout = [...state.layout]
+            layout[id] = newBlock
+            return { layout }
+        }),
+    addBlock: (block) =>
+        set((state) => ({
+            layout: [...state.layout, block],
+        })),
 }))
