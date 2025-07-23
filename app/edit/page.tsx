@@ -18,6 +18,7 @@ import {
     arrayMove,
 } from '@dnd-kit/sortable'
 import SortableBlock from '@/components/editor/SortableBlock'
+import DownloadButton from '@/components/editor/DownloadButton';
 
 function SaveButton() {
     const layout = useLayoutStore((s) => s.layout)
@@ -122,6 +123,7 @@ export default function EditPage() {
             <div className="flex">
                 <SaveButton />
                 <PreviewButton />
+                <DownloadButton />
             </div>
         </main>
     )
