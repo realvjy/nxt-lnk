@@ -11,23 +11,29 @@
     "start": "next start"
   },
   "dependencies": {
-    "@react-three/fiber": "^8.2.1",
-    "next": "^12.2.4",
-    "next-seo": "^5.5.0",
-    "nextjs-google-analytics": "^2.0.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-fast-marquee": "^1.3.2",
-    "react-mailchimp-subscribe": "^2.1.3",
-    "react-particles-js": "^3.6.0",
-    "styled-components": "^5.3.5",
-    "three": "^0.142.0",
-    "use-dark-mode": "^2.3.1",
-    "use-window-size": "^0.0.1"
+    "@radix-ui/react-slot": "^1.2.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.525.0",
+    "next": "^14.0.0",
+    "next-seo": "^6.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sass": "^1.89.2",
+    "tailwind-merge": "^3.3.1",
+    "zustand": "^4.4.0"
   },
   "devDependencies": {
-    "eslint": "8.19.0",
-    "eslint-config-next": "12.2.2",
-    "prettier": "^2.7.1"
+    "@tailwindcss/cli": "^4.1.11",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "24.1.0",
+    "@types/react": "19.1.8",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.x",
+    "eslint-config-next": "^14.x",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.11",
+    "tw-animate-css": "^1.3.5",
+    "typescript": "^5.x"
   }
 }
