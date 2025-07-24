@@ -1,4 +1,3 @@
-// app/edit/page.tsx - Profile Builder Edit Interface with Drag & Drop
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -85,7 +84,7 @@ const dropAnimationConfig: DropAnimation = {
 
 const EditPage: React.FC = () => {
     const router = useRouter();
-    const { username, setUsername } = useUserStore();
+    const { username, setUsername, getStoredUsername } = useUserStore();
     const {
         layout,
         setLayout,
@@ -94,19 +93,20 @@ const EditPage: React.FC = () => {
         updateBlock: updateBlockInLayout,
         deleteBlock: deleteBlockFromLayout,
         duplicateBlock: duplicateBlockInLayout,
+        loadLayout,
         undo,
         redo,
         canUndo,
         canRedo
     } = useLayoutStore();
-    const { saveToStorage } = usePersistenceStore();
+    const { saveToStorage, loadFromStorage, migrateUsername } = usePersistenceStore();
 
     const [blocks, setBlocks] = useState<Block[]>(layout);
     const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(true);
     const [previewMode, setPreviewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
     const [isSaving, setIsSaving] = useState(false);
-    const [usernameInput, setUsernameInput] = useState(username || '');
+    const [usernameInput, setUsernameInput] = useState('');
     const [usernameError, setUsernameError] = useState('');
 
     // Drag and drop state
@@ -128,18 +128,34 @@ const EditPage: React.FC = () => {
         setBlocks(layout);
     }, [layout]);
 
-    // Initialize data from localStorage
+    // Initialize data and username from localStorage
     useEffect(() => {
         const initializeData = async () => {
-            if (username) {
+            // First, try to get stored username
+            const storedUsername = getStoredUsername();
+
+            if (storedUsername) {
+                // If we have a stored username, set it and load data
+                setUsernameInput(storedUsername);
                 try {
-                    await usePersistenceStore.getState().loadFromStorage(username);
+                    await loadFromStorage(storedUsername);
                 } catch (error) {
                     console.error('Failed to load data:', error);
                 }
+            } else {
+                // If no stored username, just initialize empty
+                setUsernameInput('');
             }
         };
+
         initializeData();
+    }, []); // Remove username dependency to avoid infinite loops
+
+    // Update username input when username changes from store
+    useEffect(() => {
+        if (username && username !== usernameInput) {
+            setUsernameInput(username);
+        }
     }, [username]);
 
     // Drag and Drop handlers
@@ -203,50 +219,118 @@ const EditPage: React.FC = () => {
         }
     };
 
-    // Username handling
-    const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Username handling with validation and migration
+    const handleUsernameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.trim().toLowerCase();
         setUsernameInput(value);
 
+        // Clear previous errors
+        setUsernameError('');
+
+        // Validation
         if (!value) {
             setUsernameError('Username is required');
-        } else if (!/^[a-z0-9_-]+$/.test(value)) {
-            setUsernameError('Username can only contain lowercase letters, numbers, underscores, and hyphens');
-        } else {
-            setUsernameError('');
+            return;
         }
+
+        if (value.length < 3) {
+            setUsernameError('Username must be at least 3 characters');
+            return;
+        }
+
+        if (value.length > 20) {
+            setUsernameError('Username must be less than 20 characters');
+            return;
+        }
+
+        if (!/^[a-z0-9_-]+$/.test(value)) {
+            setUsernameError('Username can only contain lowercase letters, numbers, underscores, and hyphens');
+            return;
+        }
+
+        // If validation passes and username actually changed
+        const currentUsername = username;
+        if (currentUsername && currentUsername !== value) {
+            try {
+                // Migrate data from old username to new username
+                await loadFromStorage(currentUsername); // Ensure current data is loaded
+                await usePersistenceStore.getState().migrateUsername(currentUsername, value);
+
+                // Now set the new username
+                setUsername(value);
+
+                console.log(`Migrated data from ${currentUsername} to ${value}`);
+            } catch (error) {
+                console.error('Failed to migrate username:', error);
+                setUsernameError('Failed to update username');
+                return;
+            }
+        } else if (!currentUsername) {
+            // First time setting username
+            setUsername(value);
+        }
+    };
+
+    // Apply username change (for manual save button if needed)
+    const applyUsername = () => {
+        if (!usernameInput || usernameError) return;
+        setUsername(usernameInput);
     };
 
     const handleSave = async () => {
         setIsSaving(true);
         try {
+            // Ensure we have a valid username
+            const currentUsername = username || usernameInput;
+
+            if (!currentUsername) {
+                throw new Error('Please set a username before saving');
+            }
+
+            if (usernameError) {
+                throw new Error(usernameError);
+            }
+
+            // Make sure username is set in store
             if (!username && usernameInput && !usernameError) {
                 setUsername(usernameInput);
             }
 
-            if (!username && !usernameInput) {
-                throw new Error('Please set a username before saving');
-            }
-
+            // Save using the current username
             await saveToStorage();
+
             console.log('Profile saved successfully!');
+
+            // Show success feedback (you can add a toast here)
         } catch (error) {
             console.error('Failed to save profile:', error);
+            // Show error feedback (you can add a toast here)
+            alert(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
             setIsSaving(false);
         }
     };
 
     const handlePreview = () => {
+        // Ensure username is set before preview
+        const currentUsername = username || usernameInput;
+
+        if (!currentUsername) {
+            alert('Please set a username before previewing');
+            return;
+        }
+
+        if (usernameError) {
+            alert(`Please fix username error: ${usernameError}`);
+            return;
+        }
+
+        // Make sure username is saved
         if (!username && usernameInput && !usernameError) {
             setUsername(usernameInput);
         }
 
-        if (username) {
-            router.push(`/${username}`);
-        } else {
-            console.error('Username is required to preview profile');
-        }
+        router.push(`/${currentUsername}`);
     };
 
     // Available block types
@@ -439,7 +523,7 @@ const EditPage: React.FC = () => {
                             <Button
                                 variant="outline"
                                 onClick={handlePreview}
-                                disabled={!username}
+                                disabled={!username && !usernameInput}
                             >
                                 <ExternalLink className="w-4 h-4 mr-2" />
                                 View Live
@@ -527,9 +611,14 @@ const EditPage: React.FC = () => {
                                                 {usernameError && (
                                                     <p className="text-xs text-red-500 mt-1">{usernameError}</p>
                                                 )}
-                                                {username && (
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        Profile URL: /{username}
+                                                {username && !usernameError && (
+                                                    <p className="text-xs text-green-600 mt-1">
+                                                        ✓ Profile URL: /{username}
+                                                    </p>
+                                                )}
+                                                {usernameInput && !username && !usernameError && (
+                                                    <p className="text-xs text-blue-600 mt-1">
+                                                        Preview URL: /{usernameInput}
                                                     </p>
                                                 )}
                                             </div>

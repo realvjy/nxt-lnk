@@ -1,4 +1,3 @@
-// lib/data.ts
 
 export async function getUserLayout(username: string) {
     // This will only work in the browser during development

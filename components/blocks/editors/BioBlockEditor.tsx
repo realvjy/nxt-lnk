@@ -1,4 +1,3 @@
-// components/blocks/editors/BioBlockEditor.tsx - Using Tiptap
 import React, { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

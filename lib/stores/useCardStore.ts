@@ -1,4 +1,3 @@
-// lib/stores/useCardStore.ts
 import { create } from 'zustand'
 import { LinkCard } from '@/shared/card'
 import { nanoid } from 'nanoid'

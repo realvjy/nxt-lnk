@@ -1,4 +1,3 @@
-// components/blocks/views/BioBlockView.tsx - Updated for Rich Text
 import React from 'react';
 import { BioBlockType } from '@/shared/blocks';
 

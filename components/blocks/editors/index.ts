@@ -1,4 +1,3 @@
-// components/blocks/editors/index.ts
 export { NameBlockEditor } from './NameBlockEditor';
 export { TaglineBlockEditor } from './TaglineBlockEditor';
 export { BioBlockEditor } from './BioBlockEditor';

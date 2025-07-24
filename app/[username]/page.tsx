@@ -1,4 +1,3 @@
-// app/[username]/page.tsx - Public Profile View (Server Component)
 import React, { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';

@@ -1,4 +1,3 @@
-// components/blocks/views/ImageBlockView.tsx
 'use client';
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';

@@ -1,4 +1,3 @@
-// lib/stores/layoutStore.ts - Improved Layout Store
 import { create } from 'zustand'
 import { Block } from '@/shared/blocks'
 import { arrayMove } from '@dnd-kit/sortable'

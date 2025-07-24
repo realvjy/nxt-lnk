@@ -1,4 +1,3 @@
-// lib/stores/persistenceStore.ts - Comprehensive Persistence Store
 import { create } from 'zustand'
 import { useLayoutStore } from './layoutStore'
 import { useUserStore } from './userStore'
@@ -8,15 +7,18 @@ interface PersistenceState {
     isLoading: boolean
     lastSyncTime: Date | null
     hasUnsavedChanges: boolean
+    previousUsername: string | null // Track previous username
 
     // Actions
     setLoading: (loading: boolean) => void
     setLastSync: (time: Date) => void
     setUnsavedChanges: (hasChanges: boolean) => void
+    setPreviousUsername: (username: string | null) => void
 
     // Persistence operations
     saveToStorage: () => Promise<void>
     loadFromStorage: (username: string) => Promise<void>
+    migrateUsername: (oldUsername: string, newUsername: string) => Promise<void>
     exportData: () => string
     importData: (data: string) => Promise<void>
     clearAllData: () => void
@@ -32,10 +34,12 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
     isLoading: false,
     lastSyncTime: null,
     hasUnsavedChanges: false,
+    previousUsername: null,
 
     setLoading: (loading) => set({ isLoading: loading }),
     setLastSync: (time) => set({ lastSyncTime: time }),
     setUnsavedChanges: (hasChanges) => set({ hasUnsavedChanges: hasChanges }),
+    setPreviousUsername: (username) => set({ previousUsername: username }),
 
     saveToStorage: async () => {
         set({ isLoading: true })
@@ -45,15 +49,13 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
                 throw new Error('No username provided')
             }
 
-            // Save layout
+            // Save layout directly - no automatic migration
             useLayoutStore.getState().saveLayout(username)
-
-            // Save user data (already persisted by zustand-persist)
-            // Additional custom saving logic can go here
 
             set({
                 lastSyncTime: new Date(),
-                hasUnsavedChanges: false
+                hasUnsavedChanges: false,
+                previousUsername: username
             })
 
             console.log('Data saved successfully')
@@ -75,8 +77,11 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
             // Load layout
             useLayoutStore.getState().loadLayout(username)
 
-            // Set username
+            // Set username in user store
             useUserStore.getState().setUsername(username)
+
+            // Track this as the previous username
+            set({ previousUsername: username })
 
             set({
                 lastSyncTime: new Date(),
@@ -89,6 +94,42 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
             throw error
         } finally {
             set({ isLoading: false })
+        }
+    },
+
+    migrateUsername: async (oldUsername, newUsername) => {
+        if (typeof window === 'undefined') return
+
+        try {
+            console.log(`Starting migration from ${oldUsername} to ${newUsername}`)
+
+            // Get the old data
+            const oldLayoutKey = `user:${oldUsername}:layout`
+            const oldLayoutData = localStorage.getItem(oldLayoutKey)
+
+            if (oldLayoutData) {
+                // Save to new key
+                const newLayoutKey = `user:${newUsername}:layout`
+                localStorage.setItem(newLayoutKey, oldLayoutData)
+
+                console.log(`Copied data to ${newLayoutKey}`)
+
+                // Remove old key
+                localStorage.removeItem(oldLayoutKey)
+
+                console.log(`Removed old data from ${oldLayoutKey}`)
+
+                // Also update the layout store to use the new username
+                useLayoutStore.getState().loadLayout(newUsername)
+
+                console.log(`Successfully migrated data from ${oldUsername} to ${newUsername}`)
+            } else {
+                console.log(`No data found for ${oldUsername}, skipping migration`)
+            }
+
+        } catch (error) {
+            console.error('Failed to migrate username data:', error)
+            throw error
         }
     },
 
@@ -126,7 +167,8 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
 
             set({
                 lastSyncTime: new Date(),
-                hasUnsavedChanges: false
+                hasUnsavedChanges: false,
+                previousUsername: parsedData.username
             })
 
             console.log('Data imported successfully')
@@ -153,7 +195,8 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
 
         set({
             lastSyncTime: null,
-            hasUnsavedChanges: false
+            hasUnsavedChanges: false,
+            previousUsername: null
         })
     },
 

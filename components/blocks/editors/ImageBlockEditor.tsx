@@ -1,4 +1,3 @@
-// components/blocks/editors/ImageBlockEditor.tsx - Fixed version
 
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';

@@ -1,4 +1,3 @@
-// lib/stores/userStore.ts - Enhanced User Store
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -26,6 +25,7 @@ interface UserState {
     // Initialization
     initializeUser: () => void
     clearUser: () => void
+    getStoredUsername: () => string  // Added this method
 
     // Helpers
     isProfileComplete: () => boolean
@@ -81,6 +81,13 @@ export const useUserStore = create<UserState>()(
                         badge: undefined
                     }
                 })
+            },
+
+            getStoredUsername: () => {
+                // Get the current username from the store
+                // Since we're using persist, this will be the stored value
+                const state = get()
+                return state.username || ''
             },
 
             isProfileComplete: () => {

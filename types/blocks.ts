@@ -1,4 +1,3 @@
-// shared/blocks.ts - Fixed version
 import { UserProfile } from './profile/user'
 import { Link } from './profile/links'
 

@@ -1,4 +1,3 @@
-// lib/stores/index.ts - Simplified Store Exports
 
 import { useBuilderStore } from './builderStore'
 import { useLayoutStore } from './layoutStore'
@@ -12,9 +11,24 @@ export { useBuilderStore } from './builderStore'
 export { usePersistenceStore, useTrackChanges } from './persistenceStore'
 
 // Legacy stores (if you still need them)
-// export { useCardStore } from './useCardStore' // Remove if not needed
 
 // Removed useBlockStore - functionality moved to useLayoutStore
+
+// Export the initialization function that's used by StoreInitializer
+export function initializeStores() {
+    // Get the stored username from localStorage
+    const storedUsername = typeof window !== 'undefined' ? localStorage.getItem('active:username') : null
+
+    // Initialize the user store with the username
+    if (storedUsername) {
+        useUserStore.getState().setUsername(storedUsername)
+    }
+
+    // Initialize other stores as needed
+    useUserStore.getState().initializeUser()
+
+    console.log('All stores initialized successfully')
+}
 
 // App initialization hook
 export function useAppInitialization() {

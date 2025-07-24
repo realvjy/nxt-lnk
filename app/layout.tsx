@@ -1,4 +1,3 @@
-// app/layout.tsx
 import '../styles/global.scss'
 import type { ReactNode } from 'react'
 import { cn } from "@/lib/utils/utils"

@@ -1,4 +1,3 @@
-// components/blocks/views/index.ts
 export { default as NameBlockView } from './NameBlockView';
 export { default as TaglineBlockView } from './TaglineBlockView';
 export { default as BioBlockView } from './BioBlockView';

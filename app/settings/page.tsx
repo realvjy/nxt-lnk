@@ -1,4 +1,3 @@
-// app/settings/page.tsx
 import SettingsPanel from "@/components/settings/SettingsPanel"
 
 export default function SettingsPage() {
