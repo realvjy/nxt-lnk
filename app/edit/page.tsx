@@ -1,4 +1,4 @@
-// app/edit/page.tsx - Profile Builder Edit Interface (Fixed)
+// app/edit/page.tsx - Profile Builder Edit Interface with Drag & Drop
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { BlockRenderer } from '@/components/blocks/BlockRenderer';
 import {
     NameBlockEditor,
@@ -31,7 +33,10 @@ import {
     Tablet,
     Monitor,
     ExternalLink,
-    ArrowLeft
+    ArrowLeft,
+    Undo,
+    Redo,
+    MousePointer
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/lib/stores/userStore';
@@ -48,10 +53,52 @@ import type {
     LinkBlockType
 } from '@/shared/blocks';
 
+// Drag and Drop imports
+import {
+    DndContext,
+    DragEndEvent,
+    DragStartEvent,
+    DragOverlay,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    defaultDropAnimationSideEffects,
+    DropAnimation,
+} from '@dnd-kit/core';
+import {
+    SortableContext,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+
+const dropAnimationConfig: DropAnimation = {
+    sideEffects: defaultDropAnimationSideEffects({
+        styles: {
+            active: {
+                opacity: '0.4',
+            },
+        },
+    }),
+};
+
 const EditPage: React.FC = () => {
     const router = useRouter();
     const { username, setUsername } = useUserStore();
-    const { layout, setLayout, addBlock: addBlockToLayout } = useLayoutStore();
+    const {
+        layout,
+        setLayout,
+        reorderBlocks,
+        addBlock: addBlockToLayout,
+        updateBlock: updateBlockInLayout,
+        deleteBlock: deleteBlockFromLayout,
+        duplicateBlock: duplicateBlockInLayout,
+        undo,
+        redo,
+        canUndo,
+        canRedo
+    } = useLayoutStore();
     const { saveToStorage } = usePersistenceStore();
 
     const [blocks, setBlocks] = useState<Block[]>(layout);
@@ -62,6 +109,20 @@ const EditPage: React.FC = () => {
     const [usernameInput, setUsernameInput] = useState(username || '');
     const [usernameError, setUsernameError] = useState('');
 
+    // Drag and drop state
+    const [activeBlock, setActiveBlock] = useState<Block | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+
+    // Configure sensors for drag and drop
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8, // 8px movement required to start drag
+            },
+        }),
+        useSensor(KeyboardSensor)
+    );
+
     // Sync blocks with layout store
     useEffect(() => {
         setBlocks(layout);
@@ -70,41 +131,64 @@ const EditPage: React.FC = () => {
     // Initialize data from localStorage
     useEffect(() => {
         const initializeData = async () => {
-            // If we already have a username, load data for that username
             if (username) {
                 try {
-                    // This will load layout from localStorage for the current username
                     await usePersistenceStore.getState().loadFromStorage(username);
                 } catch (error) {
                     console.error('Failed to load data:', error);
                 }
             }
         };
-
         initializeData();
     }, [username]);
+
+    // Drag and Drop handlers
+    const handleDragStart = (event: DragStartEvent) => {
+        const { active } = event;
+        const activeBlockData = blocks.find(block => block.id === active.id);
+
+        if (activeBlockData) {
+            setActiveBlock(activeBlockData);
+            setIsDragging(true);
+        }
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        setActiveBlock(null);
+        setIsDragging(false);
+
+        if (!over || active.id === over.id) {
+            return;
+        }
+
+        const oldIndex = blocks.findIndex(block => block.id === active.id);
+        const newIndex = blocks.findIndex(block => block.id === over.id);
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+            reorderBlocks(oldIndex, newIndex);
+        }
+    };
+
+    const handleDragCancel = () => {
+        setActiveBlock(null);
+        setIsDragging(false);
+    };
 
     // Block management functions
     const handleAddBlock = (type: Block['type']) => {
         const newBlock = createBlock(type);
-        const updatedBlocks = [...blocks, newBlock];
-        setBlocks(updatedBlocks);
-        setLayout(updatedBlocks);
+        addBlockToLayout(newBlock);
         setSelectedBlockId(newBlock.id);
     };
 
     const handleUpdateBlock = (updatedBlock: Block) => {
-        const updatedBlocks = blocks.map(block =>
-            block.id === updatedBlock.id ? updatedBlock : block
-        );
-        setBlocks(updatedBlocks);
-        setLayout(updatedBlocks);
+        updateBlockInLayout(updatedBlock);
     };
 
     const handleDeleteBlock = (blockId: string) => {
-        const updatedBlocks = blocks.filter(block => block.id !== blockId);
-        setBlocks(updatedBlocks);
-        setLayout(updatedBlocks);
+        deleteBlockFromLayout(blockId);
         if (selectedBlockId === blockId) {
             setSelectedBlockId(null);
         }
@@ -114,23 +198,16 @@ const EditPage: React.FC = () => {
         const blockToDuplicate = blocks.find(b => b.id === blockId);
         if (blockToDuplicate) {
             const duplicatedBlock = createBlock(blockToDuplicate.type, blockToDuplicate.props);
-            const blockIndex = blocks.findIndex(b => b.id === blockId);
-            const updatedBlocks = [
-                ...blocks.slice(0, blockIndex + 1),
-                duplicatedBlock,
-                ...blocks.slice(blockIndex + 1)
-            ];
-            setBlocks(updatedBlocks);
-            setLayout(updatedBlocks);
+            duplicateBlockInLayout(blockId, duplicatedBlock);
+            setSelectedBlockId(duplicatedBlock.id);
         }
     };
 
-    // Handle username change
+    // Username handling
     const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.trim().toLowerCase();
         setUsernameInput(value);
 
-        // Basic validation
         if (!value) {
             setUsernameError('Username is required');
         } else if (!/^[a-z0-9_-]+$/.test(value)) {
@@ -140,38 +217,27 @@ const EditPage: React.FC = () => {
         }
     };
 
-    // Apply username change
-    const applyUsername = () => {
-        if (!usernameInput || usernameError) return;
-        setUsername(usernameInput);
-    };
-
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            // Apply username if valid
             if (!username && usernameInput && !usernameError) {
                 setUsername(usernameInput);
             }
 
-            // Check if username exists
             if (!username && !usernameInput) {
                 throw new Error('Please set a username before saving');
             }
 
             await saveToStorage();
-            // Show success message or toast
             console.log('Profile saved successfully!');
         } catch (error) {
             console.error('Failed to save profile:', error);
-            // Show error message or toast
         } finally {
             setIsSaving(false);
         }
     };
 
     const handlePreview = () => {
-        // Apply username if valid
         if (!username && usernameInput && !usernameError) {
             setUsername(usernameInput);
         }
@@ -179,7 +245,6 @@ const EditPage: React.FC = () => {
         if (username) {
             router.push(`/${username}`);
         } else {
-            // Show error or alert that username is required
             console.error('Username is required to preview profile');
         }
     };
@@ -194,12 +259,11 @@ const EditPage: React.FC = () => {
         { type: 'link', label: 'Link', icon: Link2, description: 'Add a link' },
     ];
 
-    // Render editor based on selected block with proper typing
+    // Render editor based on selected block
     const renderEditor = () => {
         const selectedBlock = blocks.find(b => b.id === selectedBlockId);
         if (!selectedBlock) return null;
 
-        // Create type-safe update handler for each block type
         const createUpdateHandler = <T extends Block>(blockType: T['type']) => {
             return (updatedBlock: T) => {
                 handleUpdateBlock(updatedBlock);
@@ -297,6 +361,31 @@ const EditPage: React.FC = () => {
                         </div>
 
                         <div className="flex items-center gap-2">
+                            {/* Undo/Redo Controls */}
+                            {isEditing && (
+                                <>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={undo}
+                                        disabled={!canUndo()}
+                                        title="Undo"
+                                    >
+                                        <Undo className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={redo}
+                                        disabled={!canRedo()}
+                                        title="Redo"
+                                    >
+                                        <Redo className="w-4 h-4" />
+                                    </Button>
+                                    <Separator orientation="vertical" className="h-6" />
+                                </>
+                            )}
+
                             {/* Preview Mode Toggle */}
                             {!isEditing && (
                                 <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
@@ -373,53 +462,99 @@ const EditPage: React.FC = () => {
                     {/* Block Library Sidebar */}
                     {isEditing && (
                         <div className="lg:col-span-3">
-                            <Card className="sticky top-24">
-                                <CardContent className="p-4">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <Settings className="w-4 h-4" />
-                                        <h3 className="font-semibold">Add Blocks</h3>
-                                    </div>
+                            <div className="space-y-4">
+                                {/* Block Library */}
+                                <Card className="sticky top-24">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <Settings className="w-4 h-4" />
+                                            <h3 className="font-semibold">Add Blocks</h3>
+                                        </div>
 
-                                    <div className="space-y-2">
-                                        {blockTypes.map(({ type, label, icon: Icon, description }) => (
-                                            <Button
-                                                key={type}
-                                                variant="outline"
-                                                className="w-full justify-start h-auto p-3"
-                                                onClick={() => handleAddBlock(type as Block['type'])}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <Icon className="w-5 h-5 text-muted-foreground" />
-                                                    <div className="text-left">
-                                                        <div className="font-medium">{label}</div>
-                                                        <div className="text-xs text-muted-foreground">
-                                                            {description}
+                                        <div className="space-y-2">
+                                            {blockTypes.map(({ type, label, icon: Icon, description }) => (
+                                                <Button
+                                                    key={type}
+                                                    variant="outline"
+                                                    className="w-full justify-start h-auto p-3"
+                                                    onClick={() => handleAddBlock(type as Block['type'])}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <Icon className="w-5 h-5 text-muted-foreground" />
+                                                        <div className="text-left">
+                                                            <div className="font-medium">{label}</div>
+                                                            <div className="text-xs text-muted-foreground">
+                                                                {description}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </Button>
-                                        ))}
-                                    </div>
+                                                </Button>
+                                            ))}
+                                        </div>
 
-                                    {blocks.length > 0 && (
-                                        <>
-                                            <Separator className="my-4" />
-                                            <div className="text-sm text-muted-foreground">
-                                                <div className="flex items-center justify-between">
-                                                    <span>Total Blocks:</span>
-                                                    <Badge variant="secondary">{blocks.length}</Badge>
+                                        {blocks.length > 0 && (
+                                            <>
+                                                <Separator className="my-4" />
+                                                <div className="text-sm text-muted-foreground">
+                                                    <div className="flex items-center justify-between">
+                                                        <span>Total Blocks:</span>
+                                                        <Badge variant="secondary">{blocks.length}</Badge>
+                                                    </div>
                                                 </div>
+                                            </>
+                                        )}
+                                    </CardContent>
+                                </Card>
+
+                                {/* Username Settings */}
+                                <Card>
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <User className="w-4 h-4" />
+                                            <h3 className="font-semibold">Profile Settings</h3>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <div>
+                                                <Label htmlFor="username">Username</Label>
+                                                <Input
+                                                    id="username"
+                                                    type="text"
+                                                    value={usernameInput}
+                                                    onChange={handleUsernameChange}
+                                                    placeholder="Enter username"
+                                                    className={usernameError ? 'border-red-500' : ''}
+                                                />
+                                                {usernameError && (
+                                                    <p className="text-xs text-red-500 mt-1">{usernameError}</p>
+                                                )}
+                                                {username && (
+                                                    <p className="text-xs text-muted-foreground mt-1">
+                                                        Profile URL: /{username}
+                                                    </p>
+                                                )}
                                             </div>
-                                        </>
-                                    )}
-                                </CardContent>
-                            </Card>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </div>
                     )}
 
-                    {/* Main Canvas */}
+                    {/* Main Canvas with Drag & Drop */}
                     <div className={`${isEditing ? 'lg:col-span-6' : 'lg:col-span-9'}`}>
                         <div className={`mx-auto transition-all duration-300 ${previewSizes[previewMode]}`}>
+                            {/* Drag Instructions */}
+                            {isEditing && blocks.length > 1 && (
+                                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <div className="flex items-center gap-2 text-sm text-blue-700">
+                                        <MousePointer className="w-4 h-4" />
+                                        <span>
+                                            Hover over blocks to see drag handles. Drag blocks to reorder them.
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+
                             {blocks.length === 0 ? (
                                 <Card>
                                     <CardContent className="flex flex-col items-center justify-center py-12">
@@ -445,20 +580,52 @@ const EditPage: React.FC = () => {
                                     </CardContent>
                                 </Card>
                             ) : (
-                                <div className="space-y-4">
-                                    {blocks.map((block) => (
-                                        <BlockRenderer
-                                            key={block.id}
-                                            block={block}
-                                            isEditing={isEditing}
-                                            isSelected={selectedBlockId === block.id}
-                                            onUpdate={handleUpdateBlock}
-                                            onDelete={handleDeleteBlock}
-                                            onDuplicate={handleDuplicateBlock}
-                                            onSelect={setSelectedBlockId}
-                                        />
-                                    ))}
-                                </div>
+                                <DndContext
+                                    sensors={sensors}
+                                    collisionDetection={closestCenter}
+                                    onDragStart={handleDragStart}
+                                    onDragEnd={handleDragEnd}
+                                    onDragCancel={handleDragCancel}
+                                    modifiers={[restrictToVerticalAxis]}
+                                >
+                                    <SortableContext
+                                        items={blocks.map(block => block.id)}
+                                        strategy={verticalListSortingStrategy}
+                                    >
+                                        <div className={`space-y-4 ${isEditing ? 'pl-12' : ''}`}>
+                                            {blocks.map((block) => (
+                                                <BlockRenderer
+                                                    key={block.id}
+                                                    block={block}
+                                                    isEditing={isEditing}
+                                                    isSelected={selectedBlockId === block.id}
+                                                    isDragging={isDragging && activeBlock?.id === block.id}
+                                                    onUpdate={handleUpdateBlock}
+                                                    onDelete={handleDeleteBlock}
+                                                    onDuplicate={handleDuplicateBlock}
+                                                    onSelect={setSelectedBlockId}
+                                                />
+                                            ))}
+                                        </div>
+                                    </SortableContext>
+
+                                    <DragOverlay dropAnimation={dropAnimationConfig}>
+                                        {activeBlock ? (
+                                            <div className="transform rotate-3 shadow-2xl">
+                                                <BlockRenderer
+                                                    block={activeBlock}
+                                                    isEditing={false}
+                                                    isSelected={false}
+                                                    isDragging={true}
+                                                    onUpdate={() => { }}
+                                                    onDelete={() => { }}
+                                                    onDuplicate={() => { }}
+                                                    onSelect={() => { }}
+                                                />
+                                            </div>
+                                        ) : null}
+                                    </DragOverlay>
+                                </DndContext>
                             )}
                         </div>
                     </div>
@@ -469,34 +636,6 @@ const EditPage: React.FC = () => {
                             <Card className="sticky top-24">
                                 <CardContent className="p-4">
                                     {renderEditor()}
-                                </CardContent>
-                            </Card>
-                        </div>
-                    )}
-                    {/* Username Input */}
-                    {isEditing && (
-                        <div className="lg:col-span-3">
-                            <Card className="sticky top-24">
-                                <CardContent className="p-4">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <Settings className="w-4 h-4" />
-                                        <h3 className="font-semibold">Settings</h3>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex flex-col gap-2">
-                                            <label className="text-sm text-muted-foreground" htmlFor="username">Username:</label>
-                                            <input
-                                                id="username"
-                                                type="text"
-                                                value={usernameInput}
-                                                onChange={handleUsernameChange}
-                                                className="w-full p-2 rounded-lg border border-muted"
-                                            />
-                                            {usernameError && (
-                                                <p className="text-xs text-error">{usernameError}</p>
-                                            )}
-                                        </div>
-                                    </div>
                                 </CardContent>
                             </Card>
                         </div>

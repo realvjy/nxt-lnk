@@ -1,7 +1,5 @@
-// components/blocks/views/BioBlockView.tsx
+// components/blocks/views/BioBlockView.tsx - Updated for Rich Text
 import React from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { BioBlockType } from '@/shared/blocks';
 
 interface BioBlockViewProps {
@@ -15,34 +13,29 @@ export const BioBlockView: React.FC<BioBlockViewProps> = ({
     isEditing,
     onChange
 }) => {
-    if (isEditing) {
+    // For the new system, we don't show inline editing in the view
+    // All editing happens in the dedicated editor panel
+
+    // If there's no content, show a placeholder
+    if (!block.props.text || block.props.text.trim() === '' || block.props.text === '<p></p>') {
         return (
-            <div className="space-y-2">
-                <Label htmlFor={`bio-${block.id}`}>Bio</Label>
-                <Textarea
-                    id={`bio-${block.id}`}
-                    value={block.props.text}
-                    onChange={(e) => onChange({
-                        ...block,
-                        props: { ...block.props, text: e.target.value }
-                    })}
-                    placeholder="Tell people about yourself..."
-                    rows={4}
-                    className="text-center resize-none"
-                />
-                <div className="text-xs text-muted-foreground text-right">
-                    {block.props.text.length}/500
+            <div className="text-center max-w-2xl mx-auto">
+                <div className="text-muted-foreground leading-relaxed py-8 px-4 border-2 border-dashed border-muted-foreground/25 rounded-lg">
+                    {isEditing
+                        ? 'Click to edit your bio...'
+                        : 'No bio added yet'
+                    }
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="text-center max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto">
             <div
-                className="text-muted-foreground leading-relaxed prose prose-sm mx-auto"
+                className="bio-content text-muted-foreground leading-relaxed"
                 dangerouslySetInnerHTML={{
-                    __html: block.props.text || 'Your bio will appear here...'
+                    __html: block.props.text
                 }}
             />
         </div>

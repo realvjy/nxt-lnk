@@ -130,33 +130,355 @@ body {
   background: yellow;
 }
 
-/* Tiptap Editor Styles */
-.tiptap-editor {
-  .ProseMirror {
-    outline: none;
-    min-height: 100px;
+/* Add this to your globals.css file */
+
+/* Enhanced Tiptap Editor Styles */
+.tiptap-editor .ProseMirror {
+  outline: none;
+  min-height: 120px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-size: 14px;
+  line-height: 1.6;
+  
+  /* Focus styles */
+  &:focus {
+    border-color: hsl(var(--ring));
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+  }
+  
+  /* Placeholder styles */
+  p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+    height: 0;
+  }
+  
+  /* Typography styles */
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.1;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
     
-    > * + * {
-      margin-top: 0.75em;
+    &:first-child {
+      margin-top: 0;
     }
+  }
+  
+  h1 {
+    font-size: 1.875rem; /* 30px */
+    font-weight: 800;
+  }
+  
+  h2 {
+    font-size: 1.5rem; /* 24px */
+    font-weight: 700;
+  }
+  
+  h3 {
+    font-size: 1.25rem; /* 20px */
+    font-weight: 600;
+  }
+  
+  h4 {
+    font-size: 1.125rem; /* 18px */
+    font-weight: 600;
+  }
+  
+  /* Paragraph spacing */
+  p {
+    margin: 0 0 1rem 0;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  /* Text formatting */
+  strong, b {
+    font-weight: 700;
+    color: hsl(var(--foreground));
+  }
+  
+  em, i {
+    font-style: italic;
+  }
+  
+  u {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+  }
+  
+  s {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  
+  /* Code styling */
+  code {
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 0.875em;
+  }
+  
+  /* Blockquote styling */
+  blockquote {
+    border-left: 4px solid hsl(var(--primary));
+    background: hsl(var(--muted) / 0.3);
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 0 6px 6px 0;
+    font-style: italic;
+    color: hsl(var(--muted-foreground));
     
     p {
       margin: 0;
     }
+  }
+  
+  /* List styling */
+  ul, ol {
+    padding-left: 1.5rem;
+    margin: 1rem 0;
     
-    ul, ol {
-      padding: 0 1rem;
+    li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+      
+      p {
+        margin: 0;
+      }
+    }
+  }
+  
+  ul {
+    li {
+      list-style-type: disc;
+      
+      &::marker {
+        color: hsl(var(--primary));
+      }
     }
     
-    blockquote {
-      padding-left: 1rem;
-      border-left: 2px solid #ddd;
-      margin-left: 0;
-      margin-right: 0;
+    ul {
+      li {
+        list-style-type: circle;
+      }
+      
+      ul {
+        li {
+          list-style-type: square;
+        }
+      }
     }
+  }
+  
+  ol {
+    li {
+      list-style-type: decimal;
+      
+      &::marker {
+        color: hsl(var(--primary));
+        font-weight: 600;
+      }
+    }
+    
+    ol {
+      li {
+        list-style-type: lower-alpha;
+      }
+      
+      ol {
+        li {
+          list-style-type: lower-roman;
+        }
+      }
+    }
+  }
+  
+  /* Link styling */
+  a {
+    color: hsl(var(--primary));
+    text-decoration: underline;
+    text-decoration-color: hsl(var(--primary) / 0.3);
+    text-underline-offset: 2px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      text-decoration-color: hsl(var(--primary));
+      color: hsl(var(--primary));
+    }
+  }
+  
+  /* Horizontal rule */
+  hr {
+    border: none;
+    border-top: 2px solid hsl(var(--border));
+    margin: 2rem 0;
+    background: none;
+  }
+  
+  /* Text alignment */
+  *[style*="text-align: left"] {
+    text-align: left !important;
+  }
+  
+  *[style*="text-align: center"] {
+    text-align: center !important;
+  }
+  
+  *[style*="text-align: right"] {
+    text-align: right !important;
+  }
+  
+  *[style*="text-align: justify"] {
+    text-align: justify !important;
   }
 }
 
+/* Bio content styling for display mode (when rendered outside editor) */
+.bio-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: hsl(var(--foreground));
+  
+  /* Typography styles - same as editor */
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.1;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+  
+  h1 {
+    font-size: 1.875rem;
+    font-weight: 800;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+  
+  p {
+    margin: 0 0 0.75rem 0;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  strong, b {
+    font-weight: 700;
+    color: hsl(var(--foreground));
+  }
+  
+  em, i {
+    font-style: italic;
+  }
+  
+  u {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+  }
+  
+  s {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  
+  code {
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 0.875em;
+  }
+  
+  blockquote {
+    border-left: 4px solid hsl(var(--primary));
+    background: hsl(var(--muted) / 0.3);
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+    border-radius: 0 6px 6px 0;
+    font-style: italic;
+    color: hsl(var(--muted-foreground));
+    
+    p {
+      margin: 0;
+    }
+  }
+  
+  ul, ol {
+    padding-left: 1.5rem;
+    margin: 0.75rem 0;
+    
+    li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+    }
+  }
+  
+  ul li {
+    list-style-type: disc;
+    
+    &::marker {
+      color: hsl(var(--primary));
+    }
+  }
+  
+  ol li {
+    list-style-type: decimal;
+    
+    &::marker {
+      color: hsl(var(--primary));
+      font-weight: 600;
+    }
+  }
+  
+  a {
+    color: hsl(var(--primary));
+    text-decoration: underline;
+    text-decoration-color: hsl(var(--primary) / 0.3);
+    text-underline-offset: 2px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      text-decoration-color: hsl(var(--primary));
+    }
+  }
+  
+  hr {
+    border: none;
+    border-top: 2px solid hsl(var(--border));
+    margin: 1.5rem 0;
+    background: none;
+  }
+}
 /* Bio content styling for display mode */
 .bio-content {
   p {
