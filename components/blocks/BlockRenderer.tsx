@@ -1,4 +1,3 @@
-// components/blocks/BlockRenderer.tsx - Updated with Drag & Drop
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +32,9 @@ import {
 } from './views';
 
 import { Block } from '@/shared/blocks';
+import { SlashMenu } from './menu/SlashMenu';
+import { BlockTypeConfig, BLOCK_TYPES } from '@/lib/constants/blockTypes';
+
 
 interface SortableBlockWrapperProps {
     block: Block;
@@ -43,6 +45,7 @@ interface SortableBlockWrapperProps {
     onDelete: (blockId: string) => void;
     onDuplicate: (blockId: string) => void;
     onSelect: (blockId: string) => void;
+    onAddBlock: (type: Block['type']) => void;
     children: React.ReactNode;
 }
 
@@ -55,6 +58,7 @@ const SortableBlockWrapper: React.FC<SortableBlockWrapperProps> = ({
     onDelete,
     onDuplicate,
     onSelect,
+    onAddBlock,
     children
 }) => {
     const {
@@ -88,6 +92,35 @@ const SortableBlockWrapper: React.FC<SortableBlockWrapperProps> = ({
     const handleDelete = (e: React.MouseEvent) => {
         e.stopPropagation();
         onDelete(block.id);
+    };
+
+    const [open, setOpen] = React.useState(false);
+    const [query, setQuery] = React.useState("");
+    const [selected, setSelected] = React.useState(0);
+    const filtered = React.useMemo(() => {
+        return BLOCK_TYPES.filter((item) =>
+            item.type.toLowerCase().includes(query.toLowerCase()) ||
+            item.label.toLowerCase().includes(query.toLowerCase()) ||
+            item.description.toLowerCase().includes(query.toLowerCase())
+        );
+    }, [query]);
+
+    const openMenu = () => {
+        setOpen(true);
+    };
+
+    const closeMenu = () => {
+        setOpen(false);
+        setQuery("");
+    };
+
+    const reset = () => {
+        closeMenu();
+        setSelected(0);
+    };
+
+    const moveSelection = (direction: number) => {
+        setSelected((prev) => (prev + direction + filtered.length) % filtered.length);
     };
 
     // If not editing, render without drag functionality
@@ -179,6 +212,58 @@ const SortableBlockWrapper: React.FC<SortableBlockWrapperProps> = ({
                 {/* Block Content */}
                 <div className="p-4">
                     {children}
+                    {isEditing && (
+                        <div className="mt-2 border-t pt-2">
+                            <div
+                                contentEditable
+                                suppressContentEditableWarning
+                                className="outline-none w-full text-sm text-muted-foreground empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground/60 before:pointer-events-none"
+                                data-placeholder="Type / for blocks..."
+                                onKeyDown={(e) => {
+                                    if (e.key === "/" && !open) {
+                                        openMenu();
+                                        setQuery("");
+                                        e.preventDefault();
+                                    } else if (open) {
+                                        if (e.key === "ArrowDown") {
+                                            e.preventDefault();
+                                            moveSelection(1);
+                                        } else if (e.key === "ArrowUp") {
+                                            e.preventDefault();
+                                            moveSelection(-1);
+                                        } else if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            if (filtered[selected]) {
+                                                onAddBlock(filtered[selected].type);
+                                                reset();
+                                            }
+                                        } else if (e.key === "Escape") {
+                                            closeMenu();
+                                        } else if (e.key.length === 1) {
+                                            setQuery(query + e.key);
+                                        } else if (e.key === "Backspace") {
+                                            setQuery(query.slice(0, -1));
+                                            if (query.length === 0) {
+                                                closeMenu();
+                                            }
+                                        }
+                                    }
+                                }}
+                            />
+                            {open && (
+                                <SlashMenu
+                                    items={filtered}
+                                    open={open}
+                                    selected={selected}
+                                    onSelect={(item) => {
+                                        onAddBlock(item.type);
+                                        reset();
+                                    }}
+                                    style={{ position: "absolute", bottom: "-1rem", left: 0, width: "100%", zIndex: 50 }}
+                                />
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Block Type Label - Bottom left */}
@@ -221,6 +306,7 @@ interface BlockRendererProps {
     onDelete: (blockId: string) => void;
     onDuplicate: (blockId: string) => void;
     onSelect: (blockId: string) => void;
+    onAddBlock: (type: Block['type']) => void;
 }
 
 export const BlockRenderer: React.FC<BlockRendererProps> = ({
@@ -231,7 +317,8 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({
     onUpdate,
     onDelete,
     onDuplicate,
-    onSelect
+    onSelect,
+    onAddBlock
 }) => {
     const renderBlockContent = () => {
         const commonProps = {
@@ -274,6 +361,7 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({
             onDelete={onDelete}
             onDuplicate={onDuplicate}
             onSelect={onSelect}
+            onAddBlock={onAddBlock}
         >
             {renderBlockContent()}
         </SortableBlockWrapper>

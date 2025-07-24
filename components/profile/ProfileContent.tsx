@@ -188,6 +188,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ username }) => {
                                             onDelete={noopHandler}
                                             onDuplicate={noopHandler}
                                             onSelect={noopHandler}
+                                            onAddBlock={noopHandler}
                                         />
                                     </div>
                                 ))}

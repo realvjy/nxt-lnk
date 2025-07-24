@@ -1,4 +1,3 @@
-// components/blocks/DragDropCanvas.tsx - Main canvas with drop zones
 import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,6 +8,10 @@ import { useBuilderStore } from '@/lib/stores/builderStore';
 import { SortableBlockWrapper } from './SortableBlockWrapper';
 import { BlockRenderer } from './BlockRenderer';
 import type { Block } from '@/shared/blocks';
+import { SlashMenu } from "./menu/SlashMenu";
+import { useSlashMenu } from "./menu/useSlashMenu";
+import { slashMenuItems } from "./menu/menuConfig";
+import { BlockType } from "@/lib/constants/blockTypes";
 
 interface DragDropCanvasProps {
     blocks: Block[];
@@ -19,6 +22,8 @@ interface DragDropCanvasProps {
     onAddBlock: (type: Block['type']) => void;
     selectedBlockId: string | null;
 }
+
+
 
 export const DragDropCanvas: React.FC<DragDropCanvasProps> = ({
     blocks,
@@ -35,44 +40,69 @@ export const DragDropCanvas: React.FC<DragDropCanvasProps> = ({
         id: 'canvas-drop-zone',
     });
 
+    const {
+        open,
+        query,
+        setQuery,
+        selected,
+        setSelected,
+        filtered,
+        openMenu,
+        closeMenu,
+        moveSelection,
+        reset,
+    } = useSlashMenu();
+
     if (blocks.length === 0) {
         return (
             <div
                 ref={setNodeRef}
-                className={cn(
-                    "min-h-[400px] border-2 border-dashed rounded-lg transition-colors duration-200",
-                    {
-                        "border-primary bg-primary/5": isOver,
-                        "border-muted-foreground/25": !isOver,
-                    }
-                )}
+                className="min-h-[120px] flex items-center justify-center border rounded bg-muted/40"
             >
-                <Card className="h-full">
-                    <CardContent className="flex flex-col items-center justify-center py-12 h-full">
-                        <div className="text-center space-y-4">
-                            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
-                                <Plus className="w-8 h-8 text-muted-foreground" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold mb-2">
-                                    Start Building Your Profile
-                                </h3>
-                                <p className="text-muted-foreground mb-4">
-                                    {isEditing
-                                        ? "Add blocks from the sidebar or drag them here to create your profile."
-                                        : "No blocks added yet. Switch to edit mode to start building."
+                <div style={{ position: "relative", width: "100%" }}>
+                    <div
+                        contentEditable
+                        suppressContentEditableWarning
+                        className="outline-none px-4 py-2 w-full empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground/60 before:pointer-events-none"
+                        data-placeholder="Type / for blocks..."
+                        onKeyDown={e => {
+                            if (e.key === "/" && !open) {
+                                openMenu();
+                                setQuery("");
+                            } else if (open) {
+                                if (e.key === "ArrowDown") {
+                                    e.preventDefault();
+                                    moveSelection(1);
+                                } else if (e.key === "ArrowUp") {
+                                    e.preventDefault();
+                                    moveSelection(-1);
+                                } else if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    if (filtered[selected]) {
+                                        onAddBlock(filtered[selected].type as BlockType);
+                                        reset();
                                     }
-                                </p>
-                                {isEditing && (
-                                    <Button onClick={() => onAddBlock('name')}>
-                                        <Plus className="w-4 h-4 mr-2" />
-                                        Add Name Block
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                                } else if (e.key === "Escape") {
+                                    closeMenu();
+                                } else if (e.key.length === 1) {
+                                    setQuery(query + e.key);
+                                } else if (e.key === "Backspace") {
+                                    setQuery(query.slice(0, -1));
+                                }
+                            }
+                        }}
+                    />
+                    <SlashMenu
+                        items={filtered}
+                        open={open}
+                        selected={selected}
+                        onSelect={item => {
+                            onAddBlock(item.type as BlockType);
+                            reset();
+                        }}
+                        style={{ position: "absolute", top: "100%", left: 0, width: "100%" }}
+                    />
+                </div>
             </div>
         );
     }
@@ -116,6 +146,7 @@ export const DragDropCanvas: React.FC<DragDropCanvasProps> = ({
                         onDelete={onDeleteBlock}
                         onDuplicate={onDuplicateBlock}
                         onSelect={onSelectBlock}
+                        onAddBlock={onAddBlock}
                     />
                 </SortableBlockWrapper>
             ))}

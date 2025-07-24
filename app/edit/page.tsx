@@ -51,6 +51,7 @@ import type {
     BadgeBlockType,
     LinkBlockType
 } from '@/shared/blocks';
+import { DragDropCanvas } from '@/components/blocks/DragDropCanvas';
 
 // Drag and Drop imports
 import {
@@ -548,47 +549,7 @@ const EditPage: React.FC = () => {
                         <div className="lg:col-span-3">
                             <div className="space-y-4">
                                 {/* Block Library */}
-                                <Card className="sticky top-24">
-                                    <CardContent className="p-4">
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <Settings className="w-4 h-4" />
-                                            <h3 className="font-semibold">Add Blocks</h3>
-                                        </div>
 
-                                        <div className="space-y-2">
-                                            {blockTypes.map(({ type, label, icon: Icon, description }) => (
-                                                <Button
-                                                    key={type}
-                                                    variant="outline"
-                                                    className="w-full justify-start h-auto p-3"
-                                                    onClick={() => handleAddBlock(type as Block['type'])}
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <Icon className="w-5 h-5 text-muted-foreground" />
-                                                        <div className="text-left">
-                                                            <div className="font-medium">{label}</div>
-                                                            <div className="text-xs text-muted-foreground">
-                                                                {description}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Button>
-                                            ))}
-                                        </div>
-
-                                        {blocks.length > 0 && (
-                                            <>
-                                                <Separator className="my-4" />
-                                                <div className="text-sm text-muted-foreground">
-                                                    <div className="flex items-center justify-between">
-                                                        <span>Total Blocks:</span>
-                                                        <Badge variant="secondary">{blocks.length}</Badge>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        )}
-                                    </CardContent>
-                                </Card>
 
                                 {/* Username Settings */}
                                 <Card>
@@ -645,29 +606,15 @@ const EditPage: React.FC = () => {
                             )}
 
                             {blocks.length === 0 ? (
-                                <Card>
-                                    <CardContent className="flex flex-col items-center justify-center py-12">
-                                        <div className="text-center space-y-4">
-                                            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
-                                                <Plus className="w-8 h-8 text-muted-foreground" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-lg font-semibold mb-2">
-                                                    Start Building Your Profile
-                                                </h3>
-                                                <p className="text-muted-foreground mb-4">
-                                                    Add blocks from the sidebar to create your profile page.
-                                                </p>
-                                                {isEditing && (
-                                                    <Button onClick={() => handleAddBlock('name')}>
-                                                        <User className="w-4 h-4 mr-2" />
-                                                        Add Name Block
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                <DragDropCanvas
+                                    blocks={blocks}
+                                    onUpdateBlock={handleUpdateBlock}
+                                    onDeleteBlock={handleDeleteBlock}
+                                    onDuplicateBlock={handleDuplicateBlock}
+                                    onSelectBlock={setSelectedBlockId}
+                                    selectedBlockId={selectedBlockId}
+                                    onAddBlock={handleAddBlock}
+                                />
                             ) : (
                                 <DndContext
                                     sensors={sensors}
@@ -693,6 +640,7 @@ const EditPage: React.FC = () => {
                                                     onDelete={handleDeleteBlock}
                                                     onDuplicate={handleDuplicateBlock}
                                                     onSelect={setSelectedBlockId}
+                                                    onAddBlock={handleAddBlock}
                                                 />
                                             ))}
                                         </div>
@@ -710,6 +658,7 @@ const EditPage: React.FC = () => {
                                                     onDelete={() => { }}
                                                     onDuplicate={() => { }}
                                                     onSelect={() => { }}
+                                                    onAddBlock={() => { }}
                                                 />
                                             </div>
                                         ) : null}

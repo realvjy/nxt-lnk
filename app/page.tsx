@@ -1,4 +1,5 @@
 'use client';
+import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 
 export default function HomePage() {
@@ -42,12 +43,12 @@ export default function HomePage() {
             <h1 className="text-3xl font-bold">Welcome to mytiny.page 🚀</h1>
 
             <div className="mt-8">
-                <button
+                <Button
+                    variant="destructive"
                     onClick={resetLocalStorage}
-                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                 >
                     Reset Local Storage
-                </button>
+                </Button>
 
                 {resetMessage && (
                     <div className="mt-4 p-3 bg-green-100 text-green-700 rounded">
@@ -64,10 +65,7 @@ export default function HomePage() {
                     </pre>
                 </div>
             )}
-            <div className="bg-debug text-white p-4">Custom color test</div>
-            <div className="p-6 bg-red-500 text-white">
-                This should be red
-            </div>
+
         </main>
     );
 }
