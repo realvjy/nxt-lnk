@@ -1,5 +1,7 @@
+// /lib/stores/userStore.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { profileService } from '@/lib/supabase/services/profile'
 
 interface Profile {
     fullName: string
@@ -16,16 +18,19 @@ interface UserState {
     // User data
     username: string
     profile: Profile
+    loading: boolean
+    error: string | null
 
     // Actions
     setUsername: (username: string) => void
     setProfile: (profile: Partial<Profile>) => void
-    updateProfile: (updates: Partial<Profile>) => void
+    updateProfile: (updates: Partial<Profile>) => Promise<void>
+    fetchProfile: (username: string) => Promise<void>
 
     // Initialization
     initializeUser: () => void
     clearUser: () => void
-    getStoredUsername: () => string  // Added this method
+    getStoredUsername: () => string
 
     // Helpers
     isProfileComplete: () => boolean
@@ -43,6 +48,8 @@ export const useUserStore = create<UserState>()(
                 image: undefined,
                 badge: undefined
             },
+            loading: false,
+            error: null,
 
             setUsername: (username) => {
                 set({ username })
@@ -54,19 +61,57 @@ export const useUserStore = create<UserState>()(
                 }))
             },
 
-            updateProfile: (updates) => {
-                set((state) => ({
-                    profile: { ...state.profile, ...updates }
-                }))
+            updateProfile: async (updates) => {
+                const { username } = get()
+                if (!username) return
+
+                set({ loading: true })
+                try {
+                    await profileService.updateProfile(username, updates)
+                    set((state) => ({
+                        profile: { ...state.profile, ...updates },
+                        loading: false,
+                        error: null
+                    }))
+                } catch (error) {
+                    set({
+                        error: 'Failed to update profile',
+                        loading: false
+                    })
+                }
+            },
+
+            fetchProfile: async (username) => {
+                set({ loading: true })
+                try {
+                    const profile = await profileService.getProfile(username)
+                    if (profile) {
+                        set({
+                            username,
+                            profile: {
+                                fullName: profile.fullName,
+                                tagline: profile.tagline,
+                                bio: profile.bio,
+                                image: profile.image,
+                                badge: profile.badge
+                            },
+                            loading: false,
+                            error: null
+                        })
+                    }
+                } catch (error) {
+                    set({
+                        error: 'Failed to fetch profile',
+                        loading: false
+                    })
+                }
             },
 
             initializeUser: () => {
-                // This would typically load from your API
-                // For now, we'll just ensure the user is initialized
-                const state = get()
-                if (!state.username) {
-                    // Could redirect to onboarding or set default values
-                    console.log('User not initialized')
+                // Keep existing initialization logic
+                const username = get().getStoredUsername()
+                if (username) {
+                    set({ username })
                 }
             },
 
@@ -83,26 +128,20 @@ export const useUserStore = create<UserState>()(
                 })
             },
 
-            getStoredUsername: () => {
-                // Get the current username from the store
-                // Since we're using persist, this will be the stored value
-                const state = get()
-                return state.username || ''
-            },
+            getStoredUsername: () => get().username,
 
             isProfileComplete: () => {
-                const { username, profile } = get()
-                return !!(username && profile.fullName)
+                const { profile } = get()
+                return Boolean(profile.fullName)
             },
 
             getDisplayName: () => {
-                const { profile, username } = get()
-                return profile.fullName || username || 'User'
+                const { profile } = get()
+                return profile.fullName || 'Anonymous'
             }
         }),
         {
-            name: 'user-data',
-            version: 1
+            name: 'user-storage'
         }
     )
 )

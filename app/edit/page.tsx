@@ -73,6 +73,8 @@ import {
 } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
+import { useSupabase } from '@/components/providers/SupabaseProvider';
+
 const dropAnimationConfig: DropAnimation = {
     sideEffects: defaultDropAnimationSideEffects({
         styles: {
@@ -85,6 +87,7 @@ const dropAnimationConfig: DropAnimation = {
 
 const EditPage: React.FC = () => {
     const router = useRouter();
+    const { supabase } = useSupabase();
     const { username, setUsername, getStoredUsername } = useUserStore();
     const {
         layout,
@@ -109,6 +112,8 @@ const EditPage: React.FC = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [usernameInput, setUsernameInput] = useState('');
     const [usernameError, setUsernameError] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState<any>(null);
 
     // Drag and drop state
     const [activeBlock, setActiveBlock] = useState<Block | null>(null);
@@ -158,6 +163,53 @@ const EditPage: React.FC = () => {
             setUsernameInput(username);
         }
     }, [username]);
+
+    // Check user authentication and fetch profile data
+    useEffect(() => {
+        const checkUser = async () => {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                if (error || !user) {
+                    router.push('/login');
+                    return;
+                }
+                setUser(user);
+
+                // Fetch user profile data
+                const { data: profiles, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('user_id', user.id);
+
+                if (profileError) {
+                    console.error('Error fetching profile:', profileError);
+                    throw profileError;
+                }
+
+                const profile = profiles?.[0];
+                if (profile) {
+                    // Load profile data into stores
+                    setUsername(profile.username);
+                    setUsernameInput(profile.username);
+                    if (profile.layout) {
+                        loadLayout(profile.layout);
+                    }
+                } else {
+                    // No profile found, redirect to login
+                    console.error('No profile found for user');
+                    router.push('/login');
+                    return;
+                }
+            } catch (error) {
+                console.error('Error fetching user:', error);
+                router.push('/login');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        checkUser();
+    }, [supabase, router]);
 
     // Drag and Drop handlers
     const handleDragStart = (event: DragStartEvent) => {
@@ -278,35 +330,33 @@ const EditPage: React.FC = () => {
         setUsername(usernameInput);
     };
 
+    // Update handleSave function
     const handleSave = async () => {
+        if (!user) return;
+
         setIsSaving(true);
         try {
-            // Ensure we have a valid username
-            const currentUsername = username || usernameInput;
+            // First update the profile
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({
+                    username: username,
+                    layout: blocks, // Save the blocks array as layout
+                    updated_at: new Date().toISOString(),
+                })
+                .eq('user_id', user.id);
 
-            if (!currentUsername) {
-                throw new Error('Please set a username before saving');
+            if (profileError) {
+                console.error('Error updating profile:', profileError);
+                throw profileError;
             }
 
-            if (usernameError) {
-                throw new Error(usernameError);
-            }
-
-            // Make sure username is set in store
-            if (!username && usernameInput && !usernameError) {
-                setUsername(usernameInput);
-            }
-
-            // Save using the current username
+            // Also save to local storage as backup
             await saveToStorage();
 
-            console.log('Profile saved successfully!');
-
-            // Show success feedback (you can add a toast here)
         } catch (error) {
-            console.error('Failed to save profile:', error);
-            // Show error feedback (you can add a toast here)
-            alert(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            console.error('Error saving profile:', error);
+            // Handle error (show toast notification)
         } finally {
             setIsSaving(false);
         }
@@ -420,6 +470,14 @@ const EditPage: React.FC = () => {
         tablet: 'max-w-2xl',
         mobile: 'max-w-sm'
     };
+
+    if (isLoading) {
+        return (
+            <div className="container mx-auto p-4 flex items-center justify-center min-h-screen">
+                <div className="text-center">Loading...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-background">

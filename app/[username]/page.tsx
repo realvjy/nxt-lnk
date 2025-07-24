@@ -1,7 +1,8 @@
 import React, { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { getCompleteUserProfile } from '@/lib/constants/testData'; // Replace with your data fetching
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import ProfileContent from '../../components/profile/ProfileContent';
 
 interface ProfilePageProps {
@@ -13,34 +14,37 @@ interface ProfilePageProps {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: ProfilePageProps): Promise<Metadata> {
     const { username } = params;
+    const supabase = createServerComponentClient({ cookies });
 
     try {
-        // In a real app, fetch user data from your API/database
-        const userData = getCompleteUserProfile(username);
+        const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('username', username)
+            .single();
 
-        if (!userData) {
+        if (error || !profile) {
             return {
                 title: 'Profile Not Found',
                 description: 'The requested profile could not be found.'
             };
         }
 
-        const { profile } = userData;
-
         return {
-            title: `${profile.fullName || username} | Next-Lnks`,
+            title: `${profile.full_name || username} | Next-Lnks`,
             description: profile.bio ?
                 profile.bio.replace(/<[^>]*>/g, '') :
-                `Check out ${profile.fullName || username}'s links and profile.`,
+                `Check out ${profile.full_name || username}'s links and profile.`,
             openGraph: {
-                title: `${profile.fullName || username} | Next-Lnks`,
+                title: `${profile.full_name || username} | Next-Lnks`,
                 description: profile.bio ?
                     profile.bio.replace(/<[^>]*>/g, '') :
-                    `Check out ${profile.fullName || username}'s links and profile.`,
-                images: profile.image?.url ? [profile.image.url] : [],
+                    `Check out ${profile.full_name || username}'s links and profile.`,
+                images: profile.image_url ? [profile.image_url] : [],
             },
         };
     } catch (error) {
+        console.error('Error fetching profile metadata:', error);
         return {
             title: 'Profile Not Found',
             description: 'The requested profile could not be found.'
@@ -48,24 +52,30 @@ export async function generateMetadata({ params }: ProfilePageProps): Promise<Me
     }
 }
 
-// Static params generation for SSG (optional)
-export async function generateStaticParams() {
-    // In a real app, fetch all usernames from your database
-    // For now, return empty array to generate pages on-demand
-    return [];
-}
-
-const ProfilePage: React.FC<ProfilePageProps> = ({ params }) => {
+const ProfilePage = async ({ params }: ProfilePageProps) => {
     const { username } = params;
+    const supabase = createServerComponentClient({ cookies });
 
-    // We'll pass the username to ProfileContent which will:
-    // 1. First try to load real data from localStorage
-    // 2. Fall back to mock data if no real data exists
-    return (
-        <Suspense fallback={<div>Loading profile...</div>}>
-            <ProfileContent username={username} />
-        </Suspense>
-    );
+    try {
+        const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('username', username)
+            .single();
+
+        if (error || !profile) {
+            notFound();
+        }
+
+        return (
+            <Suspense fallback={<div>Loading profile...</div>}>
+                <ProfileContent initialProfile={profile} />
+            </Suspense>
+        );
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+        notFound();
+    }
 };
 
 export default ProfilePage;

@@ -1,4 +1,5 @@
 // app/layout.tsx
+import '../styles/global.scss'  // Add this back
 import type { ReactNode } from 'react'
 import { cn } from "@/lib/utils/utils"
 import { Inter } from "next/font/google"
