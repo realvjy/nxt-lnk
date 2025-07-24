@@ -2,7 +2,7 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useEffect } from 'react'
-import { useUserStore } from '@/store/userStore'
+import { useUserStore } from '@/lib/stores/userStore'
 
 export function UsernameSetting() {
     const username = useUserStore((s) => s.username)

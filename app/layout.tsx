@@ -1,15 +1,13 @@
 // app/layout.tsx
 import '../styles/global.scss'
-import "tw-animate-css";
 import type { ReactNode } from 'react'
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/utils"
 import { Inter } from "next/font/google"
-import StoreInitializer from '@/components/StoreInitializer'
 
 const inter = Inter({
     subsets: ["latin"],
-    display: "swap", // optional but recommended
-    variable: "--font-inter", // optional for CSS usage
+    display: "swap",
+    variable: "--font-inter",
 })
 
 export const metadata = {
@@ -17,11 +15,10 @@ export const metadata = {
     description: "Link-in-bio by Vijay Verma",
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
     return (
-        <html lang="en" className={inter.className}>
+        <html lang="en" className={inter.variable}>
             <body className={cn("bg-background text-foreground")}>
-                <StoreInitializer />
                 {children}
             </body>
         </html>

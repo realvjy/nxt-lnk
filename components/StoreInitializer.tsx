@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { initializeStores } from '@/store/index'
+import { initializeStores } from '@/lib/stores/index'
 
 export default function StoreInitializer() {
     useEffect(() => {

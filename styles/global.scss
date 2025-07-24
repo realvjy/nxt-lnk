@@ -1,6 +1,8 @@
 @custom-variant dark (&:is(.dark *));
 
+@import "tailwindcss/preflight";
 @tailwind utilities;
+@import "tailwindcss";
 
 html{
     scroll-behavior: smooth;
@@ -45,6 +47,8 @@ html{
 }
 
 :root {
+  --background: oklch(1 0 0); /* white */
+
     --radius: 0.625rem;
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
@@ -120,6 +124,10 @@ html{
   body {
     @apply bg-background text-foreground;
     }
+}
+
+body {
+  background: yellow;
 }
 
 /* Tiptap Editor Styles */

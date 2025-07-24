@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Switch } from "@/components/ui/switch"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/utils"
 
 type Props = {
     id: string

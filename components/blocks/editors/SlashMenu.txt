@@ -2,7 +2,7 @@
 import { nanoid } from 'nanoid'
 import { useState } from 'react'
 import { Block } from '@/shared/blocks'
-import { useLayoutStore } from '@/store/layoutStore'
+import { useLayoutStore } from '@/lib/stores/layoutStore'
 
 type BlockType = 'name' | 'bio' | 'link'
 

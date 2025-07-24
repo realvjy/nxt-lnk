@@ -62,6 +62,7 @@ export default function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
             shouldShow={({ editor }) => !editor.state.selection.empty}
             className="flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2 py-1 shadow-md"
         >
+
             {/* Custom Paragraph / Heading Dropdown */}
             <div className="relative" ref={dropdownRef}>
                 <Button
@@ -242,6 +243,8 @@ export default function EditorBubbleMenu({ editor }: EditorBubbleMenuProps) {
             <Button variant="ghost" size="sm" className="h-8 px-2">
                 <ArrowRight className="h-4 w-4" />
             </Button>
+
+
         </BubbleMenu>
     )
 }

@@ -12,6 +12,18 @@ const config: Config = {
             fontFamily: {
                 sans: ["var(--font-inter)"],
             },
+            colors: {
+                debug: '#ff00ff',
+            },
+            animation: {
+                fadeIn: 'fadeIn 0.5s ease-in-out',
+            },
+            keyframes: {
+                fadeIn: {
+                    from: { opacity: '0' },
+                    to: { opacity: '1' },
+                },
+            },
         },
     },
 }

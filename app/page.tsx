@@ -65,6 +65,10 @@ export default function HomePage() {
                     </pre>
                 </div>
             )}
+            <div className="bg-debug text-white p-4">Custom color test</div>
+            <div className="p-6 bg-red-500 text-white">
+                This should be red
+            </div>
         </main>
     );
 }

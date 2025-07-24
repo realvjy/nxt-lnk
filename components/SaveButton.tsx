@@ -1,7 +1,7 @@
 // components/SaveButton.tsx
 'use client'
 
-import { useLayoutStore } from '@/store/layoutStore'
+import { useLayoutStore } from '@/lib/stores/layoutStore'
 import { Button } from '@/ui/button'
 
 export default function SaveButton() {

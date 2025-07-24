@@ -1,3 +1,4 @@
+// shared/blocks.ts - Fixed version
 import { UserProfile } from './profile/user'
 import { Link } from './profile/links'
 
@@ -12,7 +13,7 @@ export interface BaseBlock {
 /**
  * Name block for displaying user's name
  */
-export type NameBlockType = BaseBlock & {
+export interface NameBlockType extends BaseBlock {
     type: 'name'
     props: {
         text: string
@@ -22,7 +23,7 @@ export type NameBlockType = BaseBlock & {
 /**
  * Enhanced bio block with rich text content
  */
-export type BioBlockType = BaseBlock & {
+export interface BioBlockType extends BaseBlock {
     type: 'bio'
     props: {
         text: string
@@ -32,7 +33,7 @@ export type BioBlockType = BaseBlock & {
 /**
  * Enhanced link block with additional properties
  */
-export type LinkBlockType = BaseBlock & {
+export interface LinkBlockType extends BaseBlock {
     type: 'link'
     props: {
         label: string
@@ -48,7 +49,7 @@ export type LinkBlockType = BaseBlock & {
 /**
  * Tagline block for short description
  */
-export type TaglineBlockType = BaseBlock & {
+export interface TaglineBlockType extends BaseBlock {
     type: 'tagline'
     props: {
         text: string
@@ -58,7 +59,7 @@ export type TaglineBlockType = BaseBlock & {
 /**
  * Profile image block
  */
-export type ImageBlockType = BaseBlock & {
+export interface ImageBlockType extends BaseBlock {
     type: 'image'
     props: {
         url: string
@@ -69,7 +70,7 @@ export type ImageBlockType = BaseBlock & {
 /**
  * Badge block for status indicators
  */
-export type BadgeBlockType = BaseBlock & {
+export interface BadgeBlockType extends BaseBlock {
     type: 'badge'
     props: {
         type: 'exclusive' | 'live' | 'available' | 'busy' | 'away' | 'offline'

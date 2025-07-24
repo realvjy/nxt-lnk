@@ -1,7 +1,7 @@
 import { Button } from '@/ui/button'
 import { Download } from 'lucide-react'
-import { useUserStore, useLayoutStore, usePersistenceStore } from '@/store/index'
-import { generateHtml, downloadHtml } from '@/lib/htmlGenerator'
+import { useUserStore, useLayoutStore, usePersistenceStore } from '@/lib/stores/index'
+import { generateHtml, downloadHtml } from '@/lib/utils/htmlGenerator'
 
 export default function DownloadButton() {
     const username = useUserStore((s) => s.username)

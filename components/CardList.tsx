@@ -1,7 +1,7 @@
 // components/CardList.tsx
 'use client'
 
-import { useCardStore } from '@/store/useCardStore'
+import { useCardStore } from '@/lib/stores/useCardStore'
 import { ArrowUpRight } from 'lucide-react'
 
 export default function CardList() {
