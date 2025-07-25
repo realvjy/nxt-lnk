@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { useLayoutStore } from './layoutStore'
 import { useUserStore } from './userStore'
+import { useLinksStore } from './linksStore'
+import { useBlocksStore } from './blocksStore'
 
 interface PersistenceState {
     // State
@@ -49,8 +51,18 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
                 throw new Error('No username provided')
             }
 
-            // Save layout directly - no automatic migration
+            // Save layout (existing blocks/layout system)
             useLayoutStore.getState().saveLayout(username)
+
+            // Save new separated data
+            const links = useLinksStore.getState().links
+            const blocks = useBlocksStore.getState().blocks
+
+            // Save links to localStorage
+            if (typeof window !== 'undefined') {
+                localStorage.setItem(`user:${username}:links`, JSON.stringify(links))
+                localStorage.setItem(`user:${username}:blocks`, JSON.stringify(blocks))
+            }
 
             set({
                 lastSyncTime: new Date(),
@@ -74,8 +86,28 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
                 throw new Error('No username provided')
             }
 
-            // Load layout
+            // Load layout (existing blocks/layout system)
             useLayoutStore.getState().loadLayout(username)
+
+            // Load new separated data
+            if (typeof window !== 'undefined') {
+                const linksData = localStorage.getItem(`user:${username}:links`)
+                const blocksData = localStorage.getItem(`user:${username}:blocks`)
+
+                if (linksData) {
+                    const links = JSON.parse(linksData)
+                    useLinksStore.getState().setLinks(links)
+                } else {
+                    useLinksStore.getState().clearLinks()
+                }
+
+                if (blocksData) {
+                    const blocks = JSON.parse(blocksData)
+                    useBlocksStore.getState().setBlocks(blocks)
+                } else {
+                    useBlocksStore.getState().clearBlocks()
+                }
+            }
 
             // Set username in user store
             useUserStore.getState().setUsername(username)
@@ -105,27 +137,51 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
 
             // Get the old data
             const oldLayoutKey = `user:${oldUsername}:layout`
-            const oldLayoutData = localStorage.getItem(oldLayoutKey)
+            const oldLinksKey = `user:${oldUsername}:links`
+            const oldBlocksKey = `user:${oldUsername}:blocks`
 
+            const oldLayoutData = localStorage.getItem(oldLayoutKey)
+            const oldLinksData = localStorage.getItem(oldLinksKey)
+            const oldBlocksData = localStorage.getItem(oldBlocksKey)
+
+            // Migrate layout data
             if (oldLayoutData) {
-                // Save to new key
                 const newLayoutKey = `user:${newUsername}:layout`
                 localStorage.setItem(newLayoutKey, oldLayoutData)
-
-                console.log(`Copied data to ${newLayoutKey}`)
-
-                // Remove old key
                 localStorage.removeItem(oldLayoutKey)
-
-                console.log(`Removed old data from ${oldLayoutKey}`)
-
-                // Also update the layout store to use the new username
-                useLayoutStore.getState().loadLayout(newUsername)
-
-                console.log(`Successfully migrated data from ${oldUsername} to ${newUsername}`)
-            } else {
-                console.log(`No data found for ${oldUsername}, skipping migration`)
+                console.log(`Migrated layout data`)
             }
+
+            // Migrate links data
+            if (oldLinksData) {
+                const newLinksKey = `user:${newUsername}:links`
+                localStorage.setItem(newLinksKey, oldLinksData)
+                localStorage.removeItem(oldLinksKey)
+                console.log(`Migrated links data`)
+            }
+
+            // Migrate blocks data
+            if (oldBlocksData) {
+                const newBlocksKey = `user:${newUsername}:blocks`
+                localStorage.setItem(newBlocksKey, oldBlocksData)
+                localStorage.removeItem(oldBlocksKey)
+                console.log(`Migrated blocks data`)
+            }
+
+            // Reload data with new username
+            useLayoutStore.getState().loadLayout(newUsername)
+
+            if (oldLinksData) {
+                const links = JSON.parse(oldLinksData)
+                useLinksStore.getState().setLinks(links)
+            }
+
+            if (oldBlocksData) {
+                const blocks = JSON.parse(oldBlocksData)
+                useBlocksStore.getState().setBlocks(blocks)
+            }
+
+            console.log(`Successfully migrated data from ${oldUsername} to ${newUsername}`)
 
         } catch (error) {
             console.error('Failed to migrate username data:', error)
@@ -137,13 +193,17 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
         const username = useUserStore.getState().username
         const profile = useUserStore.getState().profile
         const layout = useLayoutStore.getState().layout
+        const links = useLinksStore.getState().links
+        const blocks = useBlocksStore.getState().blocks
 
         const exportData = {
-            version: '1.0',
+            version: '2.0', // Updated version for new format
             exportDate: new Date().toISOString(),
             username,
             profile,
-            layout
+            layout,
+            links,
+            blocks
         }
 
         return JSON.stringify(exportData, null, 2)
@@ -165,6 +225,19 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
             // Import layout
             useLayoutStore.getState().setLayout(parsedData.layout || [])
 
+            // Import new separated data (if available)
+            if (parsedData.links) {
+                useLinksStore.getState().setLinks(parsedData.links)
+            } else {
+                useLinksStore.getState().clearLinks()
+            }
+
+            if (parsedData.blocks) {
+                useBlocksStore.getState().setBlocks(parsedData.blocks)
+            } else {
+                useBlocksStore.getState().clearBlocks()
+            }
+
             set({
                 lastSyncTime: new Date(),
                 hasUnsavedChanges: false,
@@ -183,11 +256,13 @@ export const usePersistenceStore = create<PersistenceState>((set, get) => ({
     clearAllData: () => {
         useLayoutStore.getState().clearLayout()
         useUserStore.getState().clearUser()
+        useLinksStore.getState().clearLinks()
+        useBlocksStore.getState().clearBlocks()
 
         // Clear localStorage
         if (typeof window !== 'undefined') {
             Object.keys(localStorage).forEach(key => {
-                if (key.startsWith('user:') || key.includes('builder') || key.includes('layout')) {
+                if (key.startsWith('user:') || key.includes('builder') || key.includes('layout') || key.includes('links') || key.includes('blocks')) {
                     localStorage.removeItem(key)
                 }
             })

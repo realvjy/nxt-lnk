@@ -1,14 +1,19 @@
-
 import { useBuilderStore } from './builderStore'
 import { useLayoutStore } from './layoutStore'
 import { usePersistenceStore } from './persistenceStore'
 import { useUserStore } from './userStore'
+import { useLinksStore } from './linksStore'
+import { useBlocksStore } from './blocksStore'
 
 // Core stores - these are the main ones you need
 export { useUserStore } from './userStore'
 export { useLayoutStore } from './layoutStore'
 export { useBuilderStore } from './builderStore'
 export { usePersistenceStore, useTrackChanges } from './persistenceStore'
+
+// New separated stores
+export { useLinksStore } from './linksStore'
+export { useBlocksStore } from './blocksStore'
 
 // Legacy stores (if you still need them)
 
@@ -26,6 +31,10 @@ export function initializeStores() {
 
     // Initialize other stores as needed
     useUserStore.getState().initializeUser()
+
+    // Initialize new stores
+    useLinksStore.getState().clearLinks()
+    useBlocksStore.getState().clearBlocks()
 
     console.log('All stores initialized successfully')
 }
@@ -57,6 +66,7 @@ export function useAppInitialization() {
 
     return { initializeApp }
 }
+
 
 // Unified block operations hook - integrates all stores
 export function useBlockOperations() {
@@ -121,6 +131,126 @@ export function useBlockOperations() {
         getBlockById: (id: string) => layout.find(block => block.id === id),
         getBlocksByType: (type: string) => layout.filter(block => block.type === type),
         hasBlocks: layout.length > 0
+    }
+}
+
+
+
+// New Links operations hook
+export function useLinkOperations() {
+    const {
+        addLink,
+        updateLink,
+        deleteLink,
+        reorderLinks,
+        links,
+        getLinkById,
+        getLinksByType,
+        getActiveLinksByType
+    } = useLinksStore()
+
+    const { setUnsavedChanges } = usePersistenceStore()
+
+    // Enhanced operations that coordinate with persistence
+    const handleAddLink = (linkData: Parameters<typeof addLink>[0]) => {
+        addLink(linkData)
+        setUnsavedChanges(true)
+    }
+
+    const handleUpdateLink = (id: string, updates: Parameters<typeof updateLink>[1]) => {
+        updateLink(id, updates)
+        setUnsavedChanges(true)
+    }
+
+    const handleDeleteLink = (id: string) => {
+        deleteLink(id)
+        setUnsavedChanges(true)
+    }
+
+    const handleReorderLinks = (fromIndex: number, toIndex: number) => {
+        reorderLinks(fromIndex, toIndex)
+        setUnsavedChanges(true)
+    }
+
+    return {
+        // Operations
+        addLink: handleAddLink,
+        updateLink: handleUpdateLink,
+        deleteLink: handleDeleteLink,
+        reorderLinks: handleReorderLinks,
+
+        // State
+        links,
+
+        // Helpers
+        getLinkById,
+        getLinksByType,
+        getActiveLinksByType,
+        hasLinks: links.length > 0,
+
+        // Computed
+        socialLinks: getLinksByType('social'),
+        blogLinks: getLinksByType('blog'),
+        normalLinks: getLinksByType('normal'),
+        activeLinks: links.filter(link => link.isActive)
+    }
+}
+
+// New Content Blocks operations hook (separate from layout blocks)
+export function useContentBlockOperations() {
+    const {
+        addBlock,
+        updateBlock,
+        deleteBlock,
+        reorderBlocks,
+        blocks,
+        getBlockById,
+        getBlocksByType
+    } = useBlocksStore()
+
+    const { setUnsavedChanges } = usePersistenceStore()
+
+    // Enhanced operations that coordinate with persistence
+    const handleAddBlock = (blockData: Parameters<typeof addBlock>[0]) => {
+        addBlock(blockData)
+        setUnsavedChanges(true)
+    }
+
+    const handleUpdateBlock = (id: string, updates: Parameters<typeof updateBlock>[1]) => {
+        updateBlock(id, updates)
+        setUnsavedChanges(true)
+    }
+
+    const handleDeleteBlock = (id: string) => {
+        deleteBlock(id)
+        setUnsavedChanges(true)
+    }
+
+    const handleReorderBlocks = (fromIndex: number, toIndex: number) => {
+        reorderBlocks(fromIndex, toIndex)
+        setUnsavedChanges(true)
+    }
+
+    return {
+        // Operations
+        addBlock: handleAddBlock,
+        updateBlock: handleUpdateBlock,
+        deleteBlock: handleDeleteBlock,
+        reorderBlocks: handleReorderBlocks,
+
+        // State
+        blocks,
+
+        // Helpers
+        getBlockById,
+        getBlocksByType,
+        hasBlocks: blocks.length > 0,
+
+        // Computed
+        bioBlocks: getBlocksByType('bio'),
+        nameBlocks: getBlocksByType('name'),
+        sectionBlocks: getBlocksByType('section'),
+        customBlocks: getBlocksByType('custom')
     }
 }
 

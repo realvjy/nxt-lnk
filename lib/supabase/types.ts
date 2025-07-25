@@ -16,12 +16,14 @@ export interface Database {
             profiles: {
                 Row: {
                     id: string
+                    user_id: string
                     username: string
                     full_name: string | null
                     bio: string | null
                     tagline: string | null
                     image_url: string | null
                     badge: string | null
+                    layout: Json | null
                     created_at: string
                     updated_at: string
                 }
@@ -32,17 +34,15 @@ export interface Database {
                 Row: {
                     id: string
                     profile_id: string
-                    type: 'social' | 'normal' | 'blog'
+                    type: string
                     url: string
                     title: string
-                    order: number
+                    sort_order: number
                     is_active: boolean
-                    platform?: string
-                    description?: string
-                    publish_date?: string
                     created_at: string
+                    updated_at: string
                 }
-                Insert: Omit<Database['public']['Tables']['links']['Row'], 'id' | 'created_at'>
+                Insert: Omit<Database['public']['Tables']['links']['Row'], 'id' | 'created_at' | 'updated_at'>
                 Update: Partial<Database['public']['Tables']['links']['Insert']>
             }
             blocks: {
@@ -51,21 +51,23 @@ export interface Database {
                     profile_id: string
                     type: string
                     content: Json
-                    order: number
+                    sort_order: number
                     settings: Json | null
                     created_at: string
+                    updated_at: string
                 }
-                Insert: Omit<Database['public']['Tables']['blocks']['Row'], 'id' | 'created_at'>
+                Insert: Omit<Database['public']['Tables']['blocks']['Row'], 'id' | 'created_at' | 'updated_at'>
                 Update: Partial<Database['public']['Tables']['blocks']['Insert']>
             }
             preferences: {
                 Row: {
                     profile_id: string
                     theme: string
-                    settings: Json
+                    settings: Json | null
+                    created_at: string
                     updated_at: string
                 }
-                Insert: Omit<Database['public']['Tables']['preferences']['Row'], 'updated_at'>
+                Insert: Omit<Database['public']['Tables']['preferences']['Row'], 'created_at' | 'updated_at'>
                 Update: Partial<Database['public']['Tables']['preferences']['Insert']>
             }
         }
@@ -100,12 +102,15 @@ export interface ProfileImage {
 }
 
 export interface UserProfile {
+    id?: string
+    userId?: string
     username: string
     fullName: string
     bio: string
     tagline: string
     image?: ProfileImage
     badge?: string
+    layout?: Json
     createdAt?: string
     updatedAt?: string
 }
@@ -127,15 +132,22 @@ export type SocialPlatform =
 
 export interface BaseLink {
     id: string
-    label: string
-    url: string
+    profileId: string
     type: LinkType
+    url: string
+    title: string
+    sortOrder: number
+    isActive: boolean
+    createdAt?: string
+    updatedAt?: string
+    // App-only fields for UI/display
+    label?: string
     icon?: string
     image?: string
     cover?: string
-    position: number
-    createdAt?: string
-    updatedAt?: string
+    platform?: SocialPlatform
+    description?: string
+    publishDate?: string
 }
 
 export interface SocialLink extends BaseLink {
@@ -147,6 +159,7 @@ export interface BlogLink extends BaseLink {
     type: 'blog'
     description?: string
     publishDate?: string
+    cover?: string
 }
 
 export interface NormalLink extends BaseLink {
@@ -158,15 +171,18 @@ export type Link = SocialLink | BlogLink | NormalLink
 // App Types - Blocks
 export interface Block {
     id: string
+    profileId: string
     type: string
     content: Json
-    order: number
+    sortOrder: number
     settings?: Json
     createdAt?: string
+    updatedAt?: string
 }
 
 // App Types - Preferences
 export interface UserPreferences {
+    profileId: string
     theme: string
     settings: {
         layout?: string
@@ -174,6 +190,8 @@ export interface UserPreferences {
         font?: string
         [key: string]: any
     }
+    createdAt?: string
+    updatedAt?: string
 }
 
 // Insert/Update Types
@@ -186,3 +204,59 @@ export type ProfileUpdate = TablesUpdate<'profiles'>
 export type LinkUpdate = TablesUpdate<'links'>
 export type BlockUpdate = TablesUpdate<'blocks'>
 export type PreferenceUpdate = TablesUpdate<'preferences'>
+
+// Mapping Functions
+export function mapProfileFromDb(row: Profile): UserProfile {
+    return {
+        id: row.id,
+        userId: row.user_id,
+        username: row.username,
+        fullName: row.full_name || '',
+        bio: row.bio || '',
+        tagline: row.tagline || '',
+        image: row.image_url ? { url: row.image_url } : undefined,
+        badge: row.badge || undefined,
+        layout: row.layout,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+    }
+}
+
+export function mapLinkFromDb(row: DatabaseLink): Link {
+    const baseLink: BaseLink = {
+        id: row.id,
+        profileId: row.profile_id,
+        type: row.type as LinkType,
+        url: row.url,
+        title: row.title,
+        sortOrder: row.sort_order,
+        isActive: row.is_active,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+    }
+
+    return baseLink as Link
+}
+
+export function mapBlockFromDb(row: DatabaseBlock): Block {
+    return {
+        id: row.id,
+        profileId: row.profile_id,
+        type: row.type,
+        content: row.content,
+        sortOrder: row.sort_order,
+        settings: row.settings,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+    }
+}
+
+export function mapPreferenceFromDb(row: Preference): UserPreferences {
+    return {
+        profileId: row.profile_id,
+        theme: row.theme,
+        settings: (row.settings as any) || {},
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+    }
+}
