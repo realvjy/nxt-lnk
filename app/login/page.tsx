@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import Navbar from '@/components/layout/Navbar';
+import { LogIn, UserPlus, Mail, Lock } from 'lucide-react';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -15,6 +17,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isSignUp, setIsSignUp] = useState(false);
 
     // Handle verification errors
     useEffect(() => {
@@ -134,59 +137,98 @@ export default function LoginPage() {
         }
     };
 
-
-
     return (
-        <div className="min-h-screen flex items-center justify-center bg-background p-4">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle>Welcome to Next-Lnks</CardTitle>
-                    <CardDescription>Sign in to manage your links</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                placeholder="you@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-                        {error && (
-                            <div className="text-sm text-red-500">
-                                {error}
+        <>
+            <Navbar title="Account Access" />
+            <div className="min-h-[calc(100vh-73px)] flex items-center justify-center bg-background p-4">
+                <Card className="w-full max-w-md">
+                    <CardHeader>
+                        <CardTitle>{isSignUp ? 'Create an Account' : 'Welcome Back'}</CardTitle>
+                        <CardDescription>
+                            {isSignUp
+                                ? 'Sign up to create your personalized link page'
+                                : 'Sign in to manage your links'}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleLogin} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email</Label>
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="you@example.com"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="pl-10"
+                                        required
+                                    />
+                                </div>
                             </div>
-                        )}
-                        <div className="flex flex-col space-y-2">
-                            <Button type="submit" disabled={isLoading}>
-                                {isLoading ? 'Loading...' : 'Sign In'}
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={handleSignUp}
-                                disabled={isLoading}
-                            >
-                                Create Account
-                            </Button>
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="password">Password</Label>
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="pl-10"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            {error && (
+                                <div className="text-sm text-red-500 p-3 bg-red-50 rounded-md">
+                                    {error}
+                                </div>
+                            )}
+                            <div className="flex flex-col space-y-2">
+                                {!isSignUp ? (
+                                    <>
+                                        <Button type="submit" disabled={isLoading}>
+                                            <LogIn className="mr-2 h-4 w-4" />
+                                            {isLoading ? 'Loading...' : 'Sign In'}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => setIsSignUp(true)}
+                                            disabled={isLoading}
+                                        >
+                                            <UserPlus className="mr-2 h-4 w-4" />
+                                            Create Account
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button
+                                            type="button"
+                                            onClick={handleSignUp}
+                                            disabled={isLoading}
+                                        >
+                                            <UserPlus className="mr-2 h-4 w-4" />
+                                            {isLoading ? 'Loading...' : 'Sign Up'}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => setIsSignUp(false)}
+                                            disabled={isLoading}
+                                        >
+                                            <LogIn className="mr-2 h-4 w-4" />
+                                            Back to Sign In
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
+        </>
     );
 }

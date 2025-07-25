@@ -57,6 +57,7 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
     const supabase = createServerComponentClient({ cookies });
 
     try {
+        // Fetch profile data
         const { data: profile, error } = await supabase
             .from('profiles')
             .select('*')
@@ -67,9 +68,35 @@ const ProfilePage = async ({ params }: ProfilePageProps) => {
             notFound();
         }
 
+        // Fetch blocks data for this profile
+        const { data: blocksData, error: blocksError } = await supabase
+            .from('blocks')
+            .select('*')
+            .eq('profile_id', profile.id)
+            .order('sort_order', { ascending: true });
+
+        if (blocksError) {
+            console.error('Error fetching blocks:', blocksError);
+        }
+
+        // Transform blocks to match the app's Block format
+        const blocks = blocksData?.map(block => ({
+            id: block.id,
+            type: block.type,
+            props: block.content,
+            ...block.content, // Spread content to maintain backward compatibility
+            settings: block.settings
+        })) || [];
+
+        // Add blocks to the profile object
+        const profileWithBlocks = {
+            ...profile,
+            layout: blocks
+        };
+
         return (
             <Suspense fallback={<div>Loading profile...</div>}>
-                <ProfileContent initialProfile={profile} />
+                <ProfileContent initialProfile={profileWithBlocks} />
             </Suspense>
         );
     } catch (error) {

@@ -52,6 +52,7 @@ import type {
     LinkBlockType
 } from '@/shared/blocks';
 import { DragDropCanvas } from '@/components/blocks/DragDropCanvas';
+import Navbar from '@/components/layout/Navbar';
 
 // Drag and Drop imports
 import {
@@ -87,7 +88,7 @@ const dropAnimationConfig: DropAnimation = {
 
 const EditPage: React.FC = () => {
     const router = useRouter();
-    const { supabase } = useSupabase();
+    const { supabase, logout } = useSupabase();
     const { username, setUsername, getStoredUsername } = useUserStore();
     const {
         layout,
@@ -168,40 +169,104 @@ const EditPage: React.FC = () => {
     useEffect(() => {
         const checkUser = async () => {
             try {
-                const { data: { user }, error } = await supabase.auth.getUser();
-                if (error || !user) {
+                // First check if we have a session
+                const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+                if (sessionError || !sessionData.session) {
+                    console.error('No active session:', sessionError);
                     router.push('/login');
                     return;
                 }
+
+                // Then get the user
+                const { data: { user }, error } = await supabase.auth.getUser();
+
+                if (error || !user) {
+                    console.error('Authentication error:', error);
+                    router.push('/login');
+                    return;
+                }
+
                 setUser(user);
 
                 // Fetch user profile data
                 const { data: profiles, error: profileError } = await supabase
                     .from('profiles')
                     .select('*')
-                    .eq('user_id', user.id);
+                    .eq('id', user.id)
+                    .single();
 
                 if (profileError) {
                     console.error('Error fetching profile:', profileError);
-                    throw profileError;
-                }
 
-                const profile = profiles?.[0];
-                if (profile) {
-                    // Load profile data into stores
-                    setUsername(profile.username);
-                    setUsernameInput(profile.username);
-                    if (profile.layout) {
-                        loadLayout(profile.layout);
+                    // If no profile found, create one
+                    if (profileError.code === 'PGRST116') { // No rows returned
+                        const username = user.email?.split('@')[0] || `user_${user.id.slice(0, 6)}`;
+
+                        const { error: createError } = await supabase
+                            .from('profiles')
+                            .insert({
+                                id: user.id,
+                                user_id: user.id,
+                                username: username,
+                                email: user.email,
+                                created_at: new Date().toISOString(),
+                                updated_at: new Date().toISOString()
+                            });
+
+                        if (createError) {
+                            console.error('Error creating profile:', createError);
+                            throw createError;
+                        }
+
+                        // Set username after profile creation
+                        setUsername(username);
+                        setUsernameInput(username);
+                    } else {
+                        throw profileError;
                     }
-                } else {
-                    // No profile found, redirect to login
-                    console.error('No profile found for user');
-                    router.push('/login');
-                    return;
+                } else if (profiles) {
+                    // Load profile data into stores
+                    setUsername(profiles.username);
+                    setUsernameInput(profiles.username);
+
+                    // Fetch blocks for this user
+                    const { data: blocksData, error: blocksError } = await supabase
+                        .from('blocks')
+                        .select('*')
+                        .eq('profile_id', user.id)
+                        .order('sort_order', { ascending: true });
+
+                    if (blocksError) {
+                        console.error('Error fetching blocks:', blocksError);
+                    } else if (blocksData && blocksData.length > 0) {
+                        console.log('Loaded blocks from Supabase:', blocksData);
+
+                        // Transform blocks to match the expected format in our application
+                        const formattedBlocks = blocksData.map(block => {
+                            // Extract content from the database block and convert it to our app's Block format
+                            const { id, type, content, sort_order, settings } = block;
+
+                            // Create a block that matches our application's Block type structure
+                            return {
+                                id,
+                                type,
+                                props: content, // The content field in DB contains our props
+                                ...content, // Spread content to maintain backward compatibility
+                                settings
+                            };
+                        });
+
+                        console.log('Formatted blocks for app:', formattedBlocks);
+                        // Use setLayout instead of loadLayout since we're passing blocks array
+                        setLayout(formattedBlocks);
+                    } else {
+                        console.log('No blocks found for user, using default layout');
+                        // Optional: You could load a default layout here
+                    }
                 }
             } catch (error) {
-                console.error('Error fetching user:', error);
+                console.error('Error in checkUser:', error);
                 router.push('/login');
             } finally {
                 setIsLoading(false);
@@ -336,23 +401,87 @@ const EditPage: React.FC = () => {
 
         setIsSaving(true);
         try {
+            // Apply any pending username changes first
+            if (usernameInput !== username) {
+                await applyUsername();
+            }
+
+            console.log('Saving profile data to Supabase');
+
             // First update the profile
             const { error: profileError } = await supabase
                 .from('profiles')
                 .update({
                     username: username,
-                    layout: blocks, // Save the blocks array as layout
                     updated_at: new Date().toISOString(),
                 })
-                .eq('user_id', user.id);
+                .eq('id', user.id);
 
             if (profileError) {
                 console.error('Error updating profile:', profileError);
                 throw profileError;
             }
 
-            // Also save to local storage as backup
+            // Save blocks data - first delete existing blocks
+            try {
+                // Save blocks data - first delete existing blocks
+                const { error: deleteError } = await supabase
+                    .from('blocks')
+                    .delete()
+                    .eq('profile_id', user.id);
+
+                if (deleteError) {
+                    console.error('Error deleting existing blocks:', deleteError);
+                    // Continue anyway - the blocks might not exist yet
+                }
+
+                // Then insert new blocks if we have any
+                if (blocks.length > 0) {
+                    const blocksToInsert = blocks.map((block, index) => {
+                        // Create a database-compatible block object
+                        const dbBlock = {
+                            profile_id: user.id,
+                            type: block.type,
+                            content: block.props, // Store props as content
+                            sort_order: index, // Changed from 'order' to 'sort_order' to match DB schema
+                            settings: null // Default to null
+                        };
+
+                        // Add any additional properties that might be in the database schema but not in our Block type
+                        if ('settings' in block) {
+                            dbBlock.settings = (block as any).settings;
+                        }
+
+                        return dbBlock;
+                    });
+
+                    console.log('Saving blocks to Supabase:', blocksToInsert);
+
+                    // Try inserting with the authenticated client
+                    const { error: insertError } = await supabase
+                        .from('blocks')
+                        .insert(blocksToInsert);
+
+                    if (insertError) {
+                        console.error('Error inserting blocks:', insertError);
+                        console.log('Falling back to localStorage only');
+                        // Don't throw, we'll still save to localStorage as backup
+                    } else {
+                        console.log('Blocks saved to Supabase successfully');
+                    }
+                }
+            } catch (blockError) {
+                console.error('Error managing blocks:', blockError);
+                // Continue to localStorage save as fallback
+            }
+
+            // Always save to local storage as backup
             await saveToStorage();
+
+            console.log('Profile and blocks saved successfully to localStorage');
+
+            // Optional: Show success message
+            // You could add a toast notification here
 
         } catch (error) {
             console.error('Error saving profile:', error);
@@ -481,126 +610,109 @@ const EditPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-background">
-            {/* Header */}
-            <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => router.back()}
-                            >
-                                <ArrowLeft className="w-4 h-4 mr-2" />
-                                Back
-                            </Button>
-                            <Separator orientation="vertical" className="h-6" />
-                            <div>
-                                <h1 className="text-xl font-semibold">Profile Builder</h1>
-                                <p className="text-sm text-muted-foreground">
-                                    {username ? `Editing ${username}'s profile` : 'Create your profile'}
-                                </p>
-                            </div>
-                        </div>
+            <Navbar
+                title="Profile Builder"
+                subtitle={username ? `Editing ${username}'s profile` : 'Create your profile'}
+                showBackButton={true}
+            />
 
-                        <div className="flex items-center gap-2">
-                            {/* Undo/Redo Controls */}
-                            {isEditing && (
-                                <>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={undo}
-                                        disabled={!canUndo()}
-                                        title="Undo"
-                                    >
-                                        <Undo className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={redo}
-                                        disabled={!canRedo()}
-                                        title="Redo"
-                                    >
-                                        <Redo className="w-4 h-4" />
-                                    </Button>
-                                    <Separator orientation="vertical" className="h-6" />
-                                </>
-                            )}
+            <div className="container mx-auto px-4 py-6">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                        {/* Undo/Redo Controls */}
+                        {isEditing && (
+                            <>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={undo}
+                                    disabled={!canUndo()}
+                                    title="Undo"
+                                >
+                                    <Undo className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={redo}
+                                    disabled={!canRedo()}
+                                    title="Redo"
+                                >
+                                    <Redo className="w-4 h-4" />
+                                </Button>
+                                <Separator orientation="vertical" className="h-6" />
+                            </>
+                        )}
 
-                            {/* Preview Mode Toggle */}
-                            {!isEditing && (
-                                <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
-                                    <Button
-                                        variant={previewMode === 'desktop' ? 'default' : 'ghost'}
-                                        size="sm"
-                                        onClick={() => setPreviewMode('desktop')}
-                                    >
-                                        <Monitor className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                        variant={previewMode === 'tablet' ? 'default' : 'ghost'}
-                                        size="sm"
-                                        onClick={() => setPreviewMode('tablet')}
-                                    >
-                                        <Tablet className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                        variant={previewMode === 'mobile' ? 'default' : 'ghost'}
-                                        size="sm"
-                                        onClick={() => setPreviewMode('mobile')}
-                                    >
-                                        <Smartphone className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            )}
-
-                            {/* Edit/Preview Toggle */}
+                        {/* Preview Mode Toggle */}
+                        {!isEditing && (
                             <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
                                 <Button
-                                    variant={isEditing ? 'default' : 'ghost'}
+                                    variant={previewMode === 'desktop' ? 'default' : 'ghost'}
                                     size="sm"
-                                    onClick={() => setIsEditing(true)}
+                                    onClick={() => setPreviewMode('desktop')}
                                 >
-                                    <Edit className="w-4 h-4 mr-2" />
-                                    Edit
+                                    <Monitor className="w-4 h-4" />
                                 </Button>
                                 <Button
-                                    variant={!isEditing ? 'default' : 'ghost'}
+                                    variant={previewMode === 'tablet' ? 'default' : 'ghost'}
                                     size="sm"
-                                    onClick={() => setIsEditing(false)}
+                                    onClick={() => setPreviewMode('tablet')}
                                 >
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    Preview
+                                    <Tablet className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant={previewMode === 'mobile' ? 'default' : 'ghost'}
+                                    size="sm"
+                                    onClick={() => setPreviewMode('mobile')}
+                                >
+                                    <Smartphone className="w-4 h-4" />
                                 </Button>
                             </div>
+                        )}
 
-                            <Separator orientation="vertical" className="h-6" />
-
-                            {/* Action Buttons */}
+                        {/* Edit/Preview Toggle */}
+                        <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
                             <Button
-                                variant="outline"
-                                onClick={handlePreview}
-                                disabled={!username && !usernameInput}
+                                variant={isEditing ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setIsEditing(true)}
                             >
-                                <ExternalLink className="w-4 h-4 mr-2" />
-                                View Live
+                                <Edit className="w-4 h-4 mr-2" />
+                                Edit
                             </Button>
-
                             <Button
-                                onClick={handleSave}
-                                disabled={isSaving}
+                                variant={!isEditing ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setIsEditing(false)}
                             >
-                                <Save className="w-4 h-4 mr-2" />
-                                {isSaving ? 'Saving...' : 'Save'}
+                                <Eye className="w-4 h-4 mr-2" />
+                                Preview
                             </Button>
                         </div>
                     </div>
-                </div>
-            </header>
 
-            <div className="container mx-auto px-4 py-6">
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={handlePreview}
+                            disabled={!username && !usernameInput}
+                        >
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            View Live
+                        </Button>
+
+                        <Button
+                            onClick={handleSave}
+                            disabled={isSaving}
+                        >
+                            <Save className="w-4 h-4 mr-2" />
+                            {isSaving ? 'Saving...' : 'Save'}
+                        </Button>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     {/* Block Library Sidebar */}
                     {isEditing && (

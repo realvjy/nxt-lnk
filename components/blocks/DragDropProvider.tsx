@@ -133,6 +133,7 @@ export const DragDropProvider: React.FC<DragDropProviderProps> = ({
                             onDelete={() => { }}
                             onDuplicate={() => { }}
                             onSelect={() => { }}
+                            onAddBlock={() => { }}
                         />
                     </div>
                 ) : null}

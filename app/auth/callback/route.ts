@@ -15,7 +15,11 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const supabase = createRouteHandlerClient<Database>({ cookies });
+        // Create a Supabase client for the current request
+        const cookieStore = cookies();
+        const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore });
+
+        // Exchange the code for a session
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
         if (exchangeError) {
             console.error('exchangeCodeForSession:', exchangeError);
@@ -32,13 +36,14 @@ export async function GET(request: NextRequest) {
             return NextResponse.redirect(new URL('/login?error=session_error', url.origin));
         }
 
+        // Create admin client with service role for database operations
         const supabaseAdmin = createClient<Database>(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY!,
             { auth: { persistSession: false } }
         );
 
-        // Check by id, not user_id
+        // Check if profile exists - use id as the primary identifier
         const { data: profile, error: profileError } = await supabaseAdmin
             .from('profiles')
             .select('*')
@@ -50,13 +55,21 @@ export async function GET(request: NextRequest) {
             return NextResponse.redirect(new URL('/login?error=profile_select_error', url.origin));
         }
 
+        // If no profile exists, create one
         if (!profile) {
-            const username = user.user_metadata?.username ?? user.email?.split('@')[0] ?? `user_${user.id.slice(0, 6)}`;
+            // Get username from metadata or email or generate a default
+            const username = user.user_metadata?.username ||
+                user.email?.split('@')[0] ||
+                `user_${user.id.slice(0, 6)}`;
 
+            // Insert new profile with consistent id/user_id fields
             const { error: createError } = await supabaseAdmin.from('profiles').insert({
                 id: user.id,
+                user_id: user.id, // Include both for compatibility
                 username,
                 email: user.email,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
             });
 
             if (createError) {
@@ -65,6 +78,7 @@ export async function GET(request: NextRequest) {
             }
         }
 
+        // Redirect to edit page after successful authentication
         return NextResponse.redirect(new URL('/edit', url.origin));
     } catch (e) {
         console.error('Unexpected error:', e);
