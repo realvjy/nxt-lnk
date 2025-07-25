@@ -7,6 +7,7 @@ import { Link } from './profile/links'
 export interface BaseBlock {
     id: string
     type: string
+    settings?: any
 }
 
 /**
@@ -92,7 +93,8 @@ export type Block =
  * Helper function to create a new block with default values
  */
 export const createBlock = (type: Block['type'], props: any = {}): Block => {
-    const id = `block_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+    // Generate a proper UUID v4 format that Supabase expects
+    const id = crypto.randomUUID();
 
     switch (type) {
         case 'name':

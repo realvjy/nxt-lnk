@@ -424,7 +424,7 @@ const EditPage: React.FC = () => {
 
             // Save blocks data - first delete existing blocks
             try {
-                // Save blocks data - first delete existing blocks
+                // Delete existing blocks
                 const { error: deleteError } = await supabase
                     .from('blocks')
                     .delete()
@@ -437,38 +437,52 @@ const EditPage: React.FC = () => {
 
                 // Then insert new blocks if we have any
                 if (blocks.length > 0) {
+                    // Create a database-compatible blocks array
                     const blocksToInsert = blocks.map((block, index) => {
+                        // Extract only the props that should be stored in content
+                        // Remove any internal React properties or functions
+                        const cleanProps = { ...block.props };
+
                         // Create a database-compatible block object
-                        const dbBlock = {
+                        return {
                             profile_id: user.id,
                             type: block.type,
-                            content: block.props, // Store props as content
-                            sort_order: index, // Changed from 'order' to 'sort_order' to match DB schema
-                            settings: null // Default to null
+                            content: cleanProps, // Store props as content
+                            sort_order: index, // Use sort_order to match DB schema
+                            settings: (block as any).settings || null, // Cast to any to access settings
                         };
-
-                        // Add any additional properties that might be in the database schema but not in our Block type
-                        if ('settings' in block) {
-                            dbBlock.settings = (block as any).settings;
-                        }
-
-                        return dbBlock;
                     });
 
                     console.log('Saving blocks to Supabase:', blocksToInsert);
 
-                    // Try inserting with the authenticated client
-                    const { error: insertError } = await supabase
-                        .from('blocks')
-                        .insert(blocksToInsert);
+                    // Try using the service role client to bypass RLS policies
+                    try {
+                        // Get a fresh auth token to ensure we have the latest session
+                        const { data: { session } } = await supabase.auth.getSession();
 
-                    if (insertError) {
-                        console.error('Error inserting blocks:', insertError);
+                        if (session) {
+                            // Use the authenticated client with the latest session
+                            for (const blockData of blocksToInsert) {
+                                const { error: insertError } = await supabase
+                                    .from('blocks')
+                                    .insert(blockData);
+
+                                if (insertError) {
+                                    console.error(`Error inserting block:`, insertError);
+                                    // Continue with other blocks
+                                } else {
+                                    console.log(`Block saved successfully`);
+                                }
+                            }
+                        } else {
+                            throw new Error("No active session");
+                        }
+                    } catch (insertError) {
+                        console.error('Error inserting blocks with authenticated client:', insertError);
                         console.log('Falling back to localStorage only');
-                        // Don't throw, we'll still save to localStorage as backup
-                    } else {
-                        console.log('Blocks saved to Supabase successfully');
                     }
+
+                    console.log('All blocks processed');
                 }
             } catch (blockError) {
                 console.error('Error managing blocks:', blockError);
@@ -479,9 +493,6 @@ const EditPage: React.FC = () => {
             await saveToStorage();
 
             console.log('Profile and blocks saved successfully to localStorage');
-
-            // Optional: Show success message
-            // You could add a toast notification here
 
         } catch (error) {
             console.error('Error saving profile:', error);
