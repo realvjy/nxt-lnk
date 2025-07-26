@@ -1,5 +1,7 @@
 import { create } from 'zustand'
-import { Link, DatabaseLink, mapLinkFromDb } from '@/lib/supabase/types'
+import { BaseLink, Link, createLink } from '@/shared/app/links'
+import { DatabaseLink, Json } from '@/shared/supabase/tables'
+import { mapLinkFromDb, mapLinkToDb } from '@/shared/supabase/mappings'
 
 interface LinksState {
     links: Link[]
@@ -9,8 +11,8 @@ interface LinksState {
 
 interface LinksActions {
     // Basic CRUD operations
-    addLink: (link: Omit<Link, 'id' | 'sortOrder' | 'createdAt' | 'updatedAt'>) => void
-    updateLink: (id: string, updates: Partial<Link>) => void
+    addLink: (link: Partial<BaseLink>) => void
+    updateLink: (id: string, updates: Partial<BaseLink>) => void
     deleteLink: (id: string) => void
     reorderLinks: (fromIndex: number, toIndex: number) => void
 
@@ -38,13 +40,15 @@ export const useLinksStore = create<LinksStore>((set, get) => ({
 
     // Basic CRUD operations
     addLink: (linkData) => {
-        const newLink = {
-            ...linkData,
-            id: crypto.randomUUID(),
-            sortOrder: get().links.length,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        } as Link
+        // Use the createLink factory function for type safety
+        const newLink = createLink(
+            linkData.type || 'normal',
+            {
+                ...linkData,
+                profileId: linkData.profileId,
+                sortOrder: get().links.length,
+            }
+        );
 
         set((state) => ({
             links: [...state.links, newLink],
@@ -56,7 +60,7 @@ export const useLinksStore = create<LinksStore>((set, get) => ({
         set((state) => ({
             links: state.links.map((link) =>
                 link.id === id
-                    ? ({ ...link, ...updates, updatedAt: new Date().toISOString() } as Link)
+                    ? { ...link, ...updates, updatedAt: new Date().toISOString() } as Link
                     : link
             ),
             error: null,
@@ -72,19 +76,19 @@ export const useLinksStore = create<LinksStore>((set, get) => ({
 
     reorderLinks: (fromIndex, toIndex) => {
         set((state) => {
-            const newLinks = [...state.links]
-            const [reorderedItem] = newLinks.splice(fromIndex, 1)
-            newLinks.splice(toIndex, 0, reorderedItem)
+            const newLinks = [...state.links];
+            const [movedLink] = newLinks.splice(fromIndex, 1);
+            newLinks.splice(toIndex, 0, movedLink);
 
-            // Update sort orders
-            const updatedLinks = newLinks.map((link, index) => ({
-                ...link,
-                sortOrder: index,
-                updatedAt: new Date().toISOString(),
-            } as Link))
-
-            return { links: updatedLinks, error: null }
-        })
+            // Update sortOrder for all links
+            return {
+                links: newLinks.map((link, index) => ({
+                    ...link,
+                    sortOrder: index,
+                })),
+                error: null,
+            };
+        });
     },
 
     // Bulk operations
@@ -122,6 +126,6 @@ export const useLinksStore = create<LinksStore>((set, get) => ({
 // Helper function to convert database links to app links
 export const loadLinksFromDatabase = (dbLinks: DatabaseLink[]): Link[] => {
     return dbLinks
-        .map(mapLinkFromDb)
+        .map(link => mapLinkFromDb(link) as Link)
         .sort((a, b) => a.sortOrder - b.sortOrder)
 }
