@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { BadgeBlockType } from '@/shared/blocks';
+import { BadgeBlockType } from '@/shared/app/blocks';
 import { Shield, Eye, Palette } from 'lucide-react';
 
 interface BadgeBlockEditorProps {
@@ -58,15 +58,15 @@ export const BadgeBlockEditor: React.FC<BadgeBlockEditorProps> = ({
     onChange,
     onClose
 }) => {
-    const [localProps, setLocalProps] = useState(block.props);
+    const [localProps, setLocalProps] = useState(block.content);
 
-    const handleChange = (key: keyof BadgeBlockType['props'], value: any) => {
+    const handleChange = (key: keyof BadgeBlockType['content'], value: any) => {
         const newProps = { ...localProps, [key]: value };
         setLocalProps(newProps);
 
         onChange({
             ...block,
-            props: newProps
+            content: newProps
         });
     };
 

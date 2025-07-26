@@ -41,16 +41,7 @@ import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/lib/stores/userStore';
 import { useLayoutStore } from '@/lib/stores/layoutStore';
 import { usePersistenceStore } from '@/lib/stores/persistenceStore';
-import { createBlock } from '@/shared/blocks';
-import type {
-    Block,
-    NameBlockType,
-    TaglineBlockType,
-    BioBlockType,
-    ImageBlockType,
-    BadgeBlockType,
-    LinkBlockType
-} from '@/shared/blocks';
+
 import { DragDropCanvas } from '@/components/blocks/DragDropCanvas';
 import Navbar from '@/components/layout/Navbar';
 
@@ -75,6 +66,19 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { mapBlockToDb, mapLinkFromDb, mapLinkToDb } from '@/shared/supabase/mappings';
+import { useLinksStore } from '@/lib/stores';
+import {
+    Block,
+    NameBlockType,
+    TaglineBlockType,
+    BioBlockType,
+    ImageBlockType,
+    BadgeBlockType,
+    LinkBlockType,
+    createBlock,
+    Link
+} from '@/shared/index';
 
 const dropAnimationConfig: DropAnimation = {
     sideEffects: defaultDropAnimationSideEffects({
@@ -102,9 +106,10 @@ const EditPage: React.FC = () => {
         undo,
         redo,
         canUndo,
-        canRedo
+        canRedo,
     } = useLayoutStore();
     const { saveToStorage, loadFromStorage, migrateUsername } = usePersistenceStore();
+    const { links, setLinks, clearLinks } = useLinksStore();
 
     const [blocks, setBlocks] = useState<Block[]>(layout);
     const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
@@ -264,6 +269,30 @@ const EditPage: React.FC = () => {
                         console.log('No blocks found for user, using default layout');
                         // Optional: You could load a default layout here
                     }
+
+                    // Fetch links for this user
+                    const { data: linksData, error: linksError } = await supabase
+                        .from('links')
+                        .select('*')
+                        .eq('profile_id', user.id)
+                        .order('sort_order', { ascending: true });
+
+                    if (linksError) {
+                        console.error('Error fetching links:', linksError);
+                    } else if (linksData && linksData.length > 0) {
+                        console.log('Loaded links from Supabase:', linksData);
+
+                        // Use the mapLinkFromDb function to convert database links to app links
+                        const formattedLinks = linksData.map(link => mapLinkFromDb(link) as Link);
+
+                        console.log('Formatted links for app:', formattedLinks);
+                        // Set links in the links store
+                        setLinks(formattedLinks);
+                    } else {
+                        console.log('No links found for user');
+                        // Clear any existing links
+                        clearLinks();
+                    }
                 }
             } catch (error) {
                 console.error('Error in checkUser:', error);
@@ -331,7 +360,7 @@ const EditPage: React.FC = () => {
     const handleDuplicateBlock = (blockId: string) => {
         const blockToDuplicate = blocks.find(b => b.id === blockId);
         if (blockToDuplicate) {
-            const duplicatedBlock = createBlock(blockToDuplicate.type, blockToDuplicate.props);
+            const duplicatedBlock = createBlock(blockToDuplicate.type, blockToDuplicate.content);
             duplicateBlockInLayout(blockId, duplicatedBlock);
             setSelectedBlockId(duplicatedBlock.id);
         }
@@ -396,6 +425,7 @@ const EditPage: React.FC = () => {
     };
 
     // Update handleSave function
+    // Update handleSave function
     const handleSave = async () => {
         if (!user) return;
 
@@ -415,7 +445,7 @@ const EditPage: React.FC = () => {
                     username: username,
                     updated_at: new Date().toISOString(),
                 })
-                .eq('id', user.id);
+                .eq('user_id', user.id); // Updated to use user_id instead of id
 
             if (profileError) {
                 console.error('Error updating profile:', profileError);
@@ -428,7 +458,7 @@ const EditPage: React.FC = () => {
                 const { error: deleteError } = await supabase
                     .from('blocks')
                     .delete()
-                    .eq('profile_id', user.id);
+                    .eq('profile_id', user.id); // Use profile.id instead of user.id
 
                 if (deleteError) {
                     console.error('Error deleting existing blocks:', deleteError);
@@ -437,21 +467,8 @@ const EditPage: React.FC = () => {
 
                 // Then insert new blocks if we have any
                 if (blocks.length > 0) {
-                    // Create a database-compatible blocks array
-                    const blocksToInsert = blocks.map((block, index) => {
-                        // Extract only the props that should be stored in content
-                        // Remove any internal React properties or functions
-                        const cleanProps = { ...block.props };
-
-                        // Create a database-compatible block object
-                        return {
-                            profile_id: user.id,
-                            type: block.type,
-                            content: cleanProps, // Store props as content
-                            sort_order: index, // Use sort_order to match DB schema
-                            settings: (block as any).settings || null, // Cast to any to access settings
-                        };
-                    });
+                    // Create a database-compatible blocks array using the mapping function
+                    const blocksToInsert = blocks.map(block => mapBlockToDb(block));
 
                     console.log('Saving blocks to Supabase:', blocksToInsert);
 
@@ -489,14 +506,63 @@ const EditPage: React.FC = () => {
                 // Continue to localStorage save as fallback
             }
 
-            // Always save to local storage as backup
+            // Save links data - first delete existing links
+            try {
+                // Delete existing links
+                const { error: deleteLinksError } = await supabase
+                    .from('links')
+                    .delete()
+                    .eq('profile_id', user.id); // Use profile.id instead of user.id
+
+                if (deleteLinksError) {
+                    console.error('Error deleting existing links:', deleteLinksError);
+                    // Continue anyway - the links might not exist yet
+                }
+
+                // Then insert new links if we have any
+                if (links.length > 0) {
+                    // Create a database-compatible links array
+                    const linksToInsert = links.map(link => mapLinkToDb(link));
+
+                    console.log('Saving links to Supabase:', linksToInsert);
+
+                    // Try using the authenticated client
+                    try {
+                        // Get a fresh auth token to ensure we have the latest session
+                        const { data: { session } } = await supabase.auth.getSession();
+
+                        if (session) {
+                            // Use the authenticated client with the latest session
+                            const { error: insertLinksError } = await supabase
+                                .from('links')
+                                .insert(linksToInsert);
+
+                            if (insertLinksError) {
+                                console.error(`Error inserting links:`, insertLinksError);
+                            } else {
+                                console.log(`Links saved successfully`);
+                            }
+                        } else {
+                            throw new Error("No active session");
+                        }
+                    } catch (insertLinksError) {
+                        console.error('Error inserting links with authenticated client:', insertLinksError);
+                        console.log('Falling back to localStorage only');
+                    }
+                }
+            } catch (linksError) {
+                console.error('Error managing links:', linksError);
+                // Continue to localStorage save as fallback
+            }
+
+            // Save to localStorage as backup
             await saveToStorage();
 
-            console.log('Profile and blocks saved successfully to localStorage');
+
 
         } catch (error) {
-            console.error('Error saving profile:', error);
-            // Handle error (show toast notification)
+            console.error('Error saving changes:', error);
+
         } finally {
             setIsSaving(false);
         }
@@ -535,17 +601,23 @@ const EditPage: React.FC = () => {
     ];
 
     // Render editor based on selected block
+    // Render editor based on selected block
     const renderEditor = () => {
-        const selectedBlock = blocks.find(b => b.id === selectedBlockId);
+        if (!selectedBlockId) return null;
+
+        // Find the selected block by ID
+        const selectedBlock = blocks.find(block => block.id === selectedBlockId);
+
         if (!selectedBlock) return null;
 
-        const createUpdateHandler = <T extends Block>(blockType: T['type']) => {
-            return (updatedBlock: T) => {
-                handleUpdateBlock(updatedBlock);
-            };
+        const createUpdateHandler = <T extends Block>(type: T['type']) => (updatedBlock: T) => {
+            handleUpdateBlock(updatedBlock);
         };
 
-        const onClose = () => setSelectedBlockId(null);
+        const onClose = () => {
+            setIsEditing(false);
+            setSelectedBlockId(null);
+        };
 
         switch (selectedBlock.type) {
             case 'name':
@@ -597,11 +669,7 @@ const EditPage: React.FC = () => {
                     />
                 );
             default:
-                return (
-                    <div className="p-4 text-center text-muted-foreground">
-                        <p>No editor available for this block type</p>
-                    </div>
-                );
+                return null;
         }
     };
 

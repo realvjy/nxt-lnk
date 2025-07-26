@@ -4,8 +4,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LinkBlockType } from '@/shared/blocks';
+import { LinkBlockType } from '@/shared/app/blocks';
 import { ExternalLink, Globe, Github, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
+import { SocialPlatform } from '@/shared/index';
 
 interface LinkBlockViewProps {
     block: LinkBlockType;
@@ -93,8 +94,8 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
     isEditing,
     onChange
 }) => {
-    const linkType = block.props.linkType || 'normal';
-    const platform = block.props.platform;
+    const linkType = block.content.linkType || 'normal';
+    const platform = block.content.platform;
     const platformInfo = platform ? platformConfig[platform] || platformConfig.other : null;
 
     const getIcon = () => {
@@ -123,10 +124,10 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
                         <Label htmlFor={`link-label-${block.id}`}>Label</Label>
                         <Input
                             id={`link-label-${block.id}`}
-                            value={block.props.label}
+                            value={block.content.label}
                             onChange={(e) => onChange({
                                 ...block,
-                                props: { ...block.props, label: e.target.value }
+                                content: { ...block.content, label: e.target.value }
                             })}
                             placeholder="Link title"
                         />
@@ -136,10 +137,10 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
                         <Label htmlFor={`link-url-${block.id}`}>URL</Label>
                         <Input
                             id={`link-url-${block.id}`}
-                            value={block.props.url}
+                            value={block.content.url}
                             onChange={(e) => onChange({
                                 ...block,
-                                props: { ...block.props, url: e.target.value }
+                                content: { ...block.content, url: e.target.value }
                             })}
                             placeholder="https://..."
                         />
@@ -153,11 +154,11 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
                             value={linkType}
                             onValueChange={(value) => onChange({
                                 ...block,
-                                props: {
-                                    ...block.props,
-                                    linkType: value as LinkBlockType['props']['linkType'],
+                                content: {
+                                    ...block.content,
+                                    linkType: value as LinkBlockType['content']['linkType'],
                                     // Clear platform when changing type
-                                    platform: value === 'social' ? block.props.platform : undefined
+                                    platform: value === 'social' ? block.content.platform : undefined
                                 }
                             })}
                         >
@@ -184,7 +185,7 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
                                 value={platform || ''}
                                 onValueChange={(value) => onChange({
                                     ...block,
-                                    props: { ...block.props, platform: value }
+                                    content: { ...block.content, platform: value as SocialPlatform }
                                 })}
                             >
                                 <SelectTrigger id={`platform-${block.id}`}>
@@ -210,10 +211,10 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
                         <Label htmlFor={`cover-image-${block.id}`}>Cover Image URL (optional)</Label>
                         <Input
                             id={`cover-image-${block.id}`}
-                            value={block.props.cover || ''}
+                            value={block.content.cover || ''}
                             onChange={(e) => onChange({
                                 ...block,
-                                props: { ...block.props, cover: e.target.value }
+                                content: { ...block.content, cover: e.target.value }
                             })}
                             placeholder="https://example.com/cover.jpg"
                         />
@@ -231,7 +232,7 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
                                         {getIcon()}
                                         <div className="flex-1">
                                             <div className="font-medium">
-                                                {block.props.label || 'Link title'}
+                                                {block.content.label || 'Link title'}
                                             </div>
                                             {linkType === 'social' && platform && (
                                                 <div className="text-sm text-muted-foreground capitalize">
@@ -243,11 +244,11 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
                                     <ExternalLink className="w-4 h-4 text-muted-foreground" />
                                 </div>
 
-                                {linkType === 'blog' && block.props.cover && (
+                                {linkType === 'blog' && block.content.cover && (
                                     <div className="mt-3">
                                         <img
-                                            src={block.props.cover}
-                                            alt={block.props.label}
+                                            src={block.content.cover}
+                                            alt={block.content.label}
                                             className="w-full h-32 object-cover rounded-md"
                                         />
                                     </div>
@@ -261,7 +262,7 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
     }
 
     // Display mode
-    if (!block.props.url || !block.props.label) {
+    if (!block.content.url || !block.content.label) {
         return (
             <Card className="opacity-50">
                 <CardContent className="p-4">
@@ -281,7 +282,7 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
 
     return (
         <a
-            href={block.props.url}
+            href={block.content.url}
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full group"
@@ -292,7 +293,7 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                             {getIcon()}
                             <div className="flex-1 min-w-0">
-                                <div className="font-medium truncate">{block.props.label}</div>
+                                <div className="font-medium truncate">{block.content.label}</div>
                                 {linkType === 'social' && platform && (
                                     <div className="text-sm text-muted-foreground capitalize">
                                         {platformConfig[platform]?.label || platform}
@@ -303,11 +304,11 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
                         <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                     </div>
 
-                    {linkType === 'blog' && block.props.cover && (
+                    {linkType === 'blog' && block.content.cover && (
                         <div className="mt-3">
                             <img
-                                src={block.props.cover}
-                                alt={block.props.label}
+                                src={block.content.cover}
+                                alt={block.content.label}
                                 className="w-full h-32 object-cover rounded-md"
                             />
                         </div>

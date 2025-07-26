@@ -1,5 +1,7 @@
 import { create } from 'zustand'
-import { Block, DatabaseBlock, mapBlockFromDb } from '@/lib/supabase/types'
+import { Block, createBlock } from '@/shared/app/blocks'
+import { DatabaseBlock } from '@/shared/supabase/tables'
+import { mapBlockFromDb, mapBlockToDb } from '@/shared/supabase/mappings'
 
 interface BlocksState {
     blocks: Block[]
@@ -20,7 +22,7 @@ interface BlocksActions {
 
     // Utility functions
     getBlockById: (id: string) => Block | undefined
-    getBlocksByType: (type: string) => Block[]
+    getBlocksByType: (type: Block['type']) => Block[]
 
     // State management
     setLoading: (loading: boolean) => void
@@ -34,16 +36,23 @@ export const useBlocksStore = create<BlocksStore>((set, get) => ({
     blocks: [],
     isLoading: false,
     error: null,
-
     // Basic CRUD operations
     addBlock: (blockData) => {
-        const newBlock: Block = {
-            ...blockData,
-            id: crypto.randomUUID(),
-            sortOrder: get().blocks.length,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        }
+        // Use the createBlock factory function for type safety
+        const newBlock = createBlock(
+            blockData.type,
+            {
+                ...blockData,
+                profileId: blockData.profileId,
+                sortOrder: get().blocks.length,
+            }
+        );
+
+        // Add additional properties not handled by createBlock
+        newBlock.profileId = blockData.profileId;
+        newBlock.sortOrder = get().blocks.length;
+        newBlock.createdAt = new Date().toISOString();
+        newBlock.updatedAt = new Date().toISOString();
 
         set((state) => ({
             blocks: [...state.blocks, newBlock],
@@ -55,7 +64,7 @@ export const useBlocksStore = create<BlocksStore>((set, get) => ({
         set((state) => ({
             blocks: state.blocks.map((block) =>
                 block.id === id
-                    ? { ...block, ...updates, updatedAt: new Date().toISOString() }
+                    ? { ...block, ...updates, updatedAt: new Date().toISOString() } as Block
                     : block
             ),
             error: null,
@@ -71,19 +80,20 @@ export const useBlocksStore = create<BlocksStore>((set, get) => ({
 
     reorderBlocks: (fromIndex, toIndex) => {
         set((state) => {
-            const newBlocks = [...state.blocks]
-            const [reorderedItem] = newBlocks.splice(fromIndex, 1)
-            newBlocks.splice(toIndex, 0, reorderedItem)
+            const newBlocks = [...state.blocks];
+            const [movedBlock] = newBlocks.splice(fromIndex, 1);
+            newBlocks.splice(toIndex, 0, movedBlock);
 
-            // Update sort orders
-            const updatedBlocks = newBlocks.map((block, index) => ({
-                ...block,
-                sortOrder: index,
-                updatedAt: new Date().toISOString(),
-            }))
-
-            return { blocks: updatedBlocks, error: null }
-        })
+            // Update sortOrder for all blocks
+            return {
+                blocks: newBlocks.map((block, index) => ({
+                    ...block,
+                    sortOrder: index,
+                    updatedAt: new Date().toISOString(),
+                })),
+                error: null,
+            };
+        });
     },
 
     // Bulk operations
@@ -117,6 +127,6 @@ export const useBlocksStore = create<BlocksStore>((set, get) => ({
 // Helper function to convert database blocks to app blocks
 export const loadBlocksFromDatabase = (dbBlocks: DatabaseBlock[]): Block[] => {
     return dbBlocks
-        .map(mapBlockFromDb)
+        .map(block => mapBlockFromDb(block) as Block)
         .sort((a, b) => a.sortOrder - b.sortOrder)
 }

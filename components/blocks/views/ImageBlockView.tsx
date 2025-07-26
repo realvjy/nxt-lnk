@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ImageBlockType } from '@/shared/blocks';
+import { ImageBlockType } from '@/shared/app/blocks';
 import { Upload, X } from 'lucide-react';
 
 interface ImageBlockViewProps {
@@ -34,7 +34,7 @@ export const ImageBlockView: React.FC<ImageBlockViewProps> = ({
     const clearImage = () => {
         onChange({
             ...block,
-            props: { ...block.props, url: '', alt: '' }
+            content: { ...block.content, url: '', alt: '' }
         });
         setImageError(false);
     };
@@ -47,18 +47,18 @@ export const ImageBlockView: React.FC<ImageBlockViewProps> = ({
                     <div className="flex gap-2">
                         <Input
                             id={`image-url-${block.id}`}
-                            value={block.props.url}
+                            value={block.content.url}
                             onChange={(e) => {
                                 setIsLoading(true);
                                 setImageError(false);
                                 onChange({
                                     ...block,
-                                    props: { ...block.props, url: e.target.value }
+                                    content: { ...block.content, url: e.target.value }
                                 });
                             }}
                             placeholder="https://example.com/image.jpg"
                         />
-                        {block.props.url && (
+                        {block.content.url && (
                             <Button
                                 type="button"
                                 variant="outline"
@@ -75,17 +75,17 @@ export const ImageBlockView: React.FC<ImageBlockViewProps> = ({
                     <Label htmlFor={`image-alt-${block.id}`}>Alt Text</Label>
                     <Input
                         id={`image-alt-${block.id}`}
-                        value={block.props.alt || ''}
+                        value={block.content.alt || ''}
                         onChange={(e) => onChange({
                             ...block,
-                            props: { ...block.props, alt: e.target.value }
+                            content: { ...block.content, alt: e.target.value }
                         })}
                         placeholder="Describe the image for accessibility"
                     />
                 </div>
 
                 {/* Image Preview */}
-                {block.props.url && (
+                {block.content.url && (
                     <div className="space-y-2">
                         <Label>Preview</Label>
                         <Card>
@@ -96,8 +96,8 @@ export const ImageBlockView: React.FC<ImageBlockViewProps> = ({
                                     )}
                                     {!isLoading && !imageError && (
                                         <img
-                                            src={block.props.url}
-                                            alt={block.props.alt}
+                                            src={block.content.url}
+                                            alt={block.content.alt}
                                             className="w-24 h-24 rounded-full object-cover border-4 border-background shadow-lg"
                                             onLoad={handleImageLoad}
                                             onError={handleImageError}
@@ -119,7 +119,7 @@ export const ImageBlockView: React.FC<ImageBlockViewProps> = ({
     }
 
     // Display mode
-    if (!block.props.url) {
+    if (!block.content.url) {
         return (
             <div className="text-center">
                 <div className="w-32 h-32 rounded-full bg-muted flex items-center justify-center mx-auto">
@@ -133,8 +133,8 @@ export const ImageBlockView: React.FC<ImageBlockViewProps> = ({
         <div className="text-center">
             {!imageError ? (
                 <img
-                    src={block.props.url}
-                    alt={block.props.alt || 'Profile image'}
+                    src={block.content.url}
+                    alt={block.content.alt || 'Profile image'}
                     className="w-32 h-32 rounded-full object-cover border-4 border-background shadow-lg mx-auto transition-transform hover:scale-105"
                     onError={handleImageError}
                 />

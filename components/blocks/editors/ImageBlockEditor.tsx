@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { ImageBlockType } from '@/shared/blocks';
+import { ImageBlockType } from '@/shared/app/blocks';
 import { Image, Upload, X, Eye, Settings, Crop } from 'lucide-react';
 
 interface ImageBlockEditorProps {
@@ -32,8 +32,8 @@ export const ImageBlockEditor: React.FC<ImageBlockEditorProps> = ({
     onClose
 }) => {
     const [localProps, setLocalProps] = useState<ExtendedImageProps>({
-        url: block.props.url,
-        alt: block.props.alt,
+        url: block.content.url,
+        alt: block.content.alt,
         size: 'large',
         shape: 'circle',
         border: true,
@@ -75,7 +75,7 @@ export const ImageBlockEditor: React.FC<ImageBlockEditorProps> = ({
 
         onChange({
             ...block,
-            props: {
+            content: {
                 url: newProps.url,
                 alt: newProps.alt
             }

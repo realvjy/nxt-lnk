@@ -249,8 +249,10 @@ export function useContentBlockOperations() {
         // Computed
         bioBlocks: getBlocksByType('bio'),
         nameBlocks: getBlocksByType('name'),
-        sectionBlocks: getBlocksByType('section'),
-        customBlocks: getBlocksByType('custom')
+        linkBlocks: getBlocksByType('link'),
+        taglineBlocks: getBlocksByType('tagline'),
+        imageBlocks: getBlocksByType('image'),
+        badgeBlocks: getBlocksByType('badge')
     }
 }
 

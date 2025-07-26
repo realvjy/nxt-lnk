@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { TaglineBlockType } from '@/shared/blocks';
+import { TaglineBlockType } from '@/shared/app/blocks';
 import { Tag, Type, Eye, Sparkles } from 'lucide-react';
 
 interface TaglineBlockEditorProps {
@@ -29,7 +29,7 @@ export const TaglineBlockEditor: React.FC<TaglineBlockEditorProps> = ({
     onClose
 }) => {
     const [localProps, setLocalProps] = useState<ExtendedTaglineProps>({
-        text: block.props.text,
+        text: block.content.text,
         fontSize: 'medium',
         fontWeight: 'normal',
         textAlign: 'center',
@@ -55,7 +55,7 @@ export const TaglineBlockEditor: React.FC<TaglineBlockEditorProps> = ({
 
         onChange({
             ...block,
-            props: {
+            content: {
                 text: newProps.text
             }
         });

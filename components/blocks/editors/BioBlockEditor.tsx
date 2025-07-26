@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { BioBlockType } from '@/shared/blocks';
+import { BioBlockType } from '@/shared/app/blocks';
 import {
     Type,
     Eye,
@@ -59,7 +59,7 @@ export const BioBlockEditor: React.FC<BioBlockEditorProps> = ({
     onClose
 }) => {
     const [localProps, setLocalProps] = useState<ExtendedBioProps>({
-        text: block.props.text,
+        text: block.content.text,
         textAlign: 'center',
         fontSize: 'medium',
         lineHeight: 'relaxed',
@@ -103,7 +103,7 @@ export const BioBlockEditor: React.FC<BioBlockEditorProps> = ({
             setLocalProps(prev => ({ ...prev, text: html }));
             onChange({
                 ...block,
-                props: { text: html }
+                content: { text: html }
             });
         },
         editorProps: {
@@ -115,10 +115,10 @@ export const BioBlockEditor: React.FC<BioBlockEditorProps> = ({
 
     // Update editor content when block changes
     useEffect(() => {
-        if (editor && editor.getHTML() !== block.props.text) {
-            editor.commands.setContent(block.props.text);
+        if (editor && editor.getHTML() !== block.content.text) {
+            editor.commands.setContent(block.content.text);
         }
-    }, [block.props.text, editor]);
+    }, [block.content.text, editor]);
 
     // Validate character count
     useEffect(() => {

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { Block } from '@/shared/blocks'
+import { Block } from '@/shared/app/blocks'
 import { arrayMove } from '@dnd-kit/sortable'
 
 interface LayoutState {

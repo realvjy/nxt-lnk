@@ -7,7 +7,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils/utils';
-import type { Block } from '@/shared/blocks';
+import type { Block } from '@/shared/app/blocks';
 
 interface SortableBlockWrapperProps {
     block: Block;

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils/utils';
 import { useBuilderStore } from '@/lib/stores/builderStore';
 import { SortableBlockWrapper } from './SortableBlockWrapper';
 import { BlockRenderer } from './BlockRenderer';
-import type { Block } from '@/shared/blocks';
+import type { Block } from '@/shared/app/blocks';
 import { SlashMenu } from "./menu/SlashMenu";
 import { useSlashMenu } from "./menu/useSlashMenu";
 import { slashMenuItems } from "./menu/menuConfig";

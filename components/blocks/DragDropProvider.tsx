@@ -22,7 +22,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { useLayoutStore } from '@/lib/stores/layoutStore';
 import { useBuilderStore } from '@/lib/stores/builderStore';
 import { BlockRenderer } from './BlockRenderer';
-import type { Block } from '@/shared/blocks';
+import type { Block } from '@/shared/app/blocks';
 
 const dropAnimationConfig: DropAnimation = {
     sideEffects: defaultDropAnimationSideEffects({

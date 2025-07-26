@@ -4,7 +4,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LinkBlockType } from '@/shared/blocks';
+// Import from the central types index
+import { useLinksStore } from '@/lib/stores';
 import {
     Link2,
     ExternalLink,
@@ -18,6 +19,7 @@ import {
     Eye,
     AlertCircle
 } from 'lucide-react';
+import { createLink, LinkBlockType, LinkType, SocialPlatform } from '@/shared/index';
 
 interface LinkBlockEditorProps {
     block: LinkBlockType;
@@ -25,7 +27,16 @@ interface LinkBlockEditorProps {
     onClose?: () => void;
 }
 
-const platformConfig = {
+type PlatformConfig = {
+    [key in SocialPlatform]: {
+        icon: React.ElementType;
+        label: string;
+        color: string;
+        placeholder: string;
+    }
+};
+
+const platformConfig: PlatformConfig = {
     twitter: {
         icon: Twitter,
         label: 'Twitter',
@@ -74,6 +85,24 @@ const platformConfig = {
         color: 'bg-gray-600',
         placeholder: 'https://medium.com/@username'
     },
+    facebook: {
+        icon: Globe,
+        label: 'Facebook',
+        color: 'bg-blue-700',
+        placeholder: 'https://facebook.com/username'
+    },
+    tiktok: {
+        icon: Globe,
+        label: 'TikTok',
+        color: 'bg-black',
+        placeholder: 'https://tiktok.com/@username'
+    },
+    twitch: {
+        icon: Globe,
+        label: 'Twitch',
+        color: 'bg-purple-600',
+        placeholder: 'https://twitch.tv/username'
+    },
     other: {
         icon: Globe,
         label: 'Other',
@@ -87,9 +116,13 @@ export const LinkBlockEditor: React.FC<LinkBlockEditorProps> = ({
     onChange,
     onClose
 }) => {
-    const [localProps, setLocalProps] = useState(block.props);
+    const [localProps, setLocalProps] = useState(block.content);
     const [errors, setErrors] = useState<string[]>([]);
     const [isTestingLink, setIsTestingLink] = useState(false);
+    const { addLink, updateLink, getLinkById } = useLinksStore();
+
+    // Check if this link already exists in the links store
+    const existingLink = getLinkById(block.id);
 
     // Validate on change
     useEffect(() => {
@@ -116,14 +149,76 @@ export const LinkBlockEditor: React.FC<LinkBlockEditorProps> = ({
         setErrors(newErrors);
     }, [localProps.label, localProps.url]);
 
-    const handleChange = (key: keyof LinkBlockType['props'], value: any) => {
+    const handleChange = (key: keyof LinkBlockType['content'], value: any) => {
         const newProps = { ...localProps, [key]: value };
         setLocalProps(newProps);
 
+        // Update the block
         onChange({
             ...block,
-            props: newProps
+            content: newProps
         });
+
+        // Automatically save to links store if we have a valid URL and label
+        if (newProps.url && newProps.label && !errors.length) {
+            const linkType: LinkType = newProps.linkType as LinkType || 'normal';
+
+            // Create base link data
+            const linkParams = {
+                id: block.id,
+                url: newProps.url,
+                title: newProps.label,
+                isActive: true,
+                sortOrder: 0,
+            };
+
+            // Handle different link types with their specific properties
+            if (linkType === 'social' && newProps.platform) {
+                // For social links, use the createLink factory function with correct parameters
+                const socialLinkParams = {
+                    ...linkParams,
+                    platform: newProps.platform as SocialPlatform
+                };
+
+                const socialLink = createLink('social', socialLinkParams);
+
+                // Update existing link or add new one
+                if (existingLink) {
+                    updateLink(block.id, socialLink);
+                } else {
+                    addLink(socialLink);
+                }
+                return;
+            }
+
+            // Handle blog links
+            if (linkType === 'blog' && newProps.cover) {
+                const blogLinkParams = {
+                    ...linkParams,
+                    cover: newProps.cover
+                };
+
+                const blogLink = createLink('blog', blogLinkParams);
+
+                // Update existing link or add new one
+                if (existingLink) {
+                    updateLink(block.id, blogLink);
+                } else {
+                    addLink(blogLink);
+                }
+                return;
+            }
+
+            // For normal links
+            const normalLink = createLink('normal', linkParams);
+
+            // Update existing link or add new one
+            if (existingLink) {
+                updateLink(block.id, normalLink);
+            } else {
+                addLink(normalLink);
+            }
+        }
     };
 
     const testLink = async () => {

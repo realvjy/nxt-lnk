@@ -1,5 +1,5 @@
 import React from 'react';
-import { BioBlockType } from '@/shared/blocks';
+import { BioBlockType } from '@/shared/app/blocks';
 
 interface BioBlockViewProps {
     block: BioBlockType;
@@ -16,7 +16,7 @@ export const BioBlockView: React.FC<BioBlockViewProps> = ({
     // All editing happens in the dedicated editor panel
 
     // If there's no content, show a placeholder
-    if (!block.props.text || block.props.text.trim() === '' || block.props.text === '<p></p>') {
+    if (!block.content.text || block.content.text.trim() === '' || block.content.text === '<p></p>') {
         return (
             <div className="text-center max-w-2xl mx-auto">
                 <div className="text-muted-foreground leading-relaxed py-8 px-4 border-2 border-dashed border-muted-foreground/25 rounded-lg">
@@ -34,7 +34,7 @@ export const BioBlockView: React.FC<BioBlockViewProps> = ({
             <div
                 className="bio-content text-muted-foreground leading-relaxed"
                 dangerouslySetInnerHTML={{
-                    __html: block.props.text
+                    __html: block.content.text
                 }}
             />
         </div>

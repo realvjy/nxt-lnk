@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NameBlockType } from '@/shared/blocks';
+import { NameBlockType } from '@/shared/app/blocks';
 import { User, Type, Palette } from 'lucide-react';
 
 interface NameBlockEditorProps {
@@ -29,7 +29,7 @@ export const NameBlockEditor: React.FC<NameBlockEditorProps> = ({
     onClose
 }) => {
     const [localProps, setLocalProps] = useState<ExtendedNameProps>({
-        text: block.props.text,
+        text: block.content?.text || '',
         fontSize: 'large',
         fontWeight: 'bold',
         textAlign: 'center',
@@ -61,7 +61,8 @@ export const NameBlockEditor: React.FC<NameBlockEditorProps> = ({
         // Update the block with basic props
         onChange({
             ...block,
-            props: {
+            content: {
+                ...(block.content || {}),
                 text: newProps.text
             }
         });

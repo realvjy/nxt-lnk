@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { NameBlockType } from '@/shared/blocks';
+import { NameBlockType } from '@/shared/app/blocks';
 
 interface NameBlockViewProps {
     block: NameBlockType;
@@ -20,10 +20,10 @@ export const NameBlockView: React.FC<NameBlockViewProps> = ({
                 <Label htmlFor={`name-${block.id}`}>Full Name</Label>
                 <Input
                     id={`name-${block.id}`}
-                    value={block.props.text}
+                    value={block.content?.text || ''}
                     onChange={(e) => onChange({
                         ...block,
-                        props: { ...block.props, text: e.target.value }
+                        content: { ...block.content, text: e.target.value }
                     })}
                     placeholder="Enter your full name"
                     className="text-center"
@@ -35,7 +35,7 @@ export const NameBlockView: React.FC<NameBlockViewProps> = ({
     return (
         <div className="text-center">
             <h1 className="text-3xl font-bold text-foreground leading-tight">
-                {block.props.text || 'Your Name'}
+                {block.content?.text || 'Your Name'}
             </h1>
         </div>
     );

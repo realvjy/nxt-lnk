@@ -31,7 +31,7 @@ import {
     LinkBlockView
 } from './views';
 
-import { Block } from '@/shared/blocks';
+import { Block } from '@/shared/app/blocks';
 import { SlashMenu } from './menu/SlashMenu';
 import { BlockTypeConfig, BLOCK_TYPES } from '@/lib/constants/blockTypes';
 
