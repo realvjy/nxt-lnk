@@ -1,29 +1,29 @@
-// /app/test/page.tsx
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import dynamic from 'next/dynamic';
+
+const AuthTestClient = dynamic(() => import('./AuthTestClient'), { ssr: false });
 
 export default async function TestConnection() {
-    const supabase = createServerComponentClient({ cookies })
+    const supabase = createServerComponentClient({ cookies });
 
-    // Test database connection and get profiles
+    // Server-side: check DB and session
     const { data: profiles, error: dbError } = await supabase
         .from('profiles')
         .select('*')
-        .limit(5)
+        .limit(5);
 
-    // Test authentication
-    const { data: authData, error: authError } = await supabase.auth.getSession()
+    const { data: authData, error: authError } = await supabase.auth.getSession();
 
     const status = {
         database: !dbError,
         auth: !authError,
-        overall: !dbError && !authError
-    }
+        overall: !dbError && !authError,
+    };
 
     return (
         <div className="p-8">
             <h1 className="text-2xl font-bold mb-6">Supabase Connection Test</h1>
-
             <div className="space-y-4">
                 <div className="flex items-center gap-2">
                     <span>Overall Status:</span>
@@ -31,7 +31,6 @@ export default async function TestConnection() {
                         {status.overall ? "✓ Connected" : "✗ Issues Found"}
                     </span>
                 </div>
-
                 <div className="grid gap-4">
                     <div>
                         <h2 className="font-semibold">Database Connection</h2>
@@ -52,32 +51,27 @@ export default async function TestConnection() {
                             </div>
                         )}
                     </div>
-
                     <div>
-                        <h2 className="font-semibold">Authentication</h2>
+                        <h2 className="font-semibold">Server Auth Status</h2>
                         <div className={status.auth ? "text-green-500" : "text-red-500"}>
-                            {status.auth ? "✓ Working" : `✗ Error: ${authError?.message}`}
+                            {status.auth ? "✓ Session Found" : `✗ Error: ${authError?.message}`}
                         </div>
                         {authData?.session && (
                             <div className="mt-2 text-sm text-gray-600">
-                                Current user: {authData.session.user.email}
+                                Server sees user: {authData.session.user.email}
                             </div>
                         )}
                     </div>
                 </div>
-
-                {status.overall && (
-                    <div className="mt-6 p-4 bg-green-50 text-green-700 rounded">
-                        ✓ All systems operational
-                    </div>
-                )}
-
                 {!status.overall && (
                     <div className="mt-6 p-4 bg-red-50 text-red-700 rounded">
-                        Please check your environment variables and Supabase project settings
+                        Please check your environment variables and Supabase project settings.<br />
+                        <b>Tip:</b> If you just logged in, try refreshing the page to let the server see your session.
                     </div>
                 )}
             </div>
+            {/* Client-side login/logout test */}
+            <AuthTestClient />
         </div>
-    )
+    );
 }

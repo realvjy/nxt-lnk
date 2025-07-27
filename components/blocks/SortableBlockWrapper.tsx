@@ -16,6 +16,10 @@ interface SortableBlockWrapperProps {
     isDragging?: boolean;
     children: React.ReactNode;
     onSelect: (id: string) => void;
+    onUpdate: (block: Block) => void;
+    onDelete: (blockId: string) => void; // Add the onDelete prop
+    onDuplicate: (blockId: string) => void; // Add the onDuplicate prop
+    onAddBlock: (type: Block['type']) => void; // Add the onAddBlock prop
 }
 
 export const SortableBlockWrapper: React.FC<SortableBlockWrapperProps> = ({
@@ -25,6 +29,10 @@ export const SortableBlockWrapper: React.FC<SortableBlockWrapperProps> = ({
     isDragging = false,
     children,
     onSelect,
+    onUpdate,
+    onDelete, // Destructure the onDelete prop
+    onDuplicate, // Destructure the onDuplicate prop
+    onAddBlock, // Destructure the onAddBlock prop
 }) => {
     const {
         attributes,
@@ -47,6 +55,11 @@ export const SortableBlockWrapper: React.FC<SortableBlockWrapperProps> = ({
         if (!isEditing) return;
         e.stopPropagation();
         onSelect(block.id);
+    };
+
+    // Example usage of onDelete
+    const handleDelete = () => {
+        onDelete(block.id);
     };
 
     return (

@@ -1,63 +1,92 @@
 'use client'
-
-import React, { useState } from 'react';
-import { useAuth } from '@/hooks/supabase/useAuth';
+import React, { useState, useEffect } from 'react';
+import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { useBlocks } from '@/hooks/supabase/useBlocks';
-import { useLinks } from '@/hooks/supabase/useLinks';
 import Navbar from '@/components/layout/Navbar';
 import BlockLibrary from '@/components/edit/BlockLibrary';
-import ProfileSettings from '@/components/edit/ProfileSettings';
 import EditorPanel from '@/components/edit/EditorPanel';
 import DragAndDrop from '@/components/edit/DragAndDrop';
-import CenterPanel from '@/components/edit/CenterPanel'; // New component for center panel
+import { Button } from '@/components/ui/button';
 
 const EditPage: React.FC = () => {
-    const { user, isLoading } = useAuth();
-    const { blocks, addBlock, updateBlock, deleteBlock, duplicateBlock, reorderBlocks } = useBlocks(user?.id);
-    const { links } = useLinks(user?.id);
+    const { user, supabase } = useSupabase();
     const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
 
-    if (isLoading) {
-        return <div>Loading...</div>;
+    // Debugging: Log the user ID
+    useEffect(() => {
+        console.log('EditPage User ID:', user?.id);
+    }, [user]);
+
+    // Only call useBlocks when user ID is available
+    const { blocks, addBlock, updateBlock, deleteBlock, duplicateBlock, reorderBlocks } = useBlocks(user?.id);
+
+    if (!user?.id) {
+        return <div className="flex items-center justify-center h-screen">Loading...</div>;
     }
 
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            // Implement save logic here
+            console.log('Saving changes...');
+            // Simulate save delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log('Changes saved successfully.');
+        } catch (error) {
+            console.error('Error saving changes:', error);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handlePreview = () => {
+        setIsEditing(false);
+    };
+
     return (
-        <div className="min-h-screen bg-background">
-            <Navbar title="Profile Builder" subtitle={`Editing ${user?.username}'s profile`} showBackButton={true} />
-            <div className="container mx-auto px-4 py-6">
-                <div className="flex items-center justify-between mb-6">
-                    <button onClick={() => setIsEditing(!isEditing)}>
-                        {isEditing ? 'Preview' : 'Edit'}
-                    </button>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    {/* Left Panel */}
-                    <div className="lg:col-span-3">
-                        {isEditing && <BlockLibrary addBlock={addBlock} />}
-                    </div>
-
-                    {/* Center Panel */}
-                    <div className="lg:col-span-6">
-                        <CenterPanel onAddBlock={addBlock} />
-                        <DragAndDrop
-                            blocks={blocks}
-                            updateBlock={updateBlock}
-                            deleteBlock={deleteBlock}
-                            duplicateBlock={duplicateBlock}
-                            reorderBlocks={reorderBlocks}
-                            selectedBlockId={selectedBlockId}
-                            setSelectedBlockId={setSelectedBlockId}
-                        />
-                    </div>
-
-                    {/* Right Panel */}
-                    <div className="lg:col-span-3">
-                        {isEditing && selectedBlockId && <EditorPanel blockId={selectedBlockId} />}
-                        {isEditing && <ProfileSettings />}
-                    </div>
-                </div>
+        <div className="flex flex-col h-screen">
+            <Navbar />
+            <div className="flex flex-1 overflow-hidden">
+                <aside className="flex-none w-64 bg-gray-200 p-4 overflow-y-auto">
+                    <BlockLibrary addBlock={addBlock} />
+                </aside>
+                <main className="flex-1 p-4 overflow-y-auto">
+                    <DragAndDrop
+                        blocks={blocks}
+                        updateBlock={updateBlock}
+                        deleteBlock={deleteBlock}
+                        duplicateBlock={duplicateBlock}
+                        reorderBlocks={reorderBlocks}
+                        selectedBlockId={selectedBlockId}
+                        setSelectedBlockId={setSelectedBlockId}
+                    />
+                </main>
+                <aside className="flex-none w-64 bg-gray-200 p-4 overflow-y-auto">
+                    <EditorPanel
+                        blockId={selectedBlockId}
+                        updateBlock={updateBlock}
+                        deleteBlock={deleteBlock}
+                        duplicateBlock={duplicateBlock}
+                    />
+                </aside>
             </div>
+            <footer className="flex-none p-4 bg-gray-100 flex justify-end space-x-2">
+                <Button
+                    className={`px-4 py-2 rounded ${isSaving ? 'bg-gray-400' : 'bg-blue-500'} text-white`}
+                    onClick={handleSave}
+                    disabled={isSaving}
+                >
+                    {isSaving ? 'Saving...' : 'Save'}
+                </Button>
+                <Button
+                    className="px-4 py-2 bg-green-500 text-white rounded"
+                    onClick={handlePreview}
+                >
+                    Preview
+                </Button>
+            </footer>
         </div>
     );
 };

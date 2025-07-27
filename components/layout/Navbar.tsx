@@ -19,21 +19,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     subtitle,
 }) => {
     const pathname = usePathname();
-    const { logout } = useSupabase();
-    const [user, setUser] = React.useState<any>(null);
-    const { supabase } = useSupabase();
-
-    React.useEffect(() => {
-        const checkUser = async () => {
-            const { data, error } = await supabase.auth.getSession();
-            if (!error && data.session) {
-                const { data: userData } = await supabase.auth.getUser();
-                setUser(userData.user);
-            }
-        };
-
-        checkUser();
-    }, [supabase]);
+    const { logout, user } = useSupabase(); // Ensure user and logout are destructured
 
     return (
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -75,7 +61,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={logout}
+                                    onClick={logout} // Ensure this calls the logout function
                                 >
                                     <LogOut className="w-4 h-4 mr-2" />
                                     Logout

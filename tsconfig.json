@@ -24,7 +24,7 @@
       "@/blocks/*": ["components/blocks/*"],
       "@/store/*": ["lib/stores/*"],
       "@/shared/*": ["types/*"],
-      "@/supbase/*": ["supabase/*"],
+      "@/supabase/*": ["supabase/*"],
       "@/app/*": ["app/*"]
     },
     "plugins": [

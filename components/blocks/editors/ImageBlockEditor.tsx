@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { ImageBlockType } from '@/shared/app/blocks';
-import { Image, Upload, X, Eye, Settings, Crop } from 'lucide-react';
+import { Image, Upload, X, Eye, Settings } from 'lucide-react';
 
 interface ImageBlockEditorProps {
     block: ImageBlockType;
@@ -15,7 +14,6 @@ interface ImageBlockEditorProps {
     onClose?: () => void;
 }
 
-// Fixed interface - no extending from union type
 interface ExtendedImageProps {
     url: string;
     alt?: string;
