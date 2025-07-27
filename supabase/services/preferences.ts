@@ -1,6 +1,6 @@
-// /lib/supabase/services/preferences.ts
 import { supabase } from '../client'
-import { UserPreferences, Preference, PreferenceInsert, PreferenceUpdate } from '../types'
+import type { ThemeType, UserPreferences } from '@/shared/index'
+import type { Json, Preference, PreferenceInsert, PreferenceUpdate } from '@/shared/supabase/tables'
 
 export const preferenceService = {
     getPreferences: async (profileId: string): Promise<UserPreferences | null> => {
@@ -15,11 +15,12 @@ export const preferenceService = {
 
     updatePreferences: async (profileId: string, preferences: Partial<UserPreferences>) => {
         const supaPrefs = convertToSupabasePreferences(profileId, preferences)
-        return await supabase
+        const { data } = await supabase
             .from('preferences')
             .upsert(supaPrefs)
             .select()
             .single()
+        return data ? convertToUserPreferences(data) : null
     },
 
     // Initialize default preferences for a new user
@@ -34,18 +35,22 @@ export const preferenceService = {
             }
         }
 
-        return await supabase
+        const { data } = await supabase
             .from('preferences')
             .insert(defaultPrefs)
             .select()
             .single()
+        return data ? convertToUserPreferences(data) : null
     }
 }
 
 const convertToUserPreferences = (data: Preference): UserPreferences => {
     return {
-        theme: data.theme,
-        settings: data.settings as UserPreferences['settings']
+        profileId: data.profile_id,
+        theme: data.theme as ThemeType,
+        settings: (data.settings as UserPreferences['settings']) || {},
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
     }
 }
 
@@ -53,6 +58,6 @@ const convertToSupabasePreferences = (profileId: string, prefs: Partial<UserPref
     return {
         profile_id: profileId,
         theme: prefs.theme,
-        settings: prefs.settings
+        settings: prefs.settings as Json
     }
 }

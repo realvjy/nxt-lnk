@@ -52,6 +52,7 @@ export function mapLinkFromDb(row: DatabaseLink): BaseLink {
         isActive: row.is_active,
         cover: row.cover || undefined,
         description: row.description || undefined,
+
         createdAt: row.created_at,
         updatedAt: row.updated_at,
     } as NormalLink;

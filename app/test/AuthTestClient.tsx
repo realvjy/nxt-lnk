@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 
+import { linkService, blockService, profileService, preferenceService } from '@/supabase/services';
+
 export default function AuthTestClient() {
     const { supabase, user, logout } = useSupabase();
     const [email, setEmail] = useState('');
@@ -10,7 +12,10 @@ export default function AuthTestClient() {
     const [error, setError] = useState<string | null>(null);
     const [profileData, setProfileData] = useState<any>(null);
     const [loadingProfile, setLoadingProfile] = useState(false);
-
+    const [profile, setProfile] = useState<any>(null);
+    const [links, setLinks] = useState<any[]>([]);
+    const [blocks, setBlocks] = useState<any[]>([]);
+    const [preferences, setPreferences] = useState<any>(null);
     // Edit profile
     const [editing, setEditing] = useState(false);
     const [editFields, setEditFields] = useState({
@@ -23,7 +28,11 @@ export default function AuthTestClient() {
 
     // Add link
     const [addingLink, setAddingLink] = useState(false);
-    const [newLink, setNewLink] = useState({
+    const [newLink, setNewLink] = useState<{
+        title: string;
+        url: string;
+        type: 'normal' | 'social' | 'blog';
+    }>({
         title: '',
         url: '',
         type: 'normal'
@@ -48,6 +57,7 @@ export default function AuthTestClient() {
     // Fetch all user data after login
     useEffect(() => {
         const fetchProfile = async () => {
+            console.log('Fetching profile for user:', user);
             if (!user) {
                 setProfileData(null);
                 return;
@@ -60,25 +70,44 @@ export default function AuthTestClient() {
                 setLoadingProfile(false);
                 return;
             }
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*, links(*), blocks(*), preferences(*)')
-                .eq('username', username)
-                .single();
-            if (error) setError(error.message);
-            setProfileData(data);
+            const profile = await profileService.getProfile(username);
+            console.log('Fetched profile:', profile);
+            setProfileData(profile);
             setLoadingProfile(false);
-            if (data) {
+            if (profile) {
                 setEditFields({
-                    full_name: data.full_name || '',
-                    bio: data.bio || '',
-                    tagline: data.tagline || '',
-                    image_url: data.image_url || ''
+                    full_name: profile.fullName || '',
+                    bio: profile.bio || '',
+                    tagline: profile.tagline || '',
+                    image_url: profile.image?.url || ''
                 });
+            } else {
+                setError('Profile not found');
             }
         };
         fetchProfile();
     }, [user, supabase]);
+
+    useEffect(() => {
+        const fetchLinks = async () => {
+            if (!profileData?.id) {
+                setLinks([]);
+                return;
+            }
+            const fetchedLinks = await linkService.getLinks(profileData.id);
+            setLinks(fetchedLinks);
+        };
+        fetchLinks();
+        const fetchBlocks = async () => {
+            if (!profileData?.id) {
+                setLinks([]);
+                return;
+            }
+            const fetchedBlocks = await blockService.getBlocks(profileData.id);
+            setBlocks(fetchedBlocks);
+        };
+        fetchBlocks();
+    }, [profileData?.id]);
 
     // Profile edit logic (same as before)
     const handleEdit = () => setEditing(true);
@@ -126,33 +155,37 @@ export default function AuthTestClient() {
 
     // Add Link logic
     const handleAddLink = async () => {
+        console.log('Adding link for profile:', profileData);
         if (!profileData?.id) return;
         setAddingLinkLoading(true);
         setError(null);
-        const { error } = await supabase
-            .from('links')
-            .insert({
-                profile_id: profileData.id,
-                title: newLink.title,
-                url: newLink.url,
-                type: newLink.type
-            });
-        setAddingLinkLoading(false);
-        if (error) {
-            setError(error.message);
-        } else {
-            setAddingLink(false);
-            setNewLink({ title: '', url: '', type: 'normal' });
-            // Refetch profile data
-            const { data } = await supabase
-                .from('profiles')
-                .select('*, links(*), blocks(*), preferences(*)')
-                .eq('username', profileData.username)
-                .single();
-            setProfileData(data);
-        }
-    };
 
+        const result = await linkService.createLink(profileData.id, {
+            profileId: profileData.id,
+            title: newLink.title,
+            url: newLink.url,
+            type: newLink.type,
+            sortOrder: (Array.isArray(profileData.links) ? profileData.links.length : 0) + 1,
+            isActive: true,
+        });
+
+        console.log('Add link result:', result);
+
+        setAddingLinkLoading(false);
+
+        if (result?.error) {
+            setError(result.error.message);
+            return;
+        }
+
+        setAddingLink(false);
+        setNewLink({ title: '', url: '', type: 'normal' });
+
+        // Refetch profile data using your service
+        const updatedProfile = await profileService.getProfile(profileData.username);
+        console.log('Updated profile after add:', updatedProfile);
+        setProfileData(updatedProfile);
+    };
     // Add Block logic
     const handleAddBlock = async () => {
         if (!profileData?.id) return;
@@ -207,8 +240,7 @@ export default function AuthTestClient() {
                                     <h4 className="font-bold">Profile</h4>
                                     {!editing ? (
                                         <div>
-                                            <div><b>Full Name:</b> {profileData.full_name || <span className="text-gray-400">None</span>}</div>
-                                            <div><b>Bio:</b> {profileData.bio || <span className="text-gray-400">None</span>}</div>
+                                            <div><b>Full Name:</b> {profileData.fullName || <span className="text-gray-400">None</span>}</div>                                            <div><b>Bio:</b> {profileData.bio || <span className="text-gray-400">None</span>}</div>
                                             <div><b>Tagline:</b> {profileData.tagline || <span className="text-gray-400">None</span>}</div>
                                             <div><b>Image URL:</b> {profileData.image_url || <span className="text-gray-400">None</span>}</div>
                                             <button
@@ -280,6 +312,13 @@ export default function AuthTestClient() {
                                 <section>
                                     <h4 className="font-bold flex items-center gap-2">
                                         Links
+                                        {links && links.length > 0 ? (
+                                            <pre className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
+                                                {JSON.stringify(links, null, 2)}
+                                            </pre>
+                                        ) : (
+                                            <div className="text-gray-500">No links found.</div>
+                                        )}
                                         {!addingLink && (
                                             <button
                                                 className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
@@ -307,7 +346,7 @@ export default function AuthTestClient() {
                                             <select
                                                 className="border px-2 py-1 rounded"
                                                 value={newLink.type}
-                                                onChange={e => setNewLink({ ...newLink, type: e.target.value })}
+                                                onChange={e => setNewLink({ ...newLink, type: e.target.value as 'normal' | 'social' | 'blog' })}
                                             >
                                                 <option value="normal">Normal</option>
                                                 <option value="social">Social</option>
@@ -332,18 +371,19 @@ export default function AuthTestClient() {
                                             </div>
                                         </div>
                                     )}
-                                    {profileData.links && profileData.links.length > 0 ? (
-                                        <pre className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
-                                            {JSON.stringify(profileData.links, null, 2)}
-                                        </pre>
-                                    ) : (
-                                        <div className="text-gray-500">No links found.</div>
-                                    )}
+
                                 </section>
                                 {/* Blocks section */}
                                 <section>
                                     <h4 className="font-bold flex items-center gap-2">
                                         Blocks
+                                        {blocks && blocks.length > 0 ? (
+                                            <pre className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
+                                                {JSON.stringify(blocks, null, 2)}
+                                            </pre>
+                                        ) : (
+                                            <div className="text-gray-500">No links found.</div>
+                                        )}
                                         {!addingBlock && (
                                             <button
                                                 className="px-2 py-1 bg-blue-500 text-white rounded text-xs"

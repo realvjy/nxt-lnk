@@ -7,6 +7,9 @@ import BlockLibrary from '@/components/edit/BlockLibrary';
 import EditorPanel from '@/components/edit/EditorPanel';
 import DragAndDrop from '@/components/edit/DragAndDrop';
 import { Button } from '@/components/ui/button';
+import { useLinks } from '@/hooks/supabase/useLinks';
+import { useProfile } from '@/hooks/supabase/useProfile';
+import { usePreferences } from '@/hooks/supabase/usePreferences';
 
 const EditPage: React.FC = () => {
     const { user, supabase } = useSupabase();
@@ -14,14 +17,23 @@ const EditPage: React.FC = () => {
     const [isEditing, setIsEditing] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
+
+
     // Debugging: Log the user ID
     useEffect(() => {
         console.log('EditPage User ID:', user?.id);
     }, [user]);
 
     // Only call useBlocks when user ID is available
-    const { blocks, addBlock, updateBlock, deleteBlock, duplicateBlock, reorderBlocks } = useBlocks(user?.id);
 
+
+
+    const { blocks, isLoading: blocksLoading, error: blocksError } = useBlocks(user?.id);
+    const { links, loading: linksLoading, error: linksError } = useLinks(user?.id);
+    const { profile, loading, error } = useProfile({ id: user?.id, username: user?.user_metadata?.username });
+    console.log('profile', profile);
+    console.log('links', links);
+    console.log('blocks', blocks);
     if (!user?.id) {
         return <div className="flex items-center justify-center h-screen">Loading...</div>;
     }
@@ -48,7 +60,7 @@ const EditPage: React.FC = () => {
     return (
         <div className="flex flex-col h-screen">
             <Navbar />
-            <div className="flex flex-1 overflow-hidden">
+            {/* <div className="flex flex-1 overflow-hidden">
                 <aside className="flex-none w-64 bg-gray-200 p-4 overflow-y-auto">
                     <BlockLibrary addBlock={addBlock} />
                 </aside>
@@ -86,7 +98,7 @@ const EditPage: React.FC = () => {
                 >
                     Preview
                 </Button>
-            </footer>
+            </footer> */}
         </div>
     );
 };

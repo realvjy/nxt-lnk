@@ -1,5 +1,5 @@
+import { Block, TablesInsert } from '@/shared/index'
 import { supabase } from '../client'
-import { Block, TablesInsert } from '../types'
 
 export const blockService = {
     getBlocks: async (profileId: string): Promise<Block[]> => {
@@ -7,7 +7,7 @@ export const blockService = {
             .from('blocks')
             .select('*')
             .eq('profile_id', profileId)
-            .order('order', { ascending: true })
+            .order('sort_order', { ascending: true })
 
         return data?.map(convertToBlock) || []
     },
@@ -54,11 +54,13 @@ export const blockService = {
 const convertToBlock = (data: any): Block => {
     return {
         id: data.id,
+        profileId: data.profile_id,
         type: data.type,
         content: data.content,
-        order: data.order,
+        sortOrder: data.order ?? data.sort_order,
         settings: data.settings,
-        createdAt: data.created_at
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
     }
 }
 
@@ -67,7 +69,7 @@ const convertToSupabaseBlock = (profileId: string, block: Omit<Block, 'id' | 'cr
         profile_id: profileId,
         type: block.type,
         content: block.content,
-        order: block.order,
+        sort_order: block.sortOrder,
         settings: block.settings
     }
 }
@@ -77,7 +79,7 @@ const convertToSupabaseBlockUpdate = (block: Partial<Block>) => {
 
     if (block.type) update.type = block.type
     if (block.content) update.content = block.content
-    if (block.order !== undefined) update.order = block.order
+    if (block.sortOrder !== undefined) update.sort_order = block.sortOrder
     if (block.settings) update.settings = block.settings
 
     return update

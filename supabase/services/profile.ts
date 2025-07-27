@@ -1,12 +1,13 @@
-// /lib/supabase/services/profile.ts
+import { UserProfile } from '@/shared/index';
 import { supabase } from '../client'
-import { Profile as SupabaseProfile, UserProfile } from '../types'
+import type { Profile as SupabaseProfile } from '@/shared/supabase/tables'
 
 // Convert Supabase Profile to our UserProfile type
 const convertToUserProfile = (profile: SupabaseProfile | null): UserProfile | null => {
     if (!profile) return null;
 
     return {
+        id: profile.id,
         username: profile.username,
         fullName: profile.full_name || '',
         bio: profile.bio || '',
@@ -43,12 +44,26 @@ export const profileService = {
             .single()
         return convertToUserProfile(data)
     },
-
+    getProfileById: async (id: string) => {
+        const { data } = await supabase
+            .from('profiles')
+            .select('*, links(*), blocks(*), preferences(*)')
+            .eq('id', id)
+            .single();
+        return convertToUserProfile(data); // <-- use the converter for consistency
+    },
     updateProfile: async (username: string, profile: Partial<UserProfile>) => {
         const supabaseData = convertToSupabaseProfile(profile)
         return await supabase
             .from('profiles')
             .update(supabaseData)
             .eq('username', username)
+    },
+    updateProfileById: async (id: string, profile: Partial<UserProfile>) => {
+        const supabaseData = convertToSupabaseProfile(profile)
+        return await supabase
+            .from('profiles')
+            .update(supabaseData)
+            .eq('id', id)
     }
 }

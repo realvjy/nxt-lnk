@@ -1,14 +1,6 @@
-// /lib/supabase/services/links.ts
 import { supabase } from '../client'
-import {
-    Link,
-    LinkType,
-    TablesInsert,
-    DatabaseLink,
-    SocialLink,
-    BlogLink,
-    NormalLink
-} from '../types'
+import { Link, LinkType, TablesInsert, DatabaseLink, SocialLink, BlogLink, NormalLink, LinkUpdate } from '@/shared/index'
+
 
 export const linkService = {
     getLinks: async (profileId: string): Promise<Link[]> => {
@@ -16,7 +8,7 @@ export const linkService = {
             .from('links')
             .select('*')
             .eq('profile_id', profileId)
-            .order('order', { ascending: true })
+            .order('sort_order', { ascending: true })
 
         return data?.map(convertToLink) || []
     },
@@ -63,26 +55,39 @@ export const linkService = {
 const convertToLink = (data: DatabaseLink): Link => {
     const base = {
         id: data.id,
+        title: data.title,
+        profileId: data.profile_id,
         label: data.title,
         url: data.url,
         type: data.type as LinkType,
-        position: data.order,
-        createdAt: data.created_at
-    }
+        sortOrder: data.sort_order,
+        isActive: data.is_active,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+        platform: data.platform ?? undefined,
+        description: data.description ?? undefined,
+    };
 
     switch (data.type) {
         case 'social':
             return {
                 ...base,
+                title: data.title,
                 type: 'social',
-                platform: data.platform as SocialLink['platform']
+                platform: data.platform as SocialLink['platform'],
+                isActive: data.is_active,
+                createdAt: data.created_at,
+                updatedAt: data.updated_at,
             }
         case 'blog':
             return {
                 ...base,
                 type: 'blog',
+                title: data.title,
                 description: data.description,
-                publishDate: data.publish_date
+                isActive: data.is_active,
+                createdAt: data.created_at,
+                updatedAt: data.updated_at,
             }
         default:
             return {
@@ -95,44 +100,40 @@ const convertToLink = (data: DatabaseLink): Link => {
 const convertToSupabaseLink = (profileId: string, link: Omit<Link, 'id' | 'createdAt'>): TablesInsert<'links'> => {
     const base = {
         profile_id: profileId,
-        title: link.label,
+        title: link.title, // Use .title to match your app type
         url: link.url,
         type: link.type,
-        order: link.position,
-        is_active: true
-    }
+        sort_order: link.sortOrder,
+        is_active: true,
+        platform: null,
+        cover: null,
+        description: null,
+    };
 
     switch (link.type) {
         case 'social':
             return {
                 ...base,
-                platform: (link as Omit<SocialLink, 'id' | 'createdAt'>).platform
-            }
+                platform: (link as Omit<SocialLink, 'id' | 'createdAt'>).platform ?? null
+            };
         case 'blog':
             return {
                 ...base,
-                description: (link as Omit<BlogLink, 'id' | 'createdAt'>).description,
-                publish_date: (link as Omit<BlogLink, 'id' | 'createdAt'>).publishDate
-            }
+                description: (link as Omit<BlogLink, 'id' | 'createdAt'>).description ?? null,
+            };
         default:
-            return base
+            return base;
     }
 }
 
-const convertToSupabaseLinkUpdate = (link: Partial<Link>) => {
-    const update: any = {}
-
-    if (link.label) update.title = link.label
-    if (link.url) update.url = link.url
-    if (link.position !== undefined) update.order = link.position
-
-    if (link.type === 'social' && 'platform' in link) {
-        update.platform = link.platform
-    }
+const convertToSupabaseLinkUpdate = (link: Partial<Link>): LinkUpdate => {
+    const update: any = {};
+    if (link.label) update.title = link.label;
+    if (link.url) update.url = link.url;
+    if (link.sortOrder !== undefined) update.sort_order = link.sortOrder; // <-- correct mapping
+    if (link.type === 'social' && 'platform' in link) update.platform = link.platform;
     if (link.type === 'blog') {
-        if ('description' in link) update.description = link.description
-        if ('publishDate' in link) update.publish_date = link.publishDate
+        if ('description' in link) update.description = link.description;
     }
-
-    return update
-}
+    return update;
+};

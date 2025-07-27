@@ -4,6 +4,8 @@ import { persist } from 'zustand/middleware'
 import { profileService } from 'supabase/services/profile'
 
 interface Profile {
+    id: string; // <-- add this
+    username: string; // <-- add this
     fullName: string
     tagline?: string
     bio?: string
@@ -35,6 +37,10 @@ interface UserState {
     // Helpers
     isProfileComplete: () => boolean
     getDisplayName: () => string
+
+    // State management
+    setLoading: (loading: boolean) => void
+    setError: (error: string | null) => void
 }
 
 export const useUserStore = create<UserState>()(
@@ -42,6 +48,8 @@ export const useUserStore = create<UserState>()(
         (set, get) => ({
             username: '',
             profile: {
+                id: '',
+                username: '',
                 fullName: '',
                 tagline: '',
                 bio: '',
@@ -61,13 +69,46 @@ export const useUserStore = create<UserState>()(
                 }))
             },
 
-            updateProfile: async (updates) => {
-                const { username } = get()
-                if (!username) return
 
+            fetchProfile: async (identifier) => {
+                set({ loading: true });
+                try {
+                    let profile;
+                    // Simple check: if identifier looks like a UUID, use ID, else use username
+                    if (identifier && /^[0-9a-fA-F-]{36}$/.test(identifier)) {
+                        profile = await profileService.getProfileById(identifier);
+                    } else {
+                        profile = await profileService.getProfile(identifier);
+                    }
+                    if (profile) {
+                        set({
+                            username: profile.username,
+                            profile: {
+                                id: profile.id,
+                                username: profile.username,
+                                fullName: profile.fullName,
+                                tagline: profile.tagline,
+                                bio: profile.bio,
+                                image: profile.image,
+                                badge: profile.badge
+                            },
+                            loading: false,
+                            error: null
+                        });
+                    }
+                } catch (error) {
+                    set({
+                        error: 'Failed to fetch profile',
+                        loading: false
+                    });
+                }
+            },
+            updateProfile: async (updates) => {
+                const { profile } = get()
+                if (!profile?.id) return
                 set({ loading: true })
                 try {
-                    await profileService.updateProfile(username, updates)
+                    await profileService.updateProfileById(profile.id, updates)
                     set((state) => ({
                         profile: { ...state.profile, ...updates },
                         loading: false,
@@ -80,33 +121,6 @@ export const useUserStore = create<UserState>()(
                     })
                 }
             },
-
-            fetchProfile: async (username) => {
-                set({ loading: true })
-                try {
-                    const profile = await profileService.getProfile(username)
-                    if (profile) {
-                        set({
-                            username,
-                            profile: {
-                                fullName: profile.fullName,
-                                tagline: profile.tagline,
-                                bio: profile.bio,
-                                image: profile.image,
-                                badge: profile.badge
-                            },
-                            loading: false,
-                            error: null
-                        })
-                    }
-                } catch (error) {
-                    set({
-                        error: 'Failed to fetch profile',
-                        loading: false
-                    })
-                }
-            },
-
             initializeUser: () => {
                 // Keep existing initialization logic
                 const username = get().getStoredUsername()
@@ -119,6 +133,8 @@ export const useUserStore = create<UserState>()(
                 set({
                     username: '',
                     profile: {
+                        id: '',
+                        username: '',
                         fullName: '',
                         tagline: '',
                         bio: '',
@@ -138,7 +154,16 @@ export const useUserStore = create<UserState>()(
             getDisplayName: () => {
                 const { profile } = get()
                 return profile.fullName || 'Anonymous'
-            }
+            },
+
+            // State management
+            setLoading: (loading) => {
+                set({ loading })
+            },
+
+            setError: (error) => {
+                set({ error })
+            },
         }),
         {
             name: 'user-storage'
