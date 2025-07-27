@@ -12,7 +12,7 @@ import { BioBlockEditor } from './BioBlockEditor';
 import { ImageBlockEditor } from './ImageBlockEditor';
 import { BadgeBlockEditor } from './BadgeBlockEditor';
 import { LinkBlockEditor } from './LinkBlockEditor';
-
+import { BadgeBlockType, BioBlockType, ImageBlockType, LinkBlockType, NameBlockType, TaglineBlockType } from '@/shared/app/blocks';
 // Re-export all editors as a convenient object
 export const BlockEditors = {
     NameBlockEditor,
@@ -24,14 +24,28 @@ export const BlockEditors = {
 } as const;
 
 // Editor type mapping for dynamic editor selection
-export const EDITOR_MAP = {
+export const EDITOR_MAP: {
+    [K in keyof BlockTypeMap]: React.ComponentType<{
+        block: BlockTypeMap[K];
+        onChange: (block: BlockTypeMap[K]) => void;
+    }>;
+} = {
     name: NameBlockEditor,
     tagline: TaglineBlockEditor,
     bio: BioBlockEditor,
     image: ImageBlockEditor,
     badge: BadgeBlockEditor,
     link: LinkBlockEditor,
-} as const;
+};
+
+export type BlockTypeMap = {
+    name: NameBlockType;
+    tagline: TaglineBlockType;
+    bio: BioBlockType;
+    image: ImageBlockType;
+    badge: BadgeBlockType;
+    link: LinkBlockType;
+};
 
 // Helper function to get editor component by block type
 export const getEditorComponent = (blockType: string) => {

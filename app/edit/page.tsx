@@ -10,6 +10,9 @@ import { Button } from '@/components/ui/button';
 import { useLinks } from '@/hooks/supabase/useLinks';
 import { useProfile } from '@/hooks/supabase/useProfile';
 import { usePreferences } from '@/hooks/supabase/usePreferences';
+import { BadgeBlockView, BioBlockView, ImageBlockView, LinkBlockView, NameBlockView, TaglineBlockView } from '@/components/blocks/views';
+import { BlockSourceType, isBlogLink, isSocialLink } from '@/shared/index';
+import { UnifiedBlock } from '@/shared/app/blocks'; // <-- Add this import
 
 const EditPage: React.FC = () => {
     const { user, supabase } = useSupabase();
@@ -28,7 +31,7 @@ const EditPage: React.FC = () => {
 
 
 
-    const { blocks, isLoading: blocksLoading, error: blocksError } = useBlocks(user?.id);
+    const { blocks, isLoading: blocksLoading, error: blocksError, updateBlock, deleteBlock, reorderBlocks } = useBlocks(user?.id);
     const { links, loading: linksLoading, error: linksError } = useLinks(user?.id);
     const { profile, loading, error } = useProfile({ id: user?.id, username: user?.user_metadata?.username });
     console.log('profile', profile);
@@ -57,19 +60,56 @@ const EditPage: React.FC = () => {
         setIsEditing(false);
     };
 
+    // const unifiedBlocks: UnifiedBlock[] = [
+    //     ...blocks.map(block => ({
+    //         ...block,
+    //         sourceType: 'block' as const,
+    //     })),
+    //     ...links.map(link => ({
+    //         id: link.id,
+    //         type: 'link',
+    //         sourceType: 'link' as const,
+    //         content: link,
+    //         sortOrder: link.sortOrder,
+    //         profileId: link.profileId,
+    //     })),
+
+    // ];
     return (
         <div className="flex flex-col h-screen">
             <Navbar />
-            {/* <div className="flex flex-1 overflow-hidden">
+            {/* {links.map(link => (
+                <LinkBlockView
+                    key={link.id}
+                    block={{
+                        id: link.id,
+                        type: 'link',
+                        profileId: link.profileId,
+                        sortOrder: link.sortOrder,
+                        content: {
+                            label: link.label || link.title,
+                            url: link.url,
+                            linkType: link.type,
+                            platform: isSocialLink(link) ? link.platform : undefined,
+                            cover: isBlogLink(link) ? link.cover : undefined,
+                            // ...other fields as needed
+                        }
+                    }}
+                    isEditing={isEditing}
+                    onChange={updatedBlock => updateBlock(updatedBlock.id, updatedBlock)}
+                />
+            ))} */}
+
+            <div className="flex flex-1 overflow-hidden">
                 <aside className="flex-none w-64 bg-gray-200 p-4 overflow-y-auto">
-                    <BlockLibrary addBlock={addBlock} />
+                    {/* <BlockLibrary addBlock={addBlock} /> */}
                 </aside>
                 <main className="flex-1 p-4 overflow-y-auto">
                     <DragAndDrop
                         blocks={blocks}
                         updateBlock={updateBlock}
                         deleteBlock={deleteBlock}
-                        duplicateBlock={duplicateBlock}
+                        duplicateBlock={updateBlock}
                         reorderBlocks={reorderBlocks}
                         selectedBlockId={selectedBlockId}
                         setSelectedBlockId={setSelectedBlockId}
@@ -78,9 +118,9 @@ const EditPage: React.FC = () => {
                 <aside className="flex-none w-64 bg-gray-200 p-4 overflow-y-auto">
                     <EditorPanel
                         blockId={selectedBlockId}
-                        updateBlock={updateBlock}
+                        updateBlock={(updatedBlock) => updateBlock(updatedBlock.id, updatedBlock)} // ✅ Adapter function
                         deleteBlock={deleteBlock}
-                        duplicateBlock={duplicateBlock}
+                        duplicateBlock={(block) => updateBlock(block.id, block)}
                     />
                 </aside>
             </div>
@@ -98,7 +138,7 @@ const EditPage: React.FC = () => {
                 >
                     Preview
                 </Button>
-            </footer> */}
+            </footer>
         </div>
     );
 };

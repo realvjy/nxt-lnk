@@ -6,7 +6,7 @@ import { Block, createBlock } from '@/shared/index';
 
 interface DragAndDropProps {
     blocks: Block[];
-    updateBlock: (block: Block) => void;
+    updateBlock: (blockId: string, block: Block) => void;
     deleteBlock: (blockId: string) => void;
     duplicateBlock: (blockId: string, newBlock: Block) => void;
     reorderBlocks: (fromIndex: number, toIndex: number) => void;
@@ -28,6 +28,7 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({
         setSelectedBlockId(active.id as string);
     };
 
+    console.log('blocks', blocks);
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
         if (over && active.id !== over.id) {
@@ -54,7 +55,7 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({
                         block={block}
                         isEditing={true}
                         isSelected={block.id === selectedBlockId}
-                        onUpdate={updateBlock}
+                        onUpdate={(block) => updateBlock(block.id, block)}
                         onDelete={deleteBlock}
                         onDuplicate={handleDuplicateBlock}
                         onSelect={setSelectedBlockId}

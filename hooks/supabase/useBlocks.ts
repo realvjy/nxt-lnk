@@ -57,6 +57,11 @@ export const useBlocks = (userId: string | undefined) => {
     return {
         blocks,
         isLoading,
-        error
+        error,
+        addBlock,
+        updateBlock,
+        deleteBlock,
+        reorderBlocks,
+        // ...other actions
     };
 };

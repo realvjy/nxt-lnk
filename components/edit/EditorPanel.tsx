@@ -1,87 +1,86 @@
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import {
-    NameBlockEditor,
-    TaglineBlockEditor,
-    BioBlockEditor,
-    BadgeBlockEditor,
-    ImageBlockEditor,
-    LinkBlockEditor
-} from '@/components/blocks/editors';
-import { Block } from '@/shared/index';
 import { useLayoutStore } from '@/lib/stores/layoutStore';
+import { Card, CardContent } from '../ui/card';
+import { Block, NameBlockType, TaglineBlockType, BioBlockType, ImageBlockType, BadgeBlockType, LinkBlockType } from '@/shared/app/blocks';
+import { NameBlockEditor } from '@/components/blocks/editors/NameBlockEditor';
+import { TaglineBlockEditor } from '@/components/blocks/editors/TaglineBlockEditor';
+import { BioBlockEditor } from '@/components/blocks/editors/BioBlockEditor';
+import { ImageBlockEditor } from '@/components/blocks/editors/ImageBlockEditor';
+import { BadgeBlockEditor } from '@/components/blocks/editors/BadgeBlockEditor';
+import { LinkBlockEditor } from '@/components/blocks/editors/LinkBlockEditor';
 
 interface EditorPanelProps {
-    blockId: string | null; // Ensure this can be null
-    updateBlock: (updatedBlock: Block) => void; // Add this line
-    deleteBlock: (blockId: string) => void; // Add this line
-    duplicateBlock: (blockId: string, newBlock: Block) => void; // Add this line
+    blockId: string | null;
+    updateBlock: (block: Block) => void;
+    deleteBlock: (id: string) => void;
+    duplicateBlock: (block: Block) => void; // or the correct type if not (block: Block)
 }
 
-const EditorPanel: React.FC<EditorPanelProps> = ({ blockId, updateBlock, deleteBlock, duplicateBlock }) => {
+const EditorPanel: React.FC<EditorPanelProps> = ({ blockId, updateBlock }) => {
     const { layout } = useLayoutStore();
     const selectedBlock = layout.find(block => block.id === blockId);
 
     if (!selectedBlock) return <div>No block selected</div>;
 
-    const handleUpdateBlock = (updatedBlock: Block) => {
-        updateBlock(updatedBlock);
-    };
+    let editor = null;
 
-    const renderEditorContent = () => {
-        switch (selectedBlock.type) {
-            case 'name':
-                return (
-                    <NameBlockEditor
-                        block={selectedBlock}
-                        onChange={handleUpdateBlock}
-                    />
-                );
-            case 'tagline':
-                return (
-                    <TaglineBlockEditor
-                        block={selectedBlock}
-                        onChange={handleUpdateBlock}
-                    />
-                );
-            case 'bio':
-                return (
-                    <BioBlockEditor
-                        block={selectedBlock}
-                        onChange={handleUpdateBlock}
-                    />
-                );
-            case 'image':
-                return (
-                    <ImageBlockEditor
-                        block={selectedBlock}
-                        onChange={handleUpdateBlock}
-                    />
-                );
-            case 'badge':
-                return (
-                    <BadgeBlockEditor
-                        block={selectedBlock}
-                        onChange={handleUpdateBlock}
-                    />
-                );
-            case 'link':
-                return (
-                    <LinkBlockEditor
-                        block={selectedBlock}
-                        onChange={handleUpdateBlock}
-                    />
-                );
-            default:
-                return <div>No editor available for this block type</div>;
-        }
-    };
+    switch (selectedBlock.type) {
+        case 'name':
+            editor = (
+                <NameBlockEditor
+                    block={selectedBlock as NameBlockType}
+                    onChange={updateBlock}
+                />
+            );
+            break;
+        case 'tagline':
+            editor = (
+                <TaglineBlockEditor
+                    block={selectedBlock as TaglineBlockType}
+                    onChange={updateBlock}
+                />
+            );
+            break;
+        case 'bio':
+            editor = (
+                <BioBlockEditor
+                    block={selectedBlock as BioBlockType}
+                    onChange={updateBlock}
+                />
+            );
+            break;
+        case 'image':
+            editor = (
+                <ImageBlockEditor
+                    block={selectedBlock as ImageBlockType}
+                    onChange={updateBlock}
+                />
+            );
+            break;
+        case 'badge':
+            editor = (
+                <BadgeBlockEditor
+                    block={selectedBlock as BadgeBlockType}
+                    onChange={updateBlock}
+                />
+            );
+            break;
+        case 'link':
+            editor = (
+                <LinkBlockEditor
+                    block={selectedBlock as LinkBlockType}
+                    onChange={updateBlock}
+                />
+            );
+            break;
+        default:
+            editor = <div>No editor available for this block type</div>;
+    }
 
     return (
         <Card className="sticky top-24">
             <CardContent className="p-4">
                 <h3>Edit Block</h3>
-                {renderEditorContent()}
+                {editor}
             </CardContent>
         </Card>
     );

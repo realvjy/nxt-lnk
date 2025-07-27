@@ -13,6 +13,9 @@ export const blockTypes = [
     { type: 'link', label: 'Link', icon: Link2, description: 'Add a link' },
 ];
 
+export type BlockSourceType = 'block' | 'link' | 'profile';
+
+export type UnifiedBlock = { sourceType: BlockSourceType };
 
 /**
  * Base block interface with common properties

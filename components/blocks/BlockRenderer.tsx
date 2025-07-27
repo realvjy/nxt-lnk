@@ -1,5 +1,5 @@
 import React from 'react';
-import { Block } from '@/shared/index';
+import { Block } from '@/shared/app/blocks';
 import { SortableBlockWrapper } from './SortableBlockWrapper';
 import {
     NameBlockView,
