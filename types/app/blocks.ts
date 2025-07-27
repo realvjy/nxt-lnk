@@ -1,6 +1,18 @@
 import { UserProfile } from './profile';
 import { Link, LinkType, SocialPlatform } from './links';
 import { Json } from '../supabase/tables';
+import { User, Tag, Type, Image, Shield, Link2, LucideIcon } from 'lucide-react';
+
+// Define block types with metadata
+export const blockTypes = [
+    { type: 'name', label: 'Name', icon: User, description: 'Add your full name' },
+    { type: 'tagline', label: 'Tagline', icon: Tag, description: 'Add a tagline or title' },
+    { type: 'bio', label: 'Bio', icon: Type, description: 'Add a bio or description' },
+    { type: 'image', label: 'Image', icon: Image, description: 'Add profile image' },
+    { type: 'badge', label: 'Badge', icon: Shield, description: 'Add status badge' },
+    { type: 'link', label: 'Link', icon: Link2, description: 'Add a link' },
+];
+
 
 /**
  * Base block interface with common properties

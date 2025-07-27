@@ -1,7 +1,7 @@
 // /lib/stores/userStore.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { profileService } from '@/lib/supabase/services/profile'
+import { profileService } from 'supabase/services/profile'
 
 interface Profile {
     fullName: string

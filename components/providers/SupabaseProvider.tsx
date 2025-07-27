@@ -1,13 +1,14 @@
 'use client'
 
-import { createContext, useContext, useEffect, ReactNode } from 'react'
-import { useRouter } from 'next/navigation'  // Changed from next/router
+import { createContext, useContext, useEffect, ReactNode, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import type { Database } from '@/lib/supabase/types'
+import type { Database } from '@/supbase/types'
 
 interface SupabaseContextType {
     supabase: ReturnType<typeof createClientComponentClient<Database>>
     logout: () => Promise<void>
+    user: any;
 }
 
 const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined)
@@ -17,10 +18,11 @@ interface SupabaseProviderProps {
 }
 
 export function SupabaseProvider({ children }: SupabaseProviderProps) {
-    const supabase = createClientComponentClient<Database>()
-    const router = useRouter()
+    const supabase = createClientComponentClient<Database>();
+    const router = useRouter();
+    const [user, setUser] = useState(null);
 
-    // Logout function
+    // Define the logout function
     const logout = async () => {
         const { error } = await supabase.auth.signOut();
         if (error) {
@@ -31,11 +33,12 @@ export function SupabaseProvider({ children }: SupabaseProviderProps) {
     };
 
     useEffect(() => {
-        // Check initial auth state
         const checkUser = async () => {
             const { data, error } = await supabase.auth.getSession();
             if (error) {
                 console.error('Error checking session:', error);
+            } else {
+                setUser(data?.session?.user || null); // Ensure user is accessed correctly
             }
         };
 
@@ -48,18 +51,19 @@ export function SupabaseProvider({ children }: SupabaseProviderProps) {
                 router.push('/login');
             }
             if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                setUser(session?.user || null); // Ensure user is accessed correctly
                 router.refresh();
             }
-        })
+        });
 
-        return () => subscription.unsubscribe()
-    }, [router, supabase])
+        return () => subscription.unsubscribe();
+    }, [router, supabase]);
 
     return (
-        <SupabaseContext.Provider value={{ supabase, logout }}>
+        <SupabaseContext.Provider value={{ supabase, logout, user }}>
             {children}
         </SupabaseContext.Provider>
-    )
+    );
 }
 
 export const useSupabase = () => {

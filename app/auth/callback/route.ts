@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/lib/supabase/types';
+import type { Database } from '@/supbase/types';
 
 export const runtime = 'nodejs'; // ensure service role is available
 
