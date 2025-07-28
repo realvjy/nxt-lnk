@@ -47,6 +47,14 @@ export default function AuthTestClient() {
     });
     const [addingBlockLoading, setAddingBlockLoading] = useState(false);
 
+    // Add delete block handler
+    const [deletingBlock, setDeletingBlock] = useState(false);
+    const [deletingBlockId, setDeletingBlockId] = useState<string | null>(null);
+
+    // Add delete link handler
+    const [deletingLink, setDeletingLink] = useState(false);
+    const [deletingLinkId, setDeletingLinkId] = useState<string | null>(null);
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
@@ -55,21 +63,21 @@ export default function AuthTestClient() {
     };
 
     // Fetch all user data after login
-    useEffect(() => {
-        const fetchProfile = async () => {
-            console.log('Fetching profile for user:', user);
-            if (!user) {
-                setProfileData(null);
-                return;
-            }
-            setLoadingProfile(true);
-            setError(null);
-            const username = user.user_metadata?.username;
-            if (!username) {
-                setError('No username found in user metadata.');
-                setLoadingProfile(false);
-                return;
-            }
+    const fetchProfile = async () => {
+        console.log('Fetching profile for user:', user);
+        if (!user) {
+            setProfileData(null);
+            return;
+        }
+        setLoadingProfile(true);
+        setError(null);
+        const username = user.user_metadata?.username;
+        if (!username) {
+            setError('No username found in user metadata.');
+            setLoadingProfile(false);
+            return;
+        }
+        try {
             const profile = await profileService.getProfile(username);
             console.log('Fetched profile:', profile);
             setProfileData(profile);
@@ -84,7 +92,14 @@ export default function AuthTestClient() {
             } else {
                 setError('Profile not found');
             }
-        };
+        } catch (err: any) {
+            console.error('Error fetching profile:', err);
+            setError(`Error fetching profile: ${err.message}`);
+            setLoadingProfile(false);
+        }
+    };
+
+    useEffect(() => {
         fetchProfile();
     }, [user, supabase]);
 
@@ -222,6 +237,93 @@ export default function AuthTestClient() {
         }
     };
 
+    // Handle delete block
+    const handleDeleteBlock = async (blockId: string) => {
+        if (!blockId) return;
+
+        console.log('Deleting block with ID:', blockId);
+        setDeletingBlock(true);
+        setDeletingBlockId(blockId);
+        setError(null);
+
+        try {
+            // First try using the block service
+            const result = await blockService.deleteBlock(blockId);
+            console.log('Delete block service result:', result);
+
+            // Verify deletion by checking if the block still exists
+            const { data: checkData } = await supabase
+                .from('blocks')
+                .select('*')
+                .eq('id', blockId);
+
+            if (checkData && checkData.length > 0) {
+                console.log('Block still exists after deletion attempt. Trying direct Supabase call...');
+
+                // If block still exists, try direct deletion as fallback
+                const { error: directError } = await supabase
+                    .from('blocks')
+                    .delete()
+                    .eq('id', blockId);
+
+                if (directError) {
+                    console.error('Direct deletion error:', directError);
+                    throw new Error(`Failed to delete block: ${directError.message}`);
+                }
+
+                console.log('Block deleted via direct Supabase call');
+            } else {
+                console.log('Block successfully deleted');
+            }
+
+            // Refresh blocks after deletion
+            if (profileData?.id) {
+                const fetchedBlocks = await blockService.getBlocks(profileData.id);
+                setBlocks(fetchedBlocks);
+
+                // Also refresh the profile data to update the UI
+                await fetchProfile();
+            }
+        } catch (err: any) {
+            console.error('Error deleting block:', err);
+            setError(`Error deleting block: ${err.message}`);
+        } finally {
+            setDeletingBlock(false);
+            setDeletingBlockId(null);
+        }
+    };
+
+    // Handle delete link
+    const handleDeleteLink = async (linkId: string) => {
+        if (!linkId) return;
+
+        console.log('Deleting link with ID:', linkId);
+        setDeletingLink(true);
+        setDeletingLinkId(linkId);
+        setError(null);
+
+        try {
+            const result = await linkService.deleteLink(linkId);
+            console.log('Delete link result:', result);
+
+            // Refresh links after deletion
+            if (profileData?.id) {
+                const fetchedLinks = await linkService.getLinks(profileData.id);
+                setLinks(fetchedLinks);
+
+                // Also refresh the profile data to update the UI
+                await fetchProfile();
+            }
+            setError(null);
+        } catch (err: any) {
+            console.error('Error deleting link:', err);
+            setError(`Error deleting link: ${err.message}`);
+        } finally {
+            setDeletingLink(false);
+            setDeletingLinkId(null);
+        }
+    };
+
     return (
         <div className="mt-8 p-4 border rounded">
             <h2 className="font-semibold mb-2">Client Auth Test (Email/Password)</h2>
@@ -309,26 +411,17 @@ export default function AuthTestClient() {
                                     )}
                                 </section>
                                 {/* Links section */}
-                                <section>
-                                    <h4 className="font-bold flex items-center gap-2">
-                                        Links
-                                        {links && links.length > 0 ? (
-                                            <pre className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
-                                                {JSON.stringify(links, null, 2)}
-                                            </pre>
-                                        ) : (
-                                            <div className="text-gray-500">No links found.</div>
-                                        )}
-                                        {!addingLink && (
-                                            <button
-                                                className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
-                                                onClick={() => setAddingLink(true)}
-                                                type="button"
-                                            >
-                                                Add Link
-                                            </button>
-                                        )}
-                                    </h4>
+                                <section className="mt-6">
+                                    <div className="flex justify-between items-center">
+                                        <h4 className="font-bold">Links</h4>
+                                        <button
+                                            className="px-3 py-1 bg-blue-600 text-white text-xs rounded"
+                                            onClick={() => setAddingLink(true)}
+                                            type="button"
+                                        >
+                                            Add Link
+                                        </button>
+                                    </div>
                                     {addingLink && (
                                         <div className="mb-2 flex flex-col gap-2 bg-gray-50 p-2 rounded">
                                             <input
@@ -371,29 +464,42 @@ export default function AuthTestClient() {
                                             </div>
                                         </div>
                                     )}
-
+                                    {links && links.length > 0 ? (
+                                        <div className="space-y-2 mt-2">
+                                            {links.map(link => (
+                                                <div key={link.id} className="bg-gray-100 p-2 rounded flex justify-between items-center">
+                                                    <div>
+                                                        <div className="font-medium">{link.title}</div>
+                                                        <div className="text-xs text-gray-600">{link.url}</div>
+                                                        <div className="text-xs text-gray-500">Type: {link.type}</div>
+                                                    </div>
+                                                    <button
+                                                        className="px-2 py-1 bg-red-600 text-white text-xs rounded"
+                                                        onClick={() => handleDeleteLink(link.id)}
+                                                        disabled={deletingLink && deletingLinkId === link.id}
+                                                        type="button"
+                                                    >
+                                                        {deletingLink && deletingLinkId === link.id ? 'Deleting...' : 'Delete'}
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-gray-500">No links found.</div>
+                                    )}
                                 </section>
                                 {/* Blocks section */}
-                                <section>
-                                    <h4 className="font-bold flex items-center gap-2">
-                                        Blocks
-                                        {blocks && blocks.length > 0 ? (
-                                            <pre className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
-                                                {JSON.stringify(blocks, null, 2)}
-                                            </pre>
-                                        ) : (
-                                            <div className="text-gray-500">No links found.</div>
-                                        )}
-                                        {!addingBlock && (
-                                            <button
-                                                className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
-                                                onClick={() => setAddingBlock(true)}
-                                                type="button"
-                                            >
-                                                Add Block
-                                            </button>
-                                        )}
-                                    </h4>
+                                <section className="mt-6">
+                                    <div className="flex justify-between items-center">
+                                        <h4 className="font-bold">Blocks</h4>
+                                        <button
+                                            className="px-3 py-1 bg-blue-600 text-white text-xs rounded"
+                                            onClick={() => setAddingBlock(true)}
+                                            type="button"
+                                        >
+                                            Add Block
+                                        </button>
+                                    </div>
                                     {addingBlock && (
                                         <div className="mb-2 flex flex-col gap-2 bg-gray-50 p-2 rounded">
                                             <input
@@ -427,10 +533,27 @@ export default function AuthTestClient() {
                                             </div>
                                         </div>
                                     )}
-                                    {profileData.blocks && profileData.blocks.length > 0 ? (
-                                        <pre className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
-                                            {JSON.stringify(profileData.blocks, null, 2)}
-                                        </pre>
+                                    {blocks && blocks.length > 0 ? (
+                                        <div className="space-y-2 mt-2">
+                                            {blocks.map(block => (
+                                                <div key={block.id} className="bg-gray-100 p-2 rounded flex justify-between items-center">
+                                                    <div>
+                                                        <div className="font-medium">Type: {block.type}</div>
+                                                        <div className="text-xs text-gray-600 truncate max-w-xs">
+                                                            Content: {JSON.stringify(block.content).substring(0, 50)}...
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        className="px-2 py-1 bg-red-600 text-white text-xs rounded"
+                                                        onClick={() => handleDeleteBlock(block.id)}
+                                                        disabled={deletingBlock && deletingBlockId === block.id}
+                                                        type="button"
+                                                    >
+                                                        {deletingBlock && deletingBlockId === block.id ? 'Deleting...' : 'Delete'}
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     ) : (
                                         <div className="text-gray-500">No blocks found.</div>
                                     )}

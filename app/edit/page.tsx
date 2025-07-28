@@ -20,6 +20,7 @@ import { useBlocksStore } from '@/lib/stores/blocksStore';
 import { useLinksStore } from '@/lib/stores/linksStore';
 import { useLayoutStore } from '@/lib/stores/layoutStore';
 import { usePersistenceStore } from '@/lib/stores/persistenceStore';
+import { blockService } from '@/supabase/services/blocks';
 
 const EditPage: React.FC = () => {
     const { user, supabase } = useSupabase();
@@ -168,8 +169,19 @@ const EditPage: React.FC = () => {
 
         setIsSaving(true);
         try {
+            console.log('Starting save operation with profile:', profile);
+            console.log('Current blocks:', blocks);
+            console.log('Current links:', links);
+
             // Update profile in database
             if (profile.id) {
+                console.log('Updating profile with data:', {
+                    full_name: profileForm.fullName,
+                    bio: profileForm.bio,
+                    tagline: profileForm.tagline,
+                    image_url: profileForm.imageUrl
+                });
+
                 const { error: updateError } = await supabase
                     .from('profiles')
                     .update({
@@ -178,61 +190,203 @@ const EditPage: React.FC = () => {
                         tagline: profileForm.tagline,
                         image_url: profileForm.imageUrl
                     })
-                    .eq('user_id', user.id);
+                    .eq('id', profile.id);
 
-                if (updateError) throw updateError;
+                if (updateError) {
+                    console.error('Error updating profile:', updateError);
+                    throw updateError;
+                } else {
+                    console.log('Profile updated successfully');
+                }
             }
 
             // Save blocks to database
-            if (blocks.length > 0) {
-                // First delete existing blocks
-                const { error: deleteBlocksError } = await supabase
-                    .from('blocks')
-                    .delete()
-                    .eq('profile_id', profile.id);
+            if (blocks.length > 0 && profile?.id) {
+                console.log('Saving blocks for profile ID:', profile.id);
 
-                if (deleteBlocksError) throw deleteBlocksError;
+                try {
+                    // Prepare blocks for upsert with profile_id and sort_order
+                    const dbBlocks = blocks.map((block, index) => {
+                        const mappedBlock = mapBlockToDb({
+                            ...block,
+                            profileId: profile.id,
+                            sortOrder: index
+                        });
+                        console.log(`Mapped block ${block.id}:`, mappedBlock);
+                        return mappedBlock;
+                    });
 
-                // Then insert new blocks
-                const dbBlocks = blocks.map((block, index) =>
-                    mapBlockToDb({
-                        ...block,
-                        profileId: profile.id,
-                        sortOrder: index
-                    })
-                );
+                    // Use upsert to update existing blocks and insert new ones
+                    console.log('Upserting blocks:', dbBlocks);
+                    const { error: upsertBlocksError } = await supabase
+                        .from('blocks')
+                        .upsert(dbBlocks, {
+                            onConflict: 'id',
+                            ignoreDuplicates: false
+                        });
 
-                const { error: insertBlocksError } = await supabase
-                    .from('blocks')
-                    .insert(dbBlocks);
+                    if (upsertBlocksError) {
+                        console.error('Error upserting blocks:', upsertBlocksError);
+                        throw upsertBlocksError;
+                    }
 
-                if (insertBlocksError) throw insertBlocksError;
+                    console.log('Blocks upserted successfully');
+
+                    // Find blocks that were deleted in the UI but still exist in the database
+                    const { data: existingBlocks, error: fetchBlocksError } = await supabase
+                        .from('blocks')
+                        .select('id')
+                        .eq('profile_id', profile.id);
+
+                    if (fetchBlocksError) {
+                        console.error('Error fetching existing blocks:', fetchBlocksError);
+                        throw fetchBlocksError;
+                    }
+
+                    // Find IDs that exist in the database but not in the current blocks array
+                    if (existingBlocks && existingBlocks.length > 0) {
+                        const currentBlockIds = blocks.map(block => block.id);
+                        const blocksToDelete = existingBlocks
+                            .filter(dbBlock => !currentBlockIds.includes(dbBlock.id))
+                            .map(block => block.id);
+
+                        console.log('Blocks to delete:', blocksToDelete);
+
+                        // Delete blocks that were removed in the UI
+                        if (blocksToDelete.length > 0) {
+                            const { error: deleteError } = await supabase
+                                .from('blocks')
+                                .delete()
+                                .in('id', blocksToDelete);
+
+                            if (deleteError) {
+                                console.error('Error deleting blocks:', deleteError);
+                                throw deleteError;
+                            }
+
+                            console.log('Deleted blocks successfully');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error handling blocks:', error);
+                    throw error;
+                }
+            } else {
+                console.log('No blocks to save or profile ID is missing');
             }
 
             // Save links to database
-            if (links.length > 0) {
-                // First delete existing links
-                const { error: deleteLinksError } = await supabase
-                    .from('links')
-                    .delete()
-                    .eq('profile_id', profile.id);
+            if (links.length > 0 && profile?.id) {
+                console.log('Saving links for profile ID:', profile.id);
 
-                if (deleteLinksError) throw deleteLinksError;
-
-                // Then insert new links
-                const dbLinks = links.map((link, index) =>
-                    mapLinkToDb({
+                // Prepare links for upsert with profile_id and sort_order
+                const dbLinks = links.map((link, index) => {
+                    const mappedLink = mapLinkToDb({
                         ...link,
                         profileId: profile.id,
                         sortOrder: index
-                    })
-                );
+                    });
+                    console.log(`Mapped link ${link.id}:`, mappedLink);
+                    return mappedLink;
+                });
 
-                const { error: insertLinksError } = await supabase
+                // Use upsert to update existing links and insert new ones
+                console.log('Upserting links:', dbLinks);
+                const { error: upsertLinksError } = await supabase
                     .from('links')
-                    .insert(dbLinks);
+                    .upsert(dbLinks, {
+                        onConflict: 'id',
+                        ignoreDuplicates: false
+                    });
 
-                if (insertLinksError) throw insertLinksError;
+                if (upsertLinksError) {
+                    console.error('Error upserting links:', upsertLinksError);
+                    throw upsertLinksError;
+                }
+
+                console.log('Links upserted successfully');
+
+                // Find links that were deleted in the UI but still exist in the database
+                const { data: existingLinks, error: fetchLinksError } = await supabase
+                    .from('links')
+                    .select('id')
+                    .eq('profile_id', profile.id);
+
+                if (fetchLinksError) {
+                    console.error('Error fetching existing links:', fetchLinksError);
+                    throw fetchLinksError;
+                }
+
+                // Find IDs that exist in the database but not in the current links array
+                if (existingLinks && existingLinks.length > 0) {
+                    const currentLinkIds = links.map(link => link.id);
+                    const linksToDelete = existingLinks
+                        .filter(dbLink => !currentLinkIds.includes(dbLink.id))
+                        .map(link => link.id);
+
+                    console.log('Links to delete:', linksToDelete);
+
+                    // Delete links that were removed in the UI
+                    if (linksToDelete.length > 0) {
+                        const { error: deleteError } = await supabase
+                            .from('links')
+                            .delete()
+                            .in('id', linksToDelete);
+
+                        if (deleteError) {
+                            console.error('Error deleting links:', deleteError);
+                            throw deleteError;
+                        }
+
+                        console.log('Deleted links successfully');
+                    }
+                }
+            } else {
+                console.log('No links to save or profile ID is missing');
+            }
+
+            // Refresh data after saving
+            if (profile?.id) {
+                console.log('Refreshing data after save');
+
+                // Refresh blocks
+                const { data: refreshedBlocks } = await supabase
+                    .from('blocks')
+                    .select('*')
+                    .eq('profile_id', profile.id);
+
+                if (refreshedBlocks) {
+                    console.log('Refreshed blocks:', refreshedBlocks);
+                    setBlocks(refreshedBlocks.map(block => ({
+                        ...block,
+                        id: block.id,
+                        profileId: block.profile_id,
+                        type: block.type,
+                        content: block.content,
+                        settings: block.settings,
+                        sortOrder: block.sort_order,
+                        createdAt: block.created_at,
+                        updatedAt: block.updated_at
+                    })));
+                }
+
+                // Refresh links
+                const { data: refreshedLinks } = await supabase
+                    .from('links')
+                    .select('*')
+                    .eq('profile_id', profile.id);
+
+                if (refreshedLinks) {
+                    console.log('Refreshed links:', refreshedLinks);
+                    setLinks(refreshedLinks.map(link => ({
+                        ...link,
+                        id: link.id,
+                        profileId: link.profile_id,
+                        sortOrder: link.sort_order,
+                        createdAt: link.created_at,
+                        updatedAt: link.updated_at
+                    })));
+                }
             }
 
             // Save to localStorage as backup
@@ -241,7 +395,7 @@ const EditPage: React.FC = () => {
             toast.success('Changes saved successfully!');
         } catch (error) {
             console.error('Error saving changes:', error);
-            toast.error('Failed to save changes');
+            toast.error(`Failed to save changes: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
             setIsSaving(false);
         }
@@ -258,10 +412,42 @@ const EditPage: React.FC = () => {
 
     // Add a new block
     const handleAddBlock = () => {
+        // Initialize appropriate content based on block type
+        let initialContent = {};
+
+        switch (newBlockType) {
+            case 'paragraph':
+                initialContent = { text: '' };
+                break;
+            case 'image':
+                initialContent = { url: '', alt: '' };
+                break;
+            case 'badge':
+                initialContent = { type: 'available', text: 'Available' };
+                break;
+            case 'name':
+                initialContent = { text: profile?.fullName || '' };
+                break;
+            case 'tagline':
+                initialContent = { text: profile?.tagline || '' };
+                break;
+            case 'bio':
+                initialContent = { text: profile?.bio || '' };
+                break;
+            default:
+                initialContent = {};
+        }
+
         const newBlock = createBlock(newBlockType, {
             profileId: profile?.id || '',
+            content: initialContent
         });
+
+        console.log('Adding new block:', newBlock);
         addBlock(newBlock);
+
+        // Auto-open the editor for the new block
+        setEditingBlock(newBlock);
         toast.success(`Added new ${newBlockType} block`);
     };
 
@@ -377,9 +563,60 @@ const EditPage: React.FC = () => {
                                             <Button
                                                 variant="destructive"
                                                 size="sm"
-                                                onClick={() => {
-                                                    deleteBlock(block.id);
-                                                    toast.success('Block deleted');
+                                                onClick={async () => {
+                                                    try {
+                                                        // Delete from database first
+                                                        if (block.id) {
+                                                            console.log('Deleting block with ID:', block.id);
+
+                                                            // Use the block service directly
+                                                            const result = await blockService.deleteBlock(block.id);
+                                                            console.log('Delete block service result:', result);
+
+                                                            // Verify deletion by checking if the block still exists
+                                                            const { data: checkData } = await supabase
+                                                                .from('blocks')
+                                                                .select('*')
+                                                                .eq('id', block.id);
+
+                                                            if (checkData && checkData.length > 0) {
+                                                                console.log('Block still exists after deletion attempt. Trying direct Supabase call...');
+
+                                                                // If block still exists, try direct deletion as fallback
+                                                                const { error: directError } = await supabase
+                                                                    .from('blocks')
+                                                                    .delete()
+                                                                    .eq('id', block.id);
+
+                                                                if (directError) {
+                                                                    console.error('Direct deletion error:', directError);
+                                                                    toast.error(`Failed to delete block: ${directError.message}`);
+                                                                    return;
+                                                                }
+
+                                                                console.log('Block deleted via direct Supabase call');
+                                                            } else {
+                                                                console.log('Block successfully deleted');
+                                                            }
+
+                                                            // Update UI state
+                                                            deleteBlock(block.id);
+
+                                                            // Refresh blocks from database
+                                                            if (profile?.id) {
+                                                                const fetchedBlocks = await blockService.getBlocks(profile.id);
+                                                                setBlocks(fetchedBlocks);
+                                                                toast.success('Block deleted');
+                                                            }
+                                                        } else {
+                                                            // For blocks not yet saved to database
+                                                            deleteBlock(block.id);
+                                                            toast.success('Block deleted');
+                                                        }
+                                                    } catch (error) {
+                                                        console.error('Error in block deletion:', error);
+                                                        toast.error('An error occurred while deleting the block');
+                                                    }
                                                 }}
                                             >
                                                 Delete
@@ -391,10 +628,48 @@ const EditPage: React.FC = () => {
                                     {block.type === 'name' && <p>Name: {block.content?.text}</p>}
                                     {block.type === 'bio' && <p>Bio: {block.content?.text}</p>}
                                     {block.type === 'tagline' && <p>Tagline: {block.content?.text}</p>}
+                                    {block.type === 'paragraph' && (
+                                        <div>
+                                            <p className="font-semibold">Paragraph:</p>
+                                            <p className="text-sm line-clamp-3">{block.content?.text}</p>
+                                        </div>
+                                    )}
                                     {block.type === 'link' && (
                                         <div>
                                             <p>Label: {block.content?.label}</p>
                                             <p>URL: {block.content?.url}</p>
+                                        </div>
+                                    )}
+                                    {block.type === 'image' && (
+                                        <div>
+                                            <p>URL: {block.content?.url}</p>
+                                            <p>Alt: {block.content?.alt}</p>
+                                            {block.content?.url && (
+                                                <img
+                                                    src={block.content.url}
+                                                    alt={block.content.alt || "Image"}
+                                                    className="mt-2 max-h-24 object-contain"
+                                                />
+                                            )}
+                                        </div>
+                                    )}
+                                    {block.type === 'badge' && (
+                                        <div>
+                                            <p>Text: {block.content?.text}</p>
+                                            <p>Type: {block.content?.type}</p>
+                                            {block.content?.type && (
+                                                <div className="mt-2">
+                                                    <span className={`px-2 py-1 text-xs rounded-full ${block.content.type === 'available' ? 'bg-green-500 text-white' :
+                                                        block.content.type === 'busy' ? 'bg-yellow-500 text-white' :
+                                                            block.content.type === 'away' ? 'bg-gray-500 text-white' :
+                                                                block.content.type === 'offline' ? 'bg-red-500 text-white' :
+                                                                    block.content.type === 'live' ? 'bg-red-500 text-white' :
+                                                                        'bg-purple-500 text-white'
+                                                        }`}>
+                                                        {block.content.text || block.content.type}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </CardContent>
@@ -404,94 +679,60 @@ const EditPage: React.FC = () => {
                 </div>
 
                 {/* Block Editor Modal */}
-                {editingBlock && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <Card className="w-full max-w-md">
-                            <CardHeader>
-                                <CardTitle>Edit {editingBlock.type} Block</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {editingBlock.type === 'name' && (
-                                    <div className="space-y-4">
-                                        <div>
-                                            <Label htmlFor="name-text">Name</Label>
-                                            <Input
-                                                id="name-text"
-                                                value={editingBlock.content?.text || ''}
-                                                onChange={(e) => setEditingBlock({
-                                                    ...editingBlock,
-                                                    content: { ...editingBlock.content, text: e.target.value }
-                                                })}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
+                {editingBlock && editingBlock.type === 'badge' && (
+                    <div className="space-y-4">
+                        <div>
+                            <Label htmlFor="badge-text">Badge Text</Label>
+                            <Input
+                                id="badge-text"
+                                value={editingBlock.content?.text || ''}
+                                onChange={(e) => setEditingBlock({
+                                    ...editingBlock,
+                                    content: { ...editingBlock.content, text: e.target.value }
+                                })}
+                                placeholder="Available, Busy, etc."
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="badge-type">Badge Type</Label>
+                            <select
+                                id="badge-type"
+                                className="w-full p-2 border rounded"
+                                value={editingBlock.content?.type || 'available'}
+                                onChange={(e) => setEditingBlock({
+                                    ...editingBlock,
+                                    content: {
+                                        ...editingBlock.content,
+                                        type: e.target.value as 'exclusive' | 'live' | 'available' | 'busy' | 'away' | 'offline'
+                                    }
+                                })}
+                            >
+                                <option value="available">Available</option>
+                                <option value="busy">Busy</option>
+                                <option value="away">Away</option>
+                                <option value="offline">Offline</option>
+                                <option value="live">Live</option>
+                                <option value="exclusive">Exclusive</option>
+                            </select>
+                        </div>
+                    </div>
+                )}
 
-                                {editingBlock.type === 'bio' && (
-                                    <div className="space-y-4">
-                                        <div>
-                                            <Label htmlFor="bio-text">Bio</Label>
-                                            <Textarea
-                                                id="bio-text"
-                                                value={editingBlock.content?.text || ''}
-                                                onChange={(e) => setEditingBlock({
-                                                    ...editingBlock,
-                                                    content: { ...editingBlock.content, text: e.target.value }
-                                                })}
-                                                rows={5}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {editingBlock.type === 'tagline' && (
-                                    <div className="space-y-4">
-                                        <div>
-                                            <Label htmlFor="tagline-text">Tagline</Label>
-                                            <Input
-                                                id="tagline-text"
-                                                value={editingBlock.content?.text || ''}
-                                                onChange={(e) => setEditingBlock({
-                                                    ...editingBlock,
-                                                    content: { ...editingBlock.content, text: e.target.value }
-                                                })}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {editingBlock.type === 'link' && (
-                                    <div className="space-y-4">
-                                        <div>
-                                            <Label htmlFor="link-label">Label</Label>
-                                            <Input
-                                                id="link-label"
-                                                value={editingBlock.content?.label || ''}
-                                                onChange={(e) => setEditingBlock({
-                                                    ...editingBlock,
-                                                    content: { ...editingBlock.content, label: e.target.value }
-                                                })}
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label htmlFor="link-url">URL</Label>
-                                            <Input
-                                                id="link-url"
-                                                value={editingBlock.content?.url || ''}
-                                                onChange={(e) => setEditingBlock({
-                                                    ...editingBlock,
-                                                    content: { ...editingBlock.content, url: e.target.value }
-                                                })}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-                            </CardContent>
-                            <CardFooter className="flex justify-between">
-                                <Button variant="outline" onClick={() => setEditingBlock(null)}>Cancel</Button>
-                                <Button onClick={() => handleUpdateBlock(editingBlock)}>Save Changes</Button>
-                            </CardFooter>
-                        </Card>
+                {editingBlock && editingBlock.type === 'paragraph' && (
+                    <div className="space-y-4">
+                        <div>
+                            <Label htmlFor="paragraph-text">Paragraph Text</Label>
+                            <textarea
+                                id="paragraph-text"
+                                className="w-full p-2 border rounded min-h-[150px]"
+                                value={editingBlock.content?.text || ''}
+                                onChange={(e) => setEditingBlock({
+                                    ...editingBlock,
+                                    content: { ...editingBlock.content, text: e.target.value }
+                                })}
+                                placeholder="Enter your paragraph text here..."
+                            />
+                        </div>
                     </div>
                 )}
             </div>
@@ -637,9 +878,34 @@ const EditPage: React.FC = () => {
                                             <Button
                                                 variant="destructive"
                                                 size="sm"
-                                                onClick={() => {
-                                                    deleteLink(link.id);
-                                                    toast.success('Link deleted');
+                                                onClick={async () => {
+                                                    try {
+                                                        // Delete from database first
+                                                        if (link.id) {
+                                                            console.log('Deleting link with ID:', link.id);
+
+                                                            // Use the supabase client directly since we don't have linkService imported
+                                                            const { error } = await supabase
+                                                                .from('links')
+                                                                .delete()
+                                                                .eq('id', link.id);
+
+                                                            if (error) {
+                                                                console.error('Error deleting link:', error);
+                                                                toast.error('Failed to delete link');
+                                                                return;
+                                                            }
+
+                                                            console.log('Link deleted successfully from database');
+                                                        }
+
+                                                        // Delete from UI state
+                                                        deleteLink(link.id);
+                                                        toast.success('Link deleted');
+                                                    } catch (error) {
+                                                        console.error('Error in link deletion:', error);
+                                                        toast.error('An error occurred while deleting the link');
+                                                    }
                                                 }}
                                             >
                                                 Delete
