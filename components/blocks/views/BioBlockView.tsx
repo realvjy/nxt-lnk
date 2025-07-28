@@ -19,24 +19,14 @@ export const BioBlockView: React.FC<BioBlockViewProps> = ({
     if (!block.content.text || block.content.text.trim() === '' || block.content.text === '<p></p>') {
         return (
             <div className="text-center max-w-2xl mx-auto">
-                <div className="text-muted-foreground leading-relaxed py-8 px-4 border-2 border-dashed border-muted-foreground/25 rounded-lg">
-                    {isEditing
-                        ? 'Click to edit your bio...'
-                        : 'No bio added yet'
-                    }
-                </div>
+                Slash Menu Link
             </div>
         );
     }
 
     return (
         <div className="max-w-2xl mx-auto">
-            <div
-                className="bio-content text-muted-foreground leading-relaxed"
-                dangerouslySetInnerHTML={{
-                    __html: block.content.text
-                }}
-            />
+            Slash Menu Link
         </div>
     );
 };

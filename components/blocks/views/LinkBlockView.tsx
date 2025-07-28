@@ -119,144 +119,7 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
     if (isEditing) {
         return (
             <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor={`link-label-${block.id}`}>Label</Label>
-                        <Input
-                            id={`link-label-${block.id}`}
-                            value={block.content.label}
-                            onChange={(e) => onChange({
-                                ...block,
-                                content: { ...block.content, label: e.target.value }
-                            })}
-                            placeholder="Link title"
-                        />
-                    </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor={`link-url-${block.id}`}>URL</Label>
-                        <Input
-                            id={`link-url-${block.id}`}
-                            value={block.content.url}
-                            onChange={(e) => onChange({
-                                ...block,
-                                content: { ...block.content, url: e.target.value }
-                            })}
-                            placeholder="https://..."
-                        />
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor={`link-type-${block.id}`}>Link Type</Label>
-                        <Select
-                            value={linkType}
-                            onValueChange={(value) => onChange({
-                                ...block,
-                                content: {
-                                    ...block.content,
-                                    linkType: value as LinkBlockType['content']['linkType'],
-                                    // Clear platform when changing type
-                                    platform: value === 'social' ? block.content.platform : undefined
-                                }
-                            })}
-                        >
-                            <SelectTrigger id={`link-type-${block.id}`}>
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {Object.entries(linkTypeConfig).map(([key, { label, description }]) => (
-                                    <SelectItem key={key} value={key}>
-                                        <div>
-                                            <div className="font-medium">{label}</div>
-                                            <div className="text-xs text-muted-foreground">{description}</div>
-                                        </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    {linkType === 'social' && (
-                        <div className="space-y-2">
-                            <Label htmlFor={`platform-${block.id}`}>Platform</Label>
-                            <Select
-                                value={platform || ''}
-                                onValueChange={(value) => onChange({
-                                    ...block,
-                                    content: { ...block.content, platform: value as SocialPlatform }
-                                })}
-                            >
-                                <SelectTrigger id={`platform-${block.id}`}>
-                                    <SelectValue placeholder="Select platform" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {Object.entries(platformConfig).map(([key, { label, icon: Icon, iconColor }]) => (
-                                        <SelectItem key={key} value={key}>
-                                            <div className="flex items-center gap-2">
-                                                <Icon className={`w-4 h-4 ${iconColor}`} />
-                                                {label}
-                                            </div>
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    )}
-                </div>
-
-                {linkType === 'blog' && (
-                    <div className="space-y-2">
-                        <Label htmlFor={`cover-image-${block.id}`}>Cover Image URL (optional)</Label>
-                        <Input
-                            id={`cover-image-${block.id}`}
-                            value={block.content.cover || ''}
-                            onChange={(e) => onChange({
-                                ...block,
-                                content: { ...block.content, cover: e.target.value }
-                            })}
-                            placeholder="https://example.com/cover.jpg"
-                        />
-                    </div>
-                )}
-
-                {/* Preview */}
-                <div className="space-y-2">
-                    <Label>Preview</Label>
-                    <Card>
-                        <CardContent className="p-0">
-                            <div className={`p-4 transition-all ${getHoverColor()} border rounded-lg`}>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        {getIcon()}
-                                        <div className="flex-1">
-                                            <div className="font-medium">
-                                                {block.content.label || 'Link title'}
-                                            </div>
-                                            {linkType === 'social' && platform && (
-                                                <div className="text-sm text-muted-foreground capitalize">
-                                                    {platformConfig[platform]?.label || platform}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                                </div>
-
-                                {linkType === 'blog' && block.content.cover && (
-                                    <div className="mt-3">
-                                        <img
-                                            src={block.content.cover}
-                                            alt={block.content.label}
-                                            className="w-full h-32 object-cover rounded-md"
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
             </div>
         );
     }
@@ -265,17 +128,7 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
     if (!block.content.url || !block.content.label) {
         return (
             <Card className="opacity-50">
-                <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <Globe className="w-5 h-5 text-muted-foreground" />
-                            <div className="font-medium text-muted-foreground">
-                                Add your link
-                            </div>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                </CardContent>
+                Link Block View
             </Card>
         );
     }
@@ -287,34 +140,7 @@ export const LinkBlockView: React.FC<LinkBlockViewProps> = ({
             rel="noopener noreferrer"
             className="block w-full group"
         >
-            <Card className={`transition-all cursor-pointer ${getHoverColor()} group-hover:shadow-md group-hover:-translate-y-0.5`}>
-                <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                            {getIcon()}
-                            <div className="flex-1 min-w-0">
-                                <div className="font-medium truncate">{block.content.label}</div>
-                                {linkType === 'social' && platform && (
-                                    <div className="text-sm text-muted-foreground capitalize">
-                                        {platformConfig[platform]?.label || platform}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                    </div>
-
-                    {linkType === 'blog' && block.content.cover && (
-                        <div className="mt-3">
-                            <img
-                                src={block.content.cover}
-                                alt={block.content.label}
-                                className="w-full h-32 object-cover rounded-md"
-                            />
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
+            Link Block View
         </a>
     );
 };

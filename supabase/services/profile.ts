@@ -30,8 +30,6 @@ const convertToSupabaseProfile = (profile: Partial<UserProfile>): Partial<Supaba
         tagline: profile.tagline,
         image_url: profile.image?.url,
         badge: profile.badge,
-        // Don't include username as it's used as identifier
-        // Don't include created_at/updated_at as they're managed by Supabase
     }
 }
 

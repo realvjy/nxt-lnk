@@ -1,4 +1,4 @@
-import { Block } from '@/shared/blocks'
+import { Block } from '@/shared/app/blocks'
 
 export const createBlock = (type: Block['type'], props: any = {}): Block => {
     const id = `block_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
@@ -19,19 +19,16 @@ export const createBlock = (type: Block['type'], props: any = {}): Block => {
     return {
         id,
         type,
-        props: { ...defaultProps[type], ...props }
+        props: { ...defaultProps[type], ...props },
+        ...defaultProps[type],
+        ...props
     } as Block
 }
 
 export const validateBlock = (block: Block): boolean => {
     // Add validation logic for each block type
     switch (block.type) {
-        case 'name':
-            return !!block.props.text
-        case 'link':
-            return !!(block.props.label && block.props.url)
-        case 'image':
-            return !!block.props.url
+
         default:
             return true
     }

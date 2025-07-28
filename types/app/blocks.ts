@@ -8,6 +8,8 @@ export const blockTypes = [
     { type: 'name', label: 'Name', icon: User, description: 'Add your full name' },
     { type: 'tagline', label: 'Tagline', icon: Tag, description: 'Add a tagline or title' },
     { type: 'bio', label: 'Bio', icon: Type, description: 'Add a bio or description' },
+    { type: 'paragraph', label: 'Paragraph', icon: Type, description: 'Add a paragraph of text' },
+    { type: 'label', label: 'Label', icon: Type, description: 'Add a label' },
     { type: 'image', label: 'Image', icon: Image, description: 'Add profile image' },
     { type: 'badge', label: 'Badge', icon: Shield, description: 'Add status badge' },
     { type: 'link', label: 'Link', icon: Link2, description: 'Add a link' },
@@ -100,6 +102,26 @@ export interface BadgeBlockType extends BaseBlock {
 }
 
 /**
+ * Paragraph block for additional text content
+ */
+export interface ParagraphBlockType extends BaseBlock {
+    type: 'paragraph'
+    content: {
+        text: string
+    }
+}
+
+/**
+ * Label block for section headers or short text labels
+ */
+export interface LabelBlockType extends BaseBlock {
+    type: 'label'
+    content: {
+        text: string
+    }
+}
+
+/**
  * Union type of all specific block types
  */
 export type SpecificBlock =
@@ -108,7 +130,9 @@ export type SpecificBlock =
     | LinkBlockType
     | TaglineBlockType
     | ImageBlockType
-    | BadgeBlockType;
+    | BadgeBlockType
+    | ParagraphBlockType
+    | LabelBlockType;
 
 /**
  * Union type for all block types
@@ -120,6 +144,8 @@ export type Block =
     | TaglineBlockType
     | ImageBlockType
     | BadgeBlockType
+    | ParagraphBlockType
+    | LabelBlockType
 
 /**
  * Helper function to check if a block is a specific type
@@ -158,6 +184,14 @@ export function isBadgeBlock(block: Block): block is BadgeBlockType {
     return block.type === 'badge';
 }
 
+export function isParagraphBlock(block: Block): block is ParagraphBlockType {
+    return block.type === 'paragraph';
+}
+
+export function isLabelBlock(block: Block): block is LabelBlockType {
+    return block.type === 'label';
+}
+
 /**
  * Helper function to create a new block with default values
  */
@@ -190,6 +224,10 @@ export const createBlock = (type: Block['type'], props: any = {}): Block => {
             return { id, type, content: { url: props.url || '', alt: props.alt } } as ImageBlockType
         case 'badge':
             return { id, type, content: { type: props.type || 'available', text: props.text } } as BadgeBlockType
+        case 'paragraph':
+            return { id, type, content: { text: props.text || '' } } as ParagraphBlockType
+        case 'label':
+            return { id, type, content: { text: props.text || '' } } as LabelBlockType
         default:
             throw new Error(`Unknown block type: ${type}`)
     }

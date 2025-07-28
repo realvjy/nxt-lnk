@@ -53,13 +53,13 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({
             case 'link':
                 return <LinkBlockView {...commonProps} block={block} />;
             default:
-                const _exhaustiveCheck: never = block;
-                return (
-                    <div className="p-4 text-center text-muted-foreground border-2 border-dashed border-muted rounded-lg">
-                        <p>Unknown block type: {(block as Block).type}</p>
-                        <p className="text-sm mt-1">This block type is not supported</p>
-                    </div>
-                );
+            // const _exhaustiveCheck: never = block;
+            // return (
+            //     <div className="p-4 text-center text-muted-foreground border-2 border-dashed border-muted rounded-lg">
+            //         <p>Unknown block type: {(block as Block).type}</p>
+            //         <p className="text-sm mt-1">This block type is not supported</p>
+            //     </div>
+            // );
         }
     };
 

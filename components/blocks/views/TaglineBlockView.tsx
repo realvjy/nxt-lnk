@@ -17,26 +17,14 @@ export const TaglineBlockView: React.FC<TaglineBlockViewProps> = ({
     if (isEditing) {
         return (
             <div className="space-y-2">
-                <Label htmlFor={`tagline-${block.id}`}>Tagline</Label>
-                <Input
-                    id={`tagline-${block.id}`}
-                    value={block.content.text}
-                    onChange={(e) => onChange({
-                        ...block,
-                        content: { ...block.content, text: e.target.value }
-                    })}
-                    placeholder="What do you do?"
-                    className="text-center"
-                />
+
             </div>
         );
     }
 
     return (
         <div className="text-center">
-            <p className="text-lg text-muted-foreground leading-relaxed">
-                {block.content.text || 'Your tagline here'}
-            </p>
+
         </div>
     );
 };

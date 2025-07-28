@@ -1,4 +1,4 @@
-import { Block } from '@/shared/blocks';
+import { Block } from '@/shared/app/blocks';
 
 /**
  * Generates HTML content for a user's page based on their layout
@@ -7,8 +7,8 @@ import { Block } from '@/shared/blocks';
  * @returns HTML string of the complete page
  */
 export function generateHtml(username: string, layout: Block[]): string {
-    // Base HTML template with styling
-    const html = `<!DOCTYPE html>
+  // Base HTML template with styling
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -71,7 +71,7 @@ export function generateHtml(username: string, layout: Block[]): string {
 </body>
 </html>`;
 
-    return html;
+  return html;
 }
 
 /**
@@ -80,18 +80,18 @@ export function generateHtml(username: string, layout: Block[]): string {
  * @returns HTML string of rendered blocks
  */
 function renderBlocks(blocks: Block[]): string {
-    return blocks.map(block => {
-        switch (block.type) {
-            case 'name':
-                return `<div class="name-block">${block.props.text}</div>`;
-            case 'bio':
-                return `<div class="bio-block"><div class="bio-content">${block.props.text}</div></div>`;
-            case 'link':
-                return `<a href="${block.props.url}" target="_blank" rel="noopener noreferrer" class="link-block">${block.props.label}</a>`;
-            default:
-                return '';
-        }
-    }).join('\n    ');
+  return blocks.map(block => {
+    switch (block.type) {
+      case 'name':
+        return `<div class="name-block">${block}</div>`;
+      case 'bio':
+        return `<div class="bio-block"><div class="bio-content">${block}</div></div>`;
+      case 'link':
+        return `<a href="${block || ''}" target="_blank" rel="noopener noreferrer" class="link-block">${block}</a>`;
+      default:
+        return '';
+    }
+  }).join('\n    ');
 }
 
 /**
@@ -100,22 +100,22 @@ function renderBlocks(blocks: Block[]): string {
  * @param htmlContent The HTML content to download
  */
 export function downloadHtml(username: string, htmlContent: string): void {
-    // Create a blob with the HTML content
-    const blob = new Blob([htmlContent], { type: 'text/html' });
+  // Create a blob with the HTML content
+  const blob = new Blob([htmlContent], { type: 'text/html' });
 
-    // Create a URL for the blob
-    const url = URL.createObjectURL(blob);
+  // Create a URL for the blob
+  const url = URL.createObjectURL(blob);
 
-    // Create a temporary anchor element
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${username}-links.html`;
+  // Create a temporary anchor element
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${username}-links.html`;
 
-    // Trigger the download
-    document.body.appendChild(a);
-    a.click();
+  // Trigger the download
+  document.body.appendChild(a);
+  a.click();
 
-    // Clean up
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  // Clean up
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }

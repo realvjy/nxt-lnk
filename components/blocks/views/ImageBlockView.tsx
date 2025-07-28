@@ -42,78 +42,7 @@ export const ImageBlockView: React.FC<ImageBlockViewProps> = ({
     if (isEditing) {
         return (
             <div className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor={`image-url-${block.id}`}>Image URL</Label>
-                    <div className="flex gap-2">
-                        <Input
-                            id={`image-url-${block.id}`}
-                            value={block.content.url}
-                            onChange={(e) => {
-                                setIsLoading(true);
-                                setImageError(false);
-                                onChange({
-                                    ...block,
-                                    content: { ...block.content, url: e.target.value }
-                                });
-                            }}
-                            placeholder="https://example.com/image.jpg"
-                        />
-                        {block.content.url && (
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={clearImage}
-                            >
-                                <X className="w-4 h-4" />
-                            </Button>
-                        )}
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor={`image-alt-${block.id}`}>Alt Text</Label>
-                    <Input
-                        id={`image-alt-${block.id}`}
-                        value={block.content.alt || ''}
-                        onChange={(e) => onChange({
-                            ...block,
-                            content: { ...block.content, alt: e.target.value }
-                        })}
-                        placeholder="Describe the image for accessibility"
-                    />
-                </div>
-
-                {/* Image Preview */}
-                {block.content.url && (
-                    <div className="space-y-2">
-                        <Label>Preview</Label>
-                        <Card>
-                            <CardContent className="p-4">
-                                <div className="flex justify-center">
-                                    {isLoading && (
-                                        <div className="w-24 h-24 rounded-full bg-muted animate-pulse" />
-                                    )}
-                                    {!isLoading && !imageError && (
-                                        <img
-                                            src={block.content.url}
-                                            alt={block.content.alt}
-                                            className="w-24 h-24 rounded-full object-cover border-4 border-background shadow-lg"
-                                            onLoad={handleImageLoad}
-                                            onError={handleImageError}
-                                            style={{ display: isLoading ? 'none' : 'block' }}
-                                        />
-                                    )}
-                                    {!isLoading && imageError && (
-                                        <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center">
-                                            <Upload className="w-8 h-8 text-muted-foreground" />
-                                        </div>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                )}
+                Image Block Editor
             </div>
         );
     }
@@ -122,27 +51,14 @@ export const ImageBlockView: React.FC<ImageBlockViewProps> = ({
     if (!block.content.url) {
         return (
             <div className="text-center">
-                <div className="w-32 h-32 rounded-full bg-muted flex items-center justify-center mx-auto">
-                    <Upload className="w-12 h-12 text-muted-foreground" />
-                </div>
+                Image Block View
             </div>
         );
     }
 
     return (
         <div className="text-center">
-            {!imageError ? (
-                <img
-                    src={block.content.url}
-                    alt={block.content.alt || 'Profile image'}
-                    className="w-32 h-32 rounded-full object-cover border-4 border-background shadow-lg mx-auto transition-transform hover:scale-105"
-                    onError={handleImageError}
-                />
-            ) : (
-                <div className="w-32 h-32 rounded-full bg-muted flex items-center justify-center mx-auto">
-                    <Upload className="w-12 h-12 text-muted-foreground" />
-                </div>
-            )}
+            Image Block View
         </div>
     );
 };

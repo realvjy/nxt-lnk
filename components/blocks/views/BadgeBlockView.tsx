@@ -61,63 +61,7 @@ export const BadgeBlockView: React.FC<BadgeBlockViewProps> = ({
     if (isEditing) {
         return (
             <div className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor={`badge-type-${block.id}`}>Badge Type</Label>
-                    <Select
-                        value={block.content.type}
-                        onValueChange={(value) => onChange({
-                            ...block,
-                            content: { ...block.content, type: value as BadgeBlockType['content']['type'] }
-                        })}
-                    >
-                        <SelectTrigger id={`badge-type-${block.id}`}>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {Object.entries(badgeVariants).map(([key, { label, description }]) => (
-                                <SelectItem key={key} value={key}>
-                                    <div className="flex items-center gap-2">
-                                        <div className={`w-3 h-3 rounded-full ${badgeVariants[key].color}`} />
-                                        <div>
-                                            <div className="font-medium">{label}</div>
-                                            <div className="text-xs text-muted-foreground">{description}</div>
-                                        </div>
-                                    </div>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor={`badge-text-${block.id}`}>Custom Text (optional)</Label>
-                    <Input
-                        id={`badge-text-${block.id}`}
-                        value={block.content.text || ''}
-                        onChange={(e) => onChange({
-                            ...block,
-                            content: { ...block.content, text: e.target.value }
-                        })}
-                        placeholder={`Default: ${currentBadge?.label}`}
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label>Preview</Label>
-                    <Card>
-                        <CardContent className="p-4">
-                            <div className="flex justify-center">
-                                <Badge
-                                    variant={currentBadge?.variant}
-                                    className={`${block.content.type === 'live' ? 'animate-pulse' : ''}`}
-                                >
-                                    <div className={`w-2 h-2 rounded-full mr-2 ${currentBadge?.color}`} />
-                                    {block.content.text || currentBadge?.label}
-                                </Badge>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
+                Slash Menu Link
             </div>
         );
     }
@@ -125,14 +69,7 @@ export const BadgeBlockView: React.FC<BadgeBlockViewProps> = ({
     // Display mode
     return (
         <div className="text-center">
-            <Badge
-                variant={currentBadge?.variant}
-                className={`text-sm px-3 py-1 ${block.content.type === 'live' ? 'animate-pulse' : ''
-                    }`}
-            >
-                <div className={`w-2 h-2 rounded-full mr-2 ${currentBadge?.color}`} />
-                {block.content.text || currentBadge?.label}
-            </Badge>
+            Slash Menu Link
         </div>
     );
 };
