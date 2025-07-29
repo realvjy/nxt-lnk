@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { blockTypes } from '@/shared/index';
+import { blockTypes } from '@/types/app/blocks';
 
 interface BlockLibraryProps {
     addBlock: (type: string) => void;

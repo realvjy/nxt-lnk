@@ -2,7 +2,7 @@ import React from 'react';
 import { DndContext, DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { BlockRenderer } from '@/components/blocks/BlockRenderer';
-import { Block, createBlock } from '@/shared/index';
+import { Block, createBlock } from '@/types/app/blocks';
 
 interface DragAndDropProps {
     blocks: Block[];

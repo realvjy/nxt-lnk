@@ -1,4 +1,4 @@
-import { Block, TablesInsert } from '@/shared/index'
+import { Block, TablesInsert } from '@/types/index'
 import { supabase } from '../client'
 
 export const blockService = {

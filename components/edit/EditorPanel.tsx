@@ -1,6 +1,6 @@
 import { useLayoutStore } from '@/lib/stores/layoutStore';
 import { Card, CardContent } from '../ui/card';
-import { Block, NameBlockType, TaglineBlockType, BioBlockType, ImageBlockType, BadgeBlockType, LinkBlockType } from '@/shared/app/blocks';
+import { Block, NameBlockType, TaglineBlockType, BioBlockType, ImageBlockType, BadgeBlockType, LinkBlockType } from '@/types/app/blocks';
 import { NameBlockEditor } from '@/components/blocks/editors/NameBlockEditor';
 import { TaglineBlockEditor } from '@/components/blocks/editors/TaglineBlockEditor';
 import { BioBlockEditor } from '@/components/blocks/editors/BioBlockEditor';

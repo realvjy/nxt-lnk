@@ -1,7 +1,7 @@
 import React from 'react';
 import { SlashMenu } from './SlashMenu';
 import { useSlashMenu } from './useSlashMenu';
-import { Block } from '@/shared/app/blocks';
+import { Block } from '@/types/app/blocks';
 import { BlockType } from '@/lib/constants/blockTypes';
 
 interface BlockContentEditorProps {

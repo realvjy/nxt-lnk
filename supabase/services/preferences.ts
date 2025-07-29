@@ -1,6 +1,6 @@
 import { supabase } from '../client'
-import type { ThemeType, UserPreferences } from '@/shared/index'
-import type { Json, Preference, PreferenceInsert, PreferenceUpdate } from '@/shared/supabase/tables'
+import type { ThemeType, UserPreferences } from '@/types/index'
+import type { Json, Preference, PreferenceInsert, PreferenceUpdate } from '@/types/supabase/tables'
 
 export const preferenceService = {
     getPreferences: async (profileId: string): Promise<UserPreferences | null> => {

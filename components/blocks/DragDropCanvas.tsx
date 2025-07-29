@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils/utils';
 import { useBuilderStore } from '@/lib/stores/builderStore';
 import { SortableBlockWrapper } from './SortableBlockWrapper';
 import { BlockRenderer } from './BlockRenderer';
-import type { Block } from '@/shared/app/blocks';
+import type { Block } from '@/types/app/blocks';
 import { SlashMenu } from "./menu/SlashMenu";
 import { useSlashMenu } from "./menu/useSlashMenu";
 import { slashMenuItems } from "./menu/menuConfig";
@@ -130,26 +130,26 @@ export const DragDropCanvas: React.FC<DragDropCanvasProps> = ({
             )}
 
             {/* Blocks */}
-            {blocks.map((block) => (
-                <SortableBlockWrapper
-                    key={block.id}
-                    block={block}
-                    isEditing={isEditing}
-                    isSelected={selectedBlockId === block.id}
-                    onSelect={onSelectBlock}
-                >
-                    <BlockRenderer
-                        block={block}
-                        isEditing={isEditing}
-                        isSelected={selectedBlockId === block.id}
-                        onUpdate={onUpdateBlock}
-                        onDelete={onDeleteBlock}
-                        onDuplicate={onDuplicateBlock}
-                        onSelect={onSelectBlock}
-                        onAddBlock={onAddBlock}
-                    />
-                </SortableBlockWrapper>
-            ))}
+            {/* {blocks.map((block) => (
+                // <SortableBlockWrapper
+                //     key={block.id}
+                //     block={block}
+                //     isEditing={isEditing}
+                //     isSelected={selectedBlockId === block.id}
+                //     onSelect={onSelectBlock}
+                // >
+                //     <BlockRenderer
+                //         block={block}
+                //         isEditing={isEditing}
+                //         isSelected={selectedBlockId === block.id}
+                //         onUpdate={onUpdateBlock}
+                //         onDelete={onDeleteBlock}
+                //         onDuplicate={onDuplicateBlock}
+                //         onSelect={onSelectBlock}
+                //         onAddBlock={onAddBlock}
+                //     />
+                // </SortableBlockWrapper>
+            ))} */}
 
             {/* Drop Zone Indicator */}
             {isDragging && isOver && (

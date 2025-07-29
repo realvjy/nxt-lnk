@@ -52,7 +52,6 @@ const LinksList: React.FC = () => {
                         <Link2 className="w-12 h-12 mx-auto mb-4 opacity-50" />
                         <p className="text-lg font-medium mb-2">No saved links yet</p>
                         <p className="text-sm">
-                            Use the "Save to Links" button in link blocks to save links here
                         </p>
                     </div>
                 </CardContent>
@@ -68,7 +67,7 @@ const LinksList: React.FC = () => {
                     Saved Links ({links.length})
                 </CardTitle>
             </CardHeader>
-            <CardContent>
+            {/* <CardContent>
                 <div className="space-y-3">
                     {links.map((link) => (
                         <div
@@ -139,7 +138,7 @@ const LinksList: React.FC = () => {
                         </div>
                     ))}
                 </div>
-            </CardContent>
+            </CardContent> */}
         </Card>
     );
 };

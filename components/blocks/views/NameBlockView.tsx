@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { NameBlockType } from '@/shared/app/blocks';
+import { NameBlockType } from '@/types/app/blocks';
 
 interface NameBlockViewProps {
     block: NameBlockType;

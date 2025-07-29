@@ -4,9 +4,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LinkBlockType } from '@/shared/app/blocks';
+import { LinkBlockType } from '@/types/app/blocks';
 import { ExternalLink, Globe, Github, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
-import { SocialPlatform } from '@/shared/index';
+import { SocialPlatform } from '@/types/index';
 
 interface LinkBlockViewProps {
     block: LinkBlockType;

@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ImageBlockType } from '@/shared/app/blocks';
+import { ImageBlockType } from '@/types/app/blocks';
 import { Upload, X } from 'lucide-react';
 
 interface ImageBlockViewProps {

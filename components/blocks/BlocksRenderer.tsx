@@ -1,5 +1,5 @@
 import React from 'react';
-import { Block } from '@/shared/app/blocks';
+import { Block } from '@/types/app/blocks';
 import { BlockRenderer } from './BlockRenderer';
 
 interface BlocksRendererProps {

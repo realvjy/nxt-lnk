@@ -1,7 +1,8 @@
-import { UserProfile } from '@/shared/profile/user'
-import { Link, LinksCollection, SocialLink, BlogLink, NormalLink } from '@/shared/profile/links'
-import { Block, createBlock, profileToBlocks, linksToBlocks } from '@/shared/blocks'
-import { UserPreferences } from '@/shared/common'
+import { SocialLink, BlogLink, NormalLink, Link } from '@/types/app/links'
+import { Block, profileToBlocks, linksToBlocks } from '@/types/app/blocks'
+import { UserPreferences } from '@/types/app/preferences'
+import { LayoutConfig, UserProfile } from '@/types/index'
+import { LinksCollection } from '@/types/profile/links'
 
 /**
  * Mock user profiles for testing
@@ -57,9 +58,12 @@ export const mockSocialLinks: SocialLink[] = [
         label: 'Twitter',
         url: 'https://twitter.com/realvjy',
         type: 'social',
+        profileId: 'realvjy',
+        title: 'Twitter',
         platform: 'twitter',
         icon: 'twitter',
-        position: 1,
+        sortOrder: 1,
+        isActive: true,
         createdAt: '2023-01-15T10:35:00Z',
         updatedAt: '2023-01-15T10:35:00Z'
     },
@@ -68,9 +72,12 @@ export const mockSocialLinks: SocialLink[] = [
         label: 'Instagram',
         url: 'https://instagram.com/realvjy',
         type: 'social',
+        profileId: 'realvjy',
+        title: 'Instagram',
         platform: 'instagram',
         icon: 'instagram',
-        position: 2,
+        sortOrder: 2,
+        isActive: true,
         createdAt: '2023-01-15T10:36:00Z',
         updatedAt: '2023-01-15T10:36:00Z'
     },
@@ -79,9 +86,12 @@ export const mockSocialLinks: SocialLink[] = [
         label: 'GitHub',
         url: 'https://github.com/realvjy',
         type: 'social',
+        profileId: 'realvjy',
+        title: 'GitHub',
         platform: 'github',
         icon: 'github',
-        position: 3,
+        sortOrder: 3,
+        isActive: true,
         createdAt: '2023-01-15T10:37:00Z',
         updatedAt: '2023-01-15T10:37:00Z'
     },
@@ -90,9 +100,12 @@ export const mockSocialLinks: SocialLink[] = [
         label: 'LinkedIn',
         url: 'https://linkedin.com/in/realvjy',
         type: 'social',
+        profileId: 'realvjy',
+        title: 'LinkedIn',
         platform: 'linkedin',
         icon: 'linkedin',
-        position: 4,
+        sortOrder: 4,
+        isActive: true,
         createdAt: '2023-01-15T10:38:00Z',
         updatedAt: '2023-01-15T10:38:00Z'
     },
@@ -101,9 +114,12 @@ export const mockSocialLinks: SocialLink[] = [
         label: 'Dribbble',
         url: 'https://dribbble.com/realvjy',
         type: 'social',
+        profileId: 'realvjy',
+        title: 'Dribbble',
         platform: 'dribbble',
         icon: 'dribbble',
-        position: 5,
+        sortOrder: 5,
+        isActive: true,
         createdAt: '2023-01-15T10:39:00Z',
         updatedAt: '2023-01-15T10:39:00Z'
     }
@@ -121,7 +137,10 @@ export const mockBlogLinks: BlogLink[] = [
         description: 'A deep dive into the design process behind the Blush plugin for Figma.',
         publishDate: '2023-06-15T00:00:00Z',
         cover: 'https://miro.medium.com/max/1400/1*6ahbWjp_g9hqhaTDSJOL1Q.png',
-        position: 1,
+        profileId: 'realvjy',
+        title: 'How I designed the new Blush plugin',
+        sortOrder: 1,
+        isActive: true,
         createdAt: '2023-06-15T10:00:00Z',
         updatedAt: '2023-06-15T10:00:00Z'
     },
@@ -133,7 +152,10 @@ export const mockBlogLinks: BlogLink[] = [
         description: 'Tips and tricks for maintaining consistency in your product illustrations.',
         publishDate: '2023-05-10T00:00:00Z',
         cover: 'https://miro.medium.com/max/1400/1*8KGyj4RNxNTNveRy9mJHtA.png',
-        position: 2,
+        profileId: 'realvjy',
+        title: 'Creating consistent illustrations for your product',
+        sortOrder: 2,
+        isActive: true,
         createdAt: '2023-05-10T09:30:00Z',
         updatedAt: '2023-05-10T09:30:00Z'
     }
@@ -149,7 +171,10 @@ export const mockNormalLinks: NormalLink[] = [
         url: 'https://realvjy.com',
         type: 'normal',
         icon: 'globe',
-        position: 1,
+        profileId: 'realvjy',
+        title: 'My Portfolio',
+        sortOrder: 1,
+        isActive: true,
         createdAt: '2023-01-15T10:40:00Z',
         updatedAt: '2023-01-15T10:40:00Z'
     },
@@ -159,7 +184,10 @@ export const mockNormalLinks: NormalLink[] = [
         url: 'https://realvjy.com/resume.pdf',
         type: 'normal',
         icon: 'file-text',
-        position: 2,
+        profileId: 'realvjy',
+        title: 'Download Resume',
+        sortOrder: 2,
+        isActive: true,
         createdAt: '2023-01-15T10:41:00Z',
         updatedAt: '2023-01-15T10:41:00Z'
     },
@@ -169,7 +197,10 @@ export const mockNormalLinks: NormalLink[] = [
         url: 'https://calendly.com/realvjy',
         type: 'normal',
         icon: 'calendar',
-        position: 3,
+        profileId: 'realvjy',
+        title: 'Book a Call',
+        sortOrder: 3,
+        isActive: true,
         createdAt: '2023-01-15T10:42:00Z',
         updatedAt: '2023-01-15T10:42:00Z'
     }
@@ -180,29 +211,39 @@ export const mockNormalLinks: NormalLink[] = [
  */
 export const mockLinksCollection: LinksCollection = {
     userId: 'realvjy',
-    links: [
-        ...mockSocialLinks,
-        ...mockBlogLinks,
-        ...mockNormalLinks
-    ]
+    links: [...mockBlogLinks, ...mockNormalLinks]
 }
 
 /**
  * Mock user preferences
  */
 export const mockUserPreferences: UserPreferences = {
+    profileId: 'realvjy',
     theme: 'light',
-    colorTheme: 'blue',
-    layout: 'standard',
-    showBadge: true,
-    showSocialIcons: true,
-    customDomain: 'links.realvjy.com',
-    seo: {
-        title: 'Vijay Verma - Designer & Illustrator',
-        description: 'Connect with Vijay Verma, designer and illustrator. Find all my important links in one place.',
-        keywords: ['design', 'illustration', 'UI/UX', 'Figma', 'plugins'],
-        ogImage: 'https://realvjy.com/og-image.png'
-    }
+    settings: {
+        notifications: {
+            email: true,
+            push: true,
+            linkClicks: true,
+            profileViews: true
+        },
+        privacy: {
+            isPublic: true,
+            showAnalytics: true,
+            allowIndexing: true
+        },
+        customization: {
+            fontFamily: 'Inter',
+            buttonStyle: 'rounded',
+            animationsEnabled: true
+        },
+    },
+    // seo: {
+    //     title: 'Vijay Verma - Designer & Illustrator',
+    //     description: 'Connect with Vijay Verma, designer and illustrator. Find all my important links in one place.',
+    //     keywords: ['design', 'illustration', 'UI/UX', 'Figma', 'plugins'],
+    //     ogImage: 'https://realvjy.com/og-image.png'
+    // }
 }
 
 /**
