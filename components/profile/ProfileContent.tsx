@@ -6,8 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Edit, Share2, Heart } from 'lucide-react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
-import { Block } from '@/shared/app/blocks';
-import { Link } from '@/shared/app/links';
+import { Block } from '@/types/app/blocks';
+import { Link } from '@/types/app/links';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 

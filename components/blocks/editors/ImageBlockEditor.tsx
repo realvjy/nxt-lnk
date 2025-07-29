@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { ImageBlockType } from '@/shared/app/blocks';
+import { ImageBlockType } from '@/types/app/blocks';
 import { Image, Upload, X, Eye, Settings } from 'lucide-react';
 
 interface ImageBlockEditorProps {

@@ -12,9 +12,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { Block, createBlock, blockTypes } from '@/shared/app/blocks';
-import { Link, createLink } from '@/shared/app/links';
-import { mapBlockToDb, mapLinkToDb } from '@/shared/supabase/mappings';
+import { Block, createBlock, blockTypes } from '@/types/app/blocks';
+import { Link, createLink } from '@/types/app/links';
+import { mapBlockFromDb, mapBlockToDb, mapLinkToDb } from '@/types/supabase/mappings';
 import { useUserStore } from '@/lib/stores/userStore';
 import { useBlocksStore } from '@/lib/stores/blocksStore';
 import { useLinksStore } from '@/lib/stores/linksStore';
@@ -55,7 +55,7 @@ const EditPage: React.FC = () => {
     const { blocks: userBlocks, isLoading: blocksLoading, error: blocksError } = useBlocks(
         userReady ? user?.id || '' : ''
     );
-    const { links: userLinks, loading: linksLoading, error: linksError } = useLinks(
+    const { links: userLinks, isLoading: linksLoading, error: linksError } = useLinks(
         userReady ? user?.id || '' : ''
     );
 
@@ -411,48 +411,67 @@ const EditPage: React.FC = () => {
     };
 
     // Add a new block
-    const handleAddBlock = () => {
-        // Initialize appropriate content based on block type
-        let initialContent = {};
-
-        switch (newBlockType) {
-            case 'paragraph':
-                initialContent = { text: '' };
-                break;
-            case 'image':
-                initialContent = { url: '', alt: '' };
-                break;
-            case 'badge':
-                initialContent = { type: 'available', text: 'Available' };
-                break;
-            case 'name':
-                initialContent = { text: profile?.fullName || '' };
-                break;
-            case 'tagline':
-                initialContent = { text: profile?.tagline || '' };
-                break;
-            case 'bio':
-                initialContent = { text: profile?.bio || '' };
-                break;
-            default:
-                initialContent = {};
+    const handleAddBlock = async () => {
+        if (!profile?.id) {
+            toast.error('Profile not loaded yet. Please wait.')
+            return
         }
 
-        const newBlock = createBlock(newBlockType, {
-            profileId: profile?.id || '',
-            content: initialContent
-        });
+        // 1) initial content by type (your switch is fine)
+        let initialContent: any = {}
+        switch (newBlockType) {
+            case 'paragraph': initialContent = { text: '' }; break
+            case 'image': initialContent = { url: '', alt: '' }; break
+            case 'badge': initialContent = { type: 'available', text: 'Available' }; break
+            case 'name': initialContent = { text: profile.fullName || '' }; break
+            case 'tagline': initialContent = { text: profile.tagline || '' }; break
+            case 'bio': initialContent = { text: profile.bio || '' }; break
+            default: initialContent = {}
+        }
 
-        console.log('Adding new block:', newBlock);
-        addBlock(newBlock);
+        // 2) compute next sort order
+        const nextOrder = (blocks?.length ?? 0)
 
-        // Auto-open the editor for the new block
-        setEditingBlock(newBlock);
-        toast.success(`Added new ${newBlockType} block`);
-    };
+        // 3) create a transient block (for mapping convenience)
+        const draft = createBlock(newBlockType, {
+            profileId: profile.id,
+            content: initialContent,
+            sortOrder: nextOrder,
+        })
+
+        try {
+            // 4) insert into DB
+            const payload = mapBlockToDb(draft)                       // -> DB shape (no id)
+            const { data, error } = await supabase
+                .from('blocks')
+                .insert(payload)
+                .select('*')
+                .single()
+
+            if (error) throw error
+
+            // 5) map saved row -> app Block (has id, timestamps)
+            const saved = mapBlockFromDb(data)
+
+            // 6) update store WITHOUT calling addBlock (to avoid the Omit<...> type)
+            setBlocks([...(blocks ?? []), saved])
+
+            // 7) open editor on the SAVED block (has real id)
+            setEditingBlock(saved)
+
+            toast.success(`Added new ${newBlockType} block`)
+        } catch (err) {
+            console.error('Error adding block:', err)
+            toast.error('Failed to add block')
+        }
+    }
 
     // Add a new link
     const handleAddLink = () => {
+        if (!profile?.id) {
+            toast.error('Profile not loaded yet. Please wait.');
+            return;
+        }
         if (!newLinkUrl || !newLinkTitle) {
             toast.error('Please enter both URL and title for the link');
             return;

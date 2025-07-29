@@ -7,12 +7,14 @@ const SupabaseContext = createContext(null);
 
 export const SupabaseProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const router = useRouter(); // Ensure this is used in a client-side context
+    const [authReady, setAuthReady] = useState(false); // ✅ add this
+    const router = useRouter();
 
     useEffect(() => {
         const getSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             setUser(session?.user ?? null);
+            setAuthReady(true); // ✅ mark ready after first session check
         };
 
         getSession();
@@ -30,19 +32,14 @@ export const SupabaseProvider = ({ children }) => {
         try {
             await supabase.auth.signOut();
             setUser(null);
-            router.push('/login'); // Redirect to login page after logout
+            router.push('/login');
         } catch (error) {
             console.error('Error logging out:', error);
         }
     };
 
-    // Debugging: Log the user
-    useEffect(() => {
-        console.log('SupabaseProvider User:', user);
-    }, [user]);
-
     return (
-        <SupabaseContext.Provider value={{ supabase, user, logout }}>
+        <SupabaseContext.Provider value={{ supabase, user, logout, authReady }}>
             {children}
         </SupabaseContext.Provider>
     );

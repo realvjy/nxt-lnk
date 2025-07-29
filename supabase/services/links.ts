@@ -1,5 +1,5 @@
+import { BlogLink, DatabaseLink, Link, LinkType, LinkUpdate, SocialLink, TablesInsert } from '@/types/index'
 import { supabase } from '../client'
-import { Link, LinkType, TablesInsert, DatabaseLink, SocialLink, BlogLink, NormalLink, LinkUpdate } from '@/shared/index'
 
 
 export const linkService = {

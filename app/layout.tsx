@@ -6,6 +6,7 @@ import { Inter } from "next/font/google"
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { SupabaseProvider } from '@/components/providers/SupabaseProvider'
+import StoreInitializer from '@/components/StoreInitializer'
 
 const inter = Inter({
     subsets: ["latin"],
@@ -30,6 +31,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <html lang="en" className={inter.variable}>
             <body className={cn("bg-background text-foreground")}>
                 <SupabaseProvider>
+                    <StoreInitializer />
                     {children}
                 </SupabaseProvider>
             </body>

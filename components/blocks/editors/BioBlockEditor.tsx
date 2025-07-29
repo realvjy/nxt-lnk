@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { BioBlockType } from '@/shared/app/blocks';
+import { BioBlockType } from '@/types/app/blocks';
 import {
     Type,
     Eye,

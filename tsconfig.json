@@ -23,7 +23,7 @@
       "@/hooks/*": ["hooks/*"],
       "@/blocks/*": ["components/blocks/*"],
       "@/store/*": ["lib/stores/*"],
-      "@/shared/*": ["types/*"],
+      "@/types/*": ["types/*"],
       "@/supabase/*": ["supabase/*"],
       "@/app/*": ["app/*"]
     },

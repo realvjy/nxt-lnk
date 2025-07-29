@@ -63,34 +63,30 @@ export default function AuthTestClient() {
     };
 
     // Fetch all user data after login
+    // Fetch all user data after login
     const fetchProfile = async () => {
-        console.log('Fetching profile for user:', user);
         if (!user) {
             setProfileData(null);
             return;
         }
         setLoadingProfile(true);
         setError(null);
-        const username = user.user_metadata?.username;
-        if (!username) {
-            setError('No username found in user metadata.');
-            setLoadingProfile(false);
-            return;
-        }
+
         try {
-            const profile = await profileService.getProfile(username);
-            console.log('Fetched profile:', profile);
-            setProfileData(profile);
+            const prof = await profileService.getProfileByUserId(user.id); // ✅ session-bound
+            setProfileData(prof ?? null);
             setLoadingProfile(false);
-            if (profile) {
+
+            if (prof) {
                 setEditFields({
-                    full_name: profile.fullName || '',
-                    bio: profile.bio || '',
-                    tagline: profile.tagline || '',
-                    image_url: profile.image?.url || ''
+                    full_name: prof.fullName || '',
+                    bio: prof.bio || '',
+                    tagline: prof.tagline || '',
+                    image_url: prof.image?.url || '',
                 });
             } else {
-                setError('Profile not found');
+                // First sign-in: profile row not created yet
+                setError('Profile not found yet (will be created on first save or by trigger).');
             }
         } catch (err: any) {
             console.error('Error fetching profile:', err);
@@ -105,24 +101,20 @@ export default function AuthTestClient() {
 
     useEffect(() => {
         const fetchLinks = async () => {
-            if (!profileData?.id) {
-                setLinks([]);
-                return;
-            }
-            const fetchedLinks = await linkService.getLinks(profileData.id);
+            if (!profileData?.id) { setLinks([]); return; }
+            const fetchedLinks = await linkService.getLinks(profileData.id); // should return app `Link[]`
             setLinks(fetchedLinks);
         };
         fetchLinks();
+
         const fetchBlocks = async () => {
-            if (!profileData?.id) {
-                setLinks([]);
-                return;
-            }
-            const fetchedBlocks = await blockService.getBlocks(profileData.id);
+            if (!profileData?.id) { setBlocks([]); return; }
+            const fetchedBlocks = await blockService.getBlocks(profileData.id); // app `Block[]`
             setBlocks(fetchedBlocks);
         };
         fetchBlocks();
     }, [profileData?.id]);
+
 
     // Profile edit logic (same as before)
     const handleEdit = () => setEditing(true);
@@ -141,32 +133,27 @@ export default function AuthTestClient() {
         }
     };
     const handleEditSave = async () => {
-        if (!profileData?.username) return;
+        if (!profileData?.id) return;
         setSaving(true);
         setError(null);
-        const { error } = await supabase
-            .from('profiles')
-            .update({
+        try {
+            // If your service expects UI shape:
+            const updated = await profileService.updateProfileById(profileData.id, {
                 full_name: editFields.full_name,
                 bio: editFields.bio,
                 tagline: editFields.tagline,
-                image_url: editFields.image_url
-            })
-            .eq('username', profileData.username);
-        setSaving(false);
-        if (error) {
-            setError(error.message);
-        } else {
+                // url: editFields.image_url ? { url: editFields.image_url } : undefined,
+                // username: (optional) if you allow changing username
+            });
+            setProfileData(updated);     // ✅ stays camelCase
             setEditing(false);
-            // Refetch profile data
-            const { data } = await supabase
-                .from('profiles')
-                .select('*, links(*), blocks(*), preferences(*)')
-                .eq('username', profileData.username)
-                .single();
-            setProfileData(data);
+        } catch (e: any) {
+            setError(e.message);
+        } finally {
+            setSaving(false);
         }
     };
+
 
     // Add Link logic
     const handleAddLink = async () => {
@@ -197,7 +184,7 @@ export default function AuthTestClient() {
         setNewLink({ title: '', url: '', type: 'normal' });
 
         // Refetch profile data using your service
-        const updatedProfile = await profileService.getProfile(profileData.username);
+        const updatedProfile = await profileService.getPublicProfile(profileData.username);
         console.log('Updated profile after add:', updatedProfile);
         setProfileData(updatedProfile);
     };

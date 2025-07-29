@@ -1,5 +1,5 @@
 import React from 'react';
-import { BioBlockType } from '@/shared/app/blocks';
+import { BioBlockType } from '@/types/app/blocks';
 
 interface BioBlockViewProps {
     block: BioBlockType;

@@ -12,7 +12,7 @@ import { BioBlockEditor } from './BioBlockEditor';
 import { ImageBlockEditor } from './ImageBlockEditor';
 import { BadgeBlockEditor } from './BadgeBlockEditor';
 import { LinkBlockEditor } from './LinkBlockEditor';
-import { BadgeBlockType, BioBlockType, ImageBlockType, LinkBlockType, NameBlockType, TaglineBlockType } from '@/shared/app/blocks';
+import { BadgeBlockType, BioBlockType, ImageBlockType, LinkBlockType, NameBlockType, TaglineBlockType } from '@/types/app/blocks';
 // Re-export all editors as a convenient object
 export const BlockEditors = {
     NameBlockEditor,

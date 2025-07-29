@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NameBlockType } from '@/shared/app/blocks';
+import { NameBlockType } from '@/types/app/blocks';
 import { User, Type, Palette } from 'lucide-react';
 
 interface NameBlockEditorProps {

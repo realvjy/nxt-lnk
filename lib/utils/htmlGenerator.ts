@@ -1,4 +1,4 @@
-import { Block } from '@/shared/app/blocks';
+import { Block } from '@/types/app/blocks';
 
 /**
  * Generates HTML content for a user's page based on their layout

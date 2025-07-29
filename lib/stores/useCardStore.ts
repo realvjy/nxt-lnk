@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { LinkCard } from '@/shared/card'
+import { LinkCard } from '@/types/card'
 import { nanoid } from 'nanoid'
 
 interface CardState {

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { BaseLink, Link, createLink } from '@/shared/app/links'
-import { DatabaseLink, Json } from '@/shared/supabase/tables'
-import { mapLinkFromDb, mapLinkToDb } from '@/shared/supabase/mappings'
+import { BaseLink, Link, createLink } from '@/types/app/links'
+import { DatabaseLink, Json } from '@/types/supabase/tables'
+import { mapLinkFromDb, mapLinkToDb } from '@/types/supabase/mappings'
 
 interface LinksState {
     links: Link[]

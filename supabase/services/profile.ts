@@ -1,67 +1,107 @@
-import { UserProfile } from '@/shared/index';
-import { supabase } from '../client'
-import type { Profile as SupabaseProfile } from '@/shared/supabase/tables'
+// supabase/services/profile.ts
+import { supabase } from '@/supabase/client'
+import type { Database } from '@/types/supabase/tables'
+import type { UserProfile } from '@/types/app/profile'
+import type { BaseLink } from '@/types/app/links'
+import type { UserPreferences } from '@/types/app/preferences'
+import type { Block } from '@/types/app/blocks'
+import {
+    mapProfileFromDb,
+    mapLinkFromDb,
+    mapBlockFromDb,
+    mapPreferenceFromDb,
+} from '@/types/supabase/mappings'
 
-// Convert Supabase Profile to our UserProfile type
-const convertToUserProfile = (profile: SupabaseProfile | null): UserProfile | null => {
-    if (!profile) return null;
+type ProfileRow = Database['public']['Tables']['profiles']['Row']
+type LinkRow = Database['public']['Tables']['links']['Row']
+type BlockRow = Database['public']['Tables']['blocks']['Row']
+type PrefRow = Database['public']['Tables']['preferences']['Row']
+
+const PROFILE_COLUMNS =
+    'id,user_id,username,full_name,bio,tagline,image_url,badge,layout,created_at,updated_at'
+
+const PROFILE_WITH_RELATIONS = `
+  ${PROFILE_COLUMNS},
+  links(*),
+  blocks(*),
+  preferences(*)
+`
+
+// --- Named functions ---
+export async function getProfileByUserId(userId: string): Promise<UserProfile | null> {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select(PROFILE_COLUMNS)
+        .eq('user_id', userId)
+        .single()
+        .returns<ProfileRow>()
+
+    if (error?.code === 'PGRST116') return null
+    if (error) throw error
+    return data ? mapProfileFromDb(data) : null
+}
+
+export async function getPublicProfile(username: string): Promise<UserProfile | null> {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select(PROFILE_COLUMNS)
+        .eq('username', username)
+        .maybeSingle()
+        .returns<ProfileRow>()
+
+    if (error) throw error
+    return data ? mapProfileFromDb(data) : null
+}
+
+export async function getPublicProfileBundle(username: string) {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select(PROFILE_WITH_RELATIONS)
+        .eq('username', username)
+        .maybeSingle()
+        .returns<
+            ProfileRow & {
+                links: LinkRow[] | null
+                blocks: BlockRow[] | null
+                preferences: PrefRow | null
+            }
+        >()
+
+    if (error) throw error
 
     return {
-        id: profile.id,
-        username: profile.username,
-        fullName: profile.full_name || '',
-        bio: profile.bio || '',
-        tagline: profile.tagline || '',
-        image: profile.image_url ? {
-            url: profile.image_url,
-            alt: profile.full_name || profile.username
-        } : undefined,
-        badge: profile.badge as any || undefined,
-        createdAt: profile.created_at,
-        updatedAt: profile.updated_at
+        profile: data ? mapProfileFromDb(data) : null,
+        links: (data?.links ?? []).map(mapLinkFromDb),
+        blocks: (data?.blocks ?? []).map(mapBlockFromDb),
+        preferences: data?.preferences ? mapPreferenceFromDb(data.preferences) : null,
     }
 }
 
-// Convert our UserProfile type to Supabase Profile type
-const convertToSupabaseProfile = (profile: Partial<UserProfile>): Partial<SupabaseProfile> => {
-    return {
-        full_name: profile.fullName,
-        bio: profile.bio,
-        tagline: profile.tagline,
-        image_url: profile.image?.url,
-        badge: profile.badge,
-    }
+export async function updateProfileById(id: string, updates: Partial<ProfileRow>) {
+    const { data, error } = await supabase
+        .from('profiles')
+        .update({
+            username: updates.username,
+            full_name: updates.full_name,
+            bio: updates.bio,
+            tagline: updates.tagline,
+            image_url: updates.image_url,
+            badge: updates.badge,
+            layout: updates.layout,
+        })
+        .eq('id', id)
+        .select(PROFILE_COLUMNS)
+        .single()
+        .returns<ProfileRow>()
+
+    if (error) throw error
+    return mapProfileFromDb(data)
 }
 
+// --- Keep the original profileService object ---
 export const profileService = {
-    getProfile: async (username: string): Promise<UserProfile | null> => {
-        const { data } = await supabase
-            .from('profiles')
-            .select('*, links(*), blocks(*), preferences(*)')
-            .eq('username', username)
-            .single()
-        return convertToUserProfile(data)
-    },
-    getProfileById: async (id: string) => {
-        const { data } = await supabase
-            .from('profiles')
-            .select('*, links(*), blocks(*), preferences(*)')
-            .eq('id', id)
-            .single();
-        return convertToUserProfile(data); // <-- use the converter for consistency
-    },
-    updateProfile: async (username: string, profile: Partial<UserProfile>) => {
-        const supabaseData = convertToSupabaseProfile(profile)
-        return await supabase
-            .from('profiles')
-            .update(supabaseData)
-            .eq('username', username)
-    },
-    updateProfileById: async (id: string, profile: Partial<UserProfile>) => {
-        const supabaseData = convertToSupabaseProfile(profile)
-        return await supabase
-            .from('profiles')
-            .update(supabaseData)
-            .eq('id', id)
-    }
+    getProfileByUserId,
+    getPublicProfile,
+    getPublicProfileBundle,
+    updateProfileById,
 }

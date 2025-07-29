@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { Block, createBlock } from '@/shared/app/blocks'
-import { DatabaseBlock } from '@/shared/supabase/tables'
-import { mapBlockFromDb, mapBlockToDb } from '@/shared/supabase/mappings'
+import { Block, createBlock } from '@/types/app/blocks'
+import { DatabaseBlock } from '@/types/supabase/tables'
+import { mapBlockFromDb, mapBlockToDb } from '@/types/supabase/mappings'
 
 interface BlocksState {
     blocks: Block[]

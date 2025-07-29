@@ -1,35 +1,44 @@
-// /lib/stores/userStore.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { profileService } from 'supabase/services/profile'
+import type { Session } from '@supabase/supabase-js'
+import { supabase } from '@/supabase/client'
+import { profileService } from '@/supabase/services/profile'
 
+/** UI-facing profile shape (yours) */
 interface Profile {
-    id: string; // <-- add this
-    username: string; // <-- add this
+    id: string
+    username: string
     fullName: string
     tagline?: string
     bio?: string
-    image?: {
-        url: string
-        alt?: string
-    }
+    image?: { url: string; alt?: string }
     badge?: string
 }
 
+type Status = 'idle' | 'loading' | 'ready' | 'error'
+
 interface UserState {
-    // User data
+    // Auth/session
+    session: Session | null
+    userId: string | null
+    email: string | null
+
+    // Profile & UI state
     username: string
-    profile: Profile
-    loading: boolean
+    profile: Profile | null
+    status: Status
     error: string | null
 
     // Actions
+    setSession: (session: Session | null) => void
     setUsername: (username: string) => void
-    setProfile: (profile: Partial<Profile>) => void
-    updateProfile: (updates: Partial<Profile>) => Promise<void>
-    fetchProfile: (username: string) => Promise<void>
+    setProfile: (profile: Partial<Profile> | null) => void
 
-    // Initialization
+    refreshProfile: () => Promise<void>
+    fetchProfile: (identifier: string) => Promise<void>  // (kept for backward-compat)
+    updateProfile: (updates: Partial<Profile>) => Promise<void>
+
+    // Init / teardown
     initializeUser: () => void
     clearUser: () => void
     getStoredUsername: () => string
@@ -38,109 +47,142 @@ interface UserState {
     isProfileComplete: () => boolean
     getDisplayName: () => string
 
-    // State management
+    // State helpers
     setLoading: (loading: boolean) => void
     setError: (error: string | null) => void
 }
 
+/** Optional: normalize DB row (snake_case) to your UI (camelCase) in one place */
+const dbToUiProfile = (row: any): Profile => ({
+    id: row.id,
+    username: row.username,
+    fullName: row.full_name ?? '',
+    tagline: row.tagline ?? '',
+    bio: row.bio ?? '',
+    image: row.image_url ? { url: row.image_url } : undefined,
+    badge: row.badge ?? undefined,
+})
+
 export const useUserStore = create<UserState>()(
     persist(
         (set, get) => ({
+            // Auth/session
+            session: null,
+            userId: null,
+            email: null,
+
+            // Profile & UI state
             username: '',
-            profile: {
-                id: '',
-                username: '',
-                fullName: '',
-                tagline: '',
-                bio: '',
-                image: undefined,
-                badge: undefined
-            },
-            loading: false,
+            profile: null,
+            status: 'idle',
             error: null,
 
-            setUsername: (username) => {
-                set({ username })
+            setSession: (session) => {
+                set({
+                    session,
+                    userId: session?.user?.id ?? null,
+                    email: session?.user?.email ?? null,
+                })
             },
 
+            setUsername: (username) => set({ username }),
+
             setProfile: (profile) => {
+                if (profile === null) {
+                    set({ profile: null })
+                    return
+                }
                 set((state) => ({
-                    profile: { ...state.profile, ...profile }
+                    profile: { ...(state.profile ?? ({} as Profile)), ...profile },
+                    username: profile.username ?? state.username,
                 }))
             },
 
-
-            fetchProfile: async (identifier) => {
-                set({ loading: true });
+            /** Fetch the profile for the current session user */
+            refreshProfile: async () => {
+                const { userId } = get()
+                if (!userId) {
+                    set({ profile: null, status: 'ready' })
+                    return
+                }
                 try {
-                    let profile;
-                    // Simple check: if identifier looks like a UUID, use ID, else use username
-                    if (identifier && /^[0-9a-fA-F-]{36}$/.test(identifier)) {
-                        profile = await profileService.getProfileById(identifier);
-                    } else {
-                        profile = await profileService.getProfile(identifier);
-                    }
-                    if (profile) {
-                        set({
-                            username: profile.username,
-                            profile: {
-                                id: profile.id,
-                                username: profile.username,
-                                fullName: profile.fullName,
-                                tagline: profile.tagline,
-                                bio: profile.bio,
-                                image: profile.image,
-                                badge: profile.badge
-                            },
-                            loading: false,
-                            error: null
-                        });
-                    }
-                } catch (error) {
+                    set({ status: 'loading', error: null })
+                    const row = await profileService.getProfileByUserId(userId)
+                    const ui = row ? dbToUiProfile(row) : null
                     set({
-                        error: 'Failed to fetch profile',
-                        loading: false
-                    });
+                        profile: ui,
+                        username: ui?.username ?? get().username,
+                        status: 'ready',
+                    })
+                } catch (e: any) {
+                    set({ error: e?.message ?? 'Failed to load profile', status: 'error' })
                 }
             },
+
+            /** Kept for your existing callers (by username or id) */
+            fetchProfile: async (identifier) => {
+                set({ status: 'loading', error: null })
+                try {
+                    const looksLikeUuid = /^[0-9a-fA-F-]{36}$/.test(identifier)
+                    const row = looksLikeUuid
+                        ? await profileService.getProfileByUserId(identifier)
+                        : await profileService.getPublicProfile(identifier)
+
+                    if (row) {
+                        const ui = dbToUiProfile(row)
+                        set({
+                            username: ui.username,
+                            profile: ui,
+                            status: 'ready',
+                            error: null,
+                        })
+                    } else {
+                        set({ profile: null, status: 'ready' })
+                    }
+                } catch {
+                    set({ error: 'Failed to fetch profile', status: 'error' })
+                }
+            },
+
             updateProfile: async (updates) => {
                 const { profile } = get()
                 if (!profile?.id) return
-                set({ loading: true })
+                set({ status: 'loading' })
                 try {
-                    await profileService.updateProfileById(profile.id, updates)
+                    // Convert UI updates back to DB input if needed
+                    const dbUpdates: any = {
+                        username: updates.username,
+                        full_name: updates.fullName,
+                        tagline: updates.tagline,
+                        bio: updates.bio,
+                        image_url: updates.image?.url,
+                        badge: updates.badge,
+                    }
+                    await profileService.updateProfileById(profile.id, dbUpdates)
                     set((state) => ({
-                        profile: { ...state.profile, ...updates },
-                        loading: false,
-                        error: null
+                        profile: { ...(state.profile as Profile), ...updates },
+                        status: 'ready',
+                        error: null,
                     }))
-                } catch (error) {
-                    set({
-                        error: 'Failed to update profile',
-                        loading: false
-                    })
+                } catch {
+                    set({ error: 'Failed to update profile', status: 'error' })
                 }
             },
+
             initializeUser: () => {
-                // Keep existing initialization logic
                 const username = get().getStoredUsername()
-                if (username) {
-                    set({ username })
-                }
+                if (username) set({ username })
             },
 
             clearUser: () => {
                 set({
+                    session: null,
+                    userId: null,
+                    email: null,
                     username: '',
-                    profile: {
-                        id: '',
-                        username: '',
-                        fullName: '',
-                        tagline: '',
-                        bio: '',
-                        image: undefined,
-                        badge: undefined
-                    }
+                    profile: null,
+                    status: 'idle',
+                    error: null,
                 })
             },
 
@@ -148,25 +190,27 @@ export const useUserStore = create<UserState>()(
 
             isProfileComplete: () => {
                 const { profile } = get()
-                return Boolean(profile.fullName)
+                return Boolean(profile?.fullName)
             },
 
             getDisplayName: () => {
                 const { profile } = get()
-                return profile.fullName || 'Anonymous'
+                return profile?.fullName || 'Anonymous'
             },
 
-            // State management
-            setLoading: (loading) => {
-                set({ loading })
-            },
-
-            setError: (error) => {
-                set({ error })
-            },
+            setLoading: (loading) => set({ status: loading ? 'loading' : 'ready' }),
+            setError: (error) => set({ error, status: error ? 'error' : get().status }),
         }),
         {
-            name: 'user-storage'
+            name: 'user-storage',
+            // Only persist what’s safe/needed; do NOT persist tokens/session object
+            partialize: (state) => ({
+                username: state.username,
+                profile: state.profile,
+            }),
+            version: 2,
+            // (Optional) migration if you changed profile shape
+            migrate: (persisted, version) => persisted,
         }
     )
 )

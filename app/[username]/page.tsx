@@ -3,11 +3,9 @@ import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { Metadata, ResolvingMetadata } from 'next';
 import { profileService } from '@/supabase/services/profile';
-import { linkService } from '@/supabase/services/links';
-import { mapBlockFromDb, mapLinkFromDb } from '@/shared/supabase/mappings';
-import { Block } from '@/shared/app/blocks';
-import { Link } from '@/shared/app/links';
-import { UserProfile } from '@/shared/app/profile';
+import { mapBlockFromDb, mapLinkFromDb } from '@/types/supabase/mappings';
+import { Block } from '@/types/app/blocks';
+import { Link } from '@/types/app/links';
 import dynamic from 'next/dynamic';
 
 // Import ProfileContent component dynamically to avoid SSR issues
@@ -35,7 +33,7 @@ export async function generateMetadata(
     const supabase = createServerComponentClient({ cookies });
 
     // Fetch the profile data
-    const profile = await profileService.getProfile(username);
+    const profile = await profileService.getPublicProfile(username);
 
     // If no profile is found, return default metadata
     if (!profile) {
@@ -64,7 +62,7 @@ export default async function UsernamePage({ params }: PageProps) {
 
     try {
         // Fetch the profile data
-        const profile = await profileService.getProfile(username);
+        const profile = await profileService.getPublicProfile(username);
 
         // If no profile is found, return 404
         if (!profile) {

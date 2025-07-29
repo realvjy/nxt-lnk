@@ -1,25 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useState } from 'react';
 // Import from the central types index
-import { useLinksStore } from '@/lib/stores';
 import {
-    Link2,
-    ExternalLink,
     Globe,
     Github,
     Twitter,
     Instagram,
     Linkedin,
-    Youtube,
-    Settings,
-    Eye,
-    AlertCircle
+    Youtube
 } from 'lucide-react';
-import { createLink, LinkBlockType, LinkType, SocialPlatform } from '@/shared/index';
+import { LinkBlockType } from '@/types/app/blocks';
+import { SocialPlatform } from '@/types/index';
 
 interface LinkBlockEditorProps {
     block: LinkBlockType;

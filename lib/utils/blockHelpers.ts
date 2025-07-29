@@ -1,4 +1,4 @@
-import { Block } from '@/shared/app/blocks'
+import { Block } from '@/types/app/blocks'
 
 export const createBlock = (type: Block['type'], props: any = {}): Block => {
     const id = `block_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`

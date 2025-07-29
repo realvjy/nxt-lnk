@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { TaglineBlockType } from '@/shared/app/blocks';
+import { TaglineBlockType } from '@/types/app/blocks';
 import { Tag, Type, Eye, Sparkles } from 'lucide-react';
 
 interface TaglineBlockEditorProps {
