@@ -70,6 +70,7 @@ export function isNormalLink(link: BaseLink): link is NormalLink {
  * Create a new link with default values
  */
 export function createLink(type: LinkType, params: Partial<BaseLink> = {}): Link {
+    console.log(params, 'inside create link')
     const baseLink: BaseLink = {
         id: crypto.randomUUID(),
         profileId: params.profileId || '',

@@ -198,15 +198,22 @@ export function isLabelBlock(block: Block): block is LabelBlockType {
 export const createBlock = (type: Block['type'], props: any = {}): Block => {
     // Generate a proper UUID v4 format that Supabase expects
     const id = crypto.randomUUID();
-
+    // Base properties that should be in EVERY block type
+    const baseProps = {
+        id,
+        profileId: props.profileId,
+        sortOrder: props.sortOrder || 0,
+        createdAt: props.createdAt || new Date().toISOString(),
+        updatedAt: props.updatedAt || new Date().toISOString(),
+    };
     switch (type) {
         case 'name':
-            return { id, type, content: { text: props.text || '' } } as NameBlockType
+            return { ...baseProps, type, content: { text: props.text || '' } } as NameBlockType
         case 'bio':
-            return { id, type, content: { text: props.text || '' } } as BioBlockType
+            return { ...baseProps, type, content: { text: props.text || '' } } as BioBlockType
         case 'link':
             return {
-                id,
+                ...baseProps,
                 type,
                 content: {
                     label: props.label || '',
@@ -219,15 +226,15 @@ export const createBlock = (type: Block['type'], props: any = {}): Block => {
                 }
             } as LinkBlockType
         case 'tagline':
-            return { id, type, content: { text: props.text || '' } } as TaglineBlockType
+            return { ...baseProps, type, content: { text: props.text || '' } } as TaglineBlockType
         case 'image':
-            return { id, type, content: { url: props.url || '', alt: props.alt } } as ImageBlockType
+            return { ...baseProps, type, content: { url: props.url || '', alt: props.alt } } as ImageBlockType
         case 'badge':
-            return { id, type, content: { type: props.type || 'available', text: props.text } } as BadgeBlockType
+            return { ...baseProps, type, content: { type: props.type || 'available', text: props.text } } as BadgeBlockType
         case 'paragraph':
-            return { id, type, content: { text: props.text || '' } } as ParagraphBlockType
+            return { ...baseProps, type, content: { text: props.text || '' } } as ParagraphBlockType
         case 'label':
-            return { id, type, content: { text: props.text || '' } } as LabelBlockType
+            return { ...baseProps, type, content: { text: props.text || '' } } as LabelBlockType
         default:
             throw new Error(`Unknown block type: ${type}`)
     }

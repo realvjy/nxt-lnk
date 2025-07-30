@@ -86,6 +86,7 @@ export function mapPreferenceFromDb(row: Preference): UserPreferences {
 
 // Mapping to DB format
 export function mapLinkToDb(link: BaseLink): Omit<DatabaseLink, 'id' | 'created_at' | 'updated_at'> {
+    console.log(link, 'inside mapLinkToDb')
     const baseFields = {
         profile_id: link.profileId,
         type: link.type,
@@ -112,6 +113,7 @@ export function mapLinkToDb(link: BaseLink): Omit<DatabaseLink, 'id' | 'created_
 }
 
 export function mapBlockToDb(block: Block): Omit<DatabaseBlock, 'id' | 'created_at' | 'updated_at'> {
+    console.log('Mapping block to DB:', block);
     return {
         profile_id: block.profileId,
         type: block.type,

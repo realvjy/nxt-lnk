@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { Block, createBlock, blockTypes } from '@/types/app/blocks';
 import { Link, createLink } from '@/types/app/links';
-import { mapBlockFromDb, mapBlockToDb, mapLinkToDb } from '@/types/supabase/mappings';
+import { mapBlockFromDb, mapBlockToDb, mapLinkFromDb, mapLinkToDb, mapProfileFromDb } from '@/types/supabase/mappings';
 import { useUserStore } from '@/lib/stores/userStore';
 import { useBlocksStore } from '@/lib/stores/blocksStore';
 import { useLinksStore } from '@/lib/stores/linksStore';
@@ -58,7 +58,42 @@ const EditPage: React.FC = () => {
     const { links: userLinks, isLoading: linksLoading, error: linksError } = useLinks(
         userReady ? user?.id || '' : ''
     );
+    // In your edit page
+    useEffect(() => {
+        if (!userReady || !user?.id) return;
 
+        const loadData = async () => {
+            // 1. First fetch profile
+            const { data: profileData } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('user_id', user.id)
+                .single();
+
+            if (profileData) {
+                setProfile(mapProfileFromDb(profileData));
+
+                // 2. Then fetch blocks and links with profile.id
+                const { data: blocksData } = await supabase
+                    .from('blocks')
+                    .select('*')
+                    .eq('profile_id', profileData.id)
+                    .order('sort_order', { ascending: true });
+
+                const { data: linksData } = await supabase
+                    .from('links')
+                    .select('*')
+                    .eq('profile_id', profileData.id)
+                    .order('sort_order', { ascending: true });
+
+                // 3. Update stores
+                setBlocks((blocksData || []).map(mapBlockFromDb));
+                setLinks((linksData || []).map(mapLinkFromDb));
+            }
+        };
+
+        loadData();
+    }, [userReady, user?.id]);
     // Form states
     const [newBlockType, setNewBlockType] = useState<Block['type']>('name');
     const [newLinkType, setNewLinkType] = useState<Link['type']>('normal');
@@ -416,7 +451,10 @@ const EditPage: React.FC = () => {
             toast.error('Profile not loaded yet. Please wait.')
             return
         }
-
+        // Debug logs
+        console.log('Adding block with profile ID:', profile.id);
+        console.log('Current user ID:', user?.id);
+        console.log('Profile user ID:', profile.id);
         // 1) initial content by type (your switch is fine)
         let initialContent: any = {}
         switch (newBlockType) {
@@ -431,7 +469,7 @@ const EditPage: React.FC = () => {
 
         // 2) compute next sort order
         const nextOrder = (blocks?.length ?? 0)
-
+        console.log('Next order:', nextOrder, newBlockType);
         // 3) create a transient block (for mapping convenience)
         const draft = createBlock(newBlockType, {
             profileId: profile.id,
@@ -467,7 +505,9 @@ const EditPage: React.FC = () => {
     }
 
     // Add a new link
-    const handleAddLink = () => {
+    // Add a new link
+    // Add a new link
+    const handleAddLink = async () => {
         if (!profile?.id) {
             toast.error('Profile not loaded yet. Please wait.');
             return;
@@ -477,15 +517,41 @@ const EditPage: React.FC = () => {
             return;
         }
 
-        const newLink = createLink(newLinkType, {
-            profileId: profile?.id || '',
-            url: newLinkUrl,
-            title: newLinkTitle
-        });
-        addLink(newLink);
-        setNewLinkUrl('');
-        setNewLinkTitle('');
-        toast.success('Link added successfully');
+        try {
+            // Create the link object
+            const newLink = createLink(newLinkType, {
+                profileId: profile.id,
+                url: newLinkUrl,
+                title: newLinkTitle,
+                sortOrder: links?.length ?? 0
+            });
+
+            // Map to database format
+            const payload = mapLinkToDb(newLink);
+
+            // Insert into database
+            const { data, error } = await supabase
+                .from('links')
+                .insert(payload)
+                .select('*')
+                .single();
+
+            if (error) throw error;
+
+            // Map the returned data back to app format
+            const savedLink = mapLinkFromDb(data) as Link;
+
+            // Update the store with the saved link (with real ID)
+            setLinks([...(links ?? []), savedLink]);
+
+            // Reset form
+            setNewLinkUrl('');
+            setNewLinkTitle('');
+            toast.success('Link added successfully');
+        } catch (err) {
+            console.error('Error adding link:', err);
+            toast.error('Failed to add link');
+        }
     };
 
     // Update profile form
