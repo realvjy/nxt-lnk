@@ -122,6 +122,13 @@ const webLinks = [
         on: true
     },
     {
+        title: 'v2 mytiny.page',
+        url: 'https://s.vjy.me/i',
+        type: 'install',
+        icon: 'https://beta.mytiny.page/logomark-color.svg',
+        on: true
+    },
+    {
         title: 'Documentation',
         url: 'https://github.com/realvjy/nxt-lnk#nxt-lnk',
         type: 'install',
