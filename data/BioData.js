@@ -2,8 +2,8 @@
 const bioData = [
     {
         name: 'nxt lnk',
-        username: 'nxtlnk.vercel.app',
-        url: 'https://nxtlnk.vercel.app',
+        username: 'mytiny.page',
+        url: 'https://mytiny.page',
         titleImg: true,
         avatar: '/avatar.png',
         nftAvatar: true,
